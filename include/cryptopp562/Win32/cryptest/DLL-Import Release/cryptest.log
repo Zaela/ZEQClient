@@ -1,0 +1,47 @@
+﻿Build started 2014-12-06 3:48:07 AM.
+     1>Project "C:\Users\Samuel\Downloads\cryptopp562\cryptest.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Ob2 /Oi /Oy /GL /D NDEBUG /D CRYPTOPP_IMPORTS /D WIN32 /D _CONSOLE /D _VC80_UPGRADE=0x0710 /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Win32\cryptest\DLL-Import Release\\" /Fd"Win32\cryptest\DLL-Import Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt /Zm400  adhoc.cpp bench.cpp bench2.cpp datatest.cpp dlltest.cpp fipsalgt.cpp regtest.cpp test.cpp validat1.cpp validat2.cpp validat3.cpp
+         adhoc.cpp
+         bench.cpp
+         bench2.cpp
+         datatest.cpp
+         dlltest.cpp
+         fipsalgt.cpp
+         regtest.cpp
+         test.cpp
+         validat1.cpp
+         validat2.cpp
+         validat3.cpp
+       PreLinkEvent:
+         echo This configuration requires cryptopp.dll.
+         echo You can build it yourself using the cryptdll project, or
+         echo obtain a pre-built, FIPS 140-2 validated DLL. If you build it yourself
+         echo the resulting DLL will not be considered FIPS validated
+         echo unless it undergoes FIPS validation.
+         
+         :VCEnd
+         This configuration requires cryptopp.dll.
+         You can build it yourself using the cryptdll project, or
+         obtain a pre-built, FIPS 140-2 validated DLL. If you build it yourself
+         the resulting DLL will not be considered FIPS validated
+         unless it undergoes FIPS validation.
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"Win32\DLL_Output\Release\cryptest.exe" /NOLOGO /LIBPATH:Win32\DLL_Output\Release\ Ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"Win32\DLL_Output\Release\cryptest.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"Win32\DLL_Output\Release\cryptest.lib" /MACHINE:X86 /SAFESEH "Win32\cryptest\DLL-Import Release\adhoc.obj"
+         "Win32\cryptest\DLL-Import Release\bench.obj"
+         "Win32\cryptest\DLL-Import Release\bench2.obj"
+         "Win32\cryptest\DLL-Import Release\datatest.obj"
+         "Win32\cryptest\DLL-Import Release\dlltest.obj"
+         "Win32\cryptest\DLL-Import Release\fipsalgt.obj"
+         "Win32\cryptest\DLL-Import Release\regtest.obj"
+         "Win32\cryptest\DLL-Import Release\test.obj"
+         "Win32\cryptest\DLL-Import Release\validat1.obj"
+         "Win32\cryptest\DLL-Import Release\validat2.obj"
+         "Win32\cryptest\DLL-Import Release\validat3.obj"
+         C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptlib.lib
+     1>LINK : fatal error LNK1104: cannot open file 'cryptopp.lib'
+     1>Done Building Project "C:\Users\Samuel\Downloads\cryptopp562\cryptest.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:23.76

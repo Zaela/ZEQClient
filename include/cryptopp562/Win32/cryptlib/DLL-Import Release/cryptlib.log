@@ -1,0 +1,264 @@
+﻿Build started 2014-12-06 4:47:59 AM.
+     1>Project "C:\Users\Samuel\Downloads\cryptopp562\cryptlib.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Ob2 /Oi /Oy /GL /D NDEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D CRYPTOPP_IMPORTS /D _VC80_UPGRADE=0x0710 /GF /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"pch.h" /Fp"Win32\cryptlib\DLL-Import Release\cryptlib.pch" /Fo"Win32\cryptlib\DLL-Import Release\\" /Fd"Win32\DLL_Output\Release\vc80.pdb" /Gd /TP /analyze- /errorReport:prompt pch.cpp
+         pch.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Ob2 /Oi /Oy /GL /D NDEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D CRYPTOPP_IMPORTS /D _VC80_UPGRADE=0x0710 /GF /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"pch.h" /Fp"Win32\cryptlib\DLL-Import Release\cryptlib.pch" /Fo"Win32\cryptlib\DLL-Import Release\\" /Fd"Win32\DLL_Output\Release\vc80.pdb" /Gd /TP /analyze- /errorReport:prompt 3way.cpp adler32.cpp algebra.cpp algparam.cpp arc4.cpp asn.cpp authenc.cpp base32.cpp base64.cpp basecode.cpp bfinit.cpp blowfish.cpp blumshub.cpp camellia.cpp cast.cpp casts.cpp cbcmac.cpp ccm.cpp channels.cpp cmac.cpp cpu.cpp crc.cpp cryptlib.cpp default.cpp des.cpp dessp.cpp dh.cpp dh2.cpp dsa.cpp eax.cpp ec2n.cpp ecp.cpp elgamal.cpp emsa2.cpp esign.cpp files.cpp filters.cpp fips140.cpp fipstest.cpp gcm.cpp gf256.cpp gf2n.cpp gf2_32.cpp gfpcrypt.cpp gost.cpp gzip.cpp hex.cpp hmac.cpp hrtimer.cpp ida.cpp idea.cpp integer.cpp luc.cpp mars.cpp marss.cpp md2.cpp md4.cpp md5.cpp misc.cpp modes.cpp mqueue.cpp mqv.cpp nbtheory.cpp network.cpp oaep.cpp osrng.cpp panama.cpp pkcspad.cpp polynomi.cpp pssr.cpp pubkey.cpp queue.cpp rabin.cpp randpool.cpp rc2.cpp rc5.cpp rc6.cpp rdtables.cpp rijndael.cpp ripemd.cpp rng.cpp rsa.cpp rw.cpp safer.cpp salsa.cpp seal.cpp seed.cpp serpent.cpp sha.cpp sha3.cpp shacal2.cpp shark.cpp sharkbox.cpp simple.cpp skipjack.cpp socketft.cpp sosemanuk.cpp square.cpp squaretb.cpp strciphr.cpp tea.cpp tftables.cpp tiger.cpp tigertab.cpp trdlocal.cpp ttmac.cpp twofish.cpp vmac.cpp wait.cpp wake.cpp whrlpool.cpp winpipes.cpp xtr.cpp xtrcrypt.cpp zdeflate.cpp zinflate.cpp zlib.cpp
+         3way.cpp
+         adler32.cpp
+         algebra.cpp
+         algparam.cpp
+         arc4.cpp
+         asn.cpp
+         authenc.cpp
+         base32.cpp
+         base64.cpp
+         basecode.cpp
+         bfinit.cpp
+         blowfish.cpp
+         blumshub.cpp
+         camellia.cpp
+         cast.cpp
+         casts.cpp
+         cbcmac.cpp
+         ccm.cpp
+         channels.cpp
+         cmac.cpp
+         Compiling...
+         cpu.cpp
+         crc.cpp
+         cryptlib.cpp
+         default.cpp
+         des.cpp
+         dessp.cpp
+         dh.cpp
+         dh2.cpp
+         dsa.cpp
+         eax.cpp
+         ec2n.cpp
+         ecp.cpp
+         elgamal.cpp
+         emsa2.cpp
+         esign.cpp
+         files.cpp
+         filters.cpp
+         fips140.cpp
+         fipstest.cpp
+         gcm.cpp
+         Compiling...
+         gf256.cpp
+         gf2n.cpp
+         gf2_32.cpp
+         gfpcrypt.cpp
+         gost.cpp
+         gzip.cpp
+         hex.cpp
+         hmac.cpp
+         hrtimer.cpp
+         ida.cpp
+         idea.cpp
+         integer.cpp
+         luc.cpp
+         mars.cpp
+         marss.cpp
+         md2.cpp
+         md4.cpp
+         md5.cpp
+         misc.cpp
+         modes.cpp
+         Compiling...
+         mqueue.cpp
+         mqv.cpp
+         nbtheory.cpp
+         network.cpp
+         oaep.cpp
+         osrng.cpp
+         panama.cpp
+         pkcspad.cpp
+         polynomi.cpp
+         pssr.cpp
+         pubkey.cpp
+         queue.cpp
+         rabin.cpp
+         randpool.cpp
+         rc2.cpp
+         rc5.cpp
+         rc6.cpp
+         rdtables.cpp
+         rijndael.cpp
+         ripemd.cpp
+         Compiling...
+         rng.cpp
+         rsa.cpp
+         rw.cpp
+         safer.cpp
+         salsa.cpp
+         seal.cpp
+         seed.cpp
+         serpent.cpp
+         sha.cpp
+         sha3.cpp
+         shacal2.cpp
+         shark.cpp
+         sharkbox.cpp
+         simple.cpp
+         skipjack.cpp
+         socketft.cpp
+     1>socketft.cpp(102): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>socketft.cpp(136): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(1850) : see declaration of 'inet_addr'
+     1>socketft.cpp(140): warning C4996: 'gethostbyname': Use getaddrinfo() or GetAddrInfoW() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+                 C:\Program Files (x86)\Windows Kits\8.1\Include\um\winsock2.h(2238) : see declaration of 'gethostbyname'
+         sosemanuk.cpp
+         square.cpp
+         squaretb.cpp
+         strciphr.cpp
+         Compiling...
+         tea.cpp
+         tftables.cpp
+         tiger.cpp
+         tigertab.cpp
+         trdlocal.cpp
+         ttmac.cpp
+         twofish.cpp
+         vmac.cpp
+         wait.cpp
+         wake.cpp
+         whrlpool.cpp
+         winpipes.cpp
+         xtr.cpp
+         xtrcrypt.cpp
+         zdeflate.cpp
+         zinflate.cpp
+         zlib.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Ob2 /Oi /Oy /GL /D NDEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D CRYPTOPP_IMPORTS /D _VC80_UPGRADE=0x0710 /GF /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Win32\cryptlib\DLL-Import Release\\" /Fd"Win32\DLL_Output\Release\vc80.pdb" /Gd /TP /analyze- /errorReport:prompt dll.cpp iterhash.cpp
+         dll.cpp
+         iterhash.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"Win32\DLL_Output\Release\cryptlib.lib" /NOLOGO /LTCG "Win32\cryptlib\DLL-Import Release\3way.obj"
+         "Win32\cryptlib\DLL-Import Release\adler32.obj"
+         "Win32\cryptlib\DLL-Import Release\algebra.obj"
+         "Win32\cryptlib\DLL-Import Release\algparam.obj"
+         "Win32\cryptlib\DLL-Import Release\arc4.obj"
+         "Win32\cryptlib\DLL-Import Release\asn.obj"
+         "Win32\cryptlib\DLL-Import Release\authenc.obj"
+         "Win32\cryptlib\DLL-Import Release\base32.obj"
+         "Win32\cryptlib\DLL-Import Release\base64.obj"
+         "Win32\cryptlib\DLL-Import Release\basecode.obj"
+         "Win32\cryptlib\DLL-Import Release\bfinit.obj"
+         "Win32\cryptlib\DLL-Import Release\blowfish.obj"
+         "Win32\cryptlib\DLL-Import Release\blumshub.obj"
+         "Win32\cryptlib\DLL-Import Release\camellia.obj"
+         "Win32\cryptlib\DLL-Import Release\cast.obj"
+         "Win32\cryptlib\DLL-Import Release\casts.obj"
+         "Win32\cryptlib\DLL-Import Release\cbcmac.obj"
+         "Win32\cryptlib\DLL-Import Release\ccm.obj"
+         "Win32\cryptlib\DLL-Import Release\channels.obj"
+         "Win32\cryptlib\DLL-Import Release\cmac.obj"
+         "Win32\cryptlib\DLL-Import Release\cpu.obj"
+         "Win32\cryptlib\DLL-Import Release\crc.obj"
+         "Win32\cryptlib\DLL-Import Release\cryptlib.obj"
+         "Win32\cryptlib\DLL-Import Release\default.obj"
+         "Win32\cryptlib\DLL-Import Release\des.obj"
+         "Win32\cryptlib\DLL-Import Release\dessp.obj"
+         "Win32\cryptlib\DLL-Import Release\dh.obj"
+         "Win32\cryptlib\DLL-Import Release\dh2.obj"
+         "Win32\cryptlib\DLL-Import Release\dll.obj"
+         "Win32\cryptlib\DLL-Import Release\dsa.obj"
+         "Win32\cryptlib\DLL-Import Release\eax.obj"
+         "Win32\cryptlib\DLL-Import Release\ec2n.obj"
+         "Win32\cryptlib\DLL-Import Release\ecp.obj"
+         "Win32\cryptlib\DLL-Import Release\elgamal.obj"
+         "Win32\cryptlib\DLL-Import Release\emsa2.obj"
+         "Win32\cryptlib\DLL-Import Release\esign.obj"
+         "Win32\cryptlib\DLL-Import Release\files.obj"
+         "Win32\cryptlib\DLL-Import Release\filters.obj"
+         "Win32\cryptlib\DLL-Import Release\fips140.obj"
+         "Win32\cryptlib\DLL-Import Release\fipstest.obj"
+         "Win32\cryptlib\DLL-Import Release\gcm.obj"
+         "Win32\cryptlib\DLL-Import Release\gf256.obj"
+         "Win32\cryptlib\DLL-Import Release\gf2n.obj"
+         "Win32\cryptlib\DLL-Import Release\gf2_32.obj"
+         "Win32\cryptlib\DLL-Import Release\gfpcrypt.obj"
+         "Win32\cryptlib\DLL-Import Release\gost.obj"
+         "Win32\cryptlib\DLL-Import Release\gzip.obj"
+         "Win32\cryptlib\DLL-Import Release\hex.obj"
+         "Win32\cryptlib\DLL-Import Release\hmac.obj"
+         "Win32\cryptlib\DLL-Import Release\hrtimer.obj"
+         "Win32\cryptlib\DLL-Import Release\ida.obj"
+         "Win32\cryptlib\DLL-Import Release\idea.obj"
+         "Win32\cryptlib\DLL-Import Release\integer.obj"
+         "Win32\cryptlib\DLL-Import Release\iterhash.obj"
+         "Win32\cryptlib\DLL-Import Release\luc.obj"
+         "Win32\cryptlib\DLL-Import Release\mars.obj"
+         "Win32\cryptlib\DLL-Import Release\marss.obj"
+         "Win32\cryptlib\DLL-Import Release\md2.obj"
+         "Win32\cryptlib\DLL-Import Release\md4.obj"
+         "Win32\cryptlib\DLL-Import Release\md5.obj"
+         "Win32\cryptlib\DLL-Import Release\misc.obj"
+         "Win32\cryptlib\DLL-Import Release\modes.obj"
+         "Win32\cryptlib\DLL-Import Release\mqueue.obj"
+         "Win32\cryptlib\DLL-Import Release\mqv.obj"
+         "Win32\cryptlib\DLL-Import Release\nbtheory.obj"
+         "Win32\cryptlib\DLL-Import Release\network.obj"
+         "Win32\cryptlib\DLL-Import Release\oaep.obj"
+         "Win32\cryptlib\DLL-Import Release\osrng.obj"
+         "Win32\cryptlib\DLL-Import Release\panama.obj"
+         "Win32\cryptlib\DLL-Import Release\pch.obj"
+         "Win32\cryptlib\DLL-Import Release\pkcspad.obj"
+         "Win32\cryptlib\DLL-Import Release\polynomi.obj"
+         "Win32\cryptlib\DLL-Import Release\pssr.obj"
+         "Win32\cryptlib\DLL-Import Release\pubkey.obj"
+         "Win32\cryptlib\DLL-Import Release\queue.obj"
+         "Win32\cryptlib\DLL-Import Release\rabin.obj"
+         "Win32\cryptlib\DLL-Import Release\randpool.obj"
+         "Win32\cryptlib\DLL-Import Release\rc2.obj"
+         "Win32\cryptlib\DLL-Import Release\rc5.obj"
+         "Win32\cryptlib\DLL-Import Release\rc6.obj"
+         "Win32\cryptlib\DLL-Import Release\rdtables.obj"
+         "Win32\cryptlib\DLL-Import Release\rijndael.obj"
+         "Win32\cryptlib\DLL-Import Release\ripemd.obj"
+         "Win32\cryptlib\DLL-Import Release\rng.obj"
+         "Win32\cryptlib\DLL-Import Release\rsa.obj"
+         "Win32\cryptlib\DLL-Import Release\rw.obj"
+         "Win32\cryptlib\DLL-Import Release\safer.obj"
+         "Win32\cryptlib\DLL-Import Release\salsa.obj"
+         "Win32\cryptlib\DLL-Import Release\seal.obj"
+         "Win32\cryptlib\DLL-Import Release\seed.obj"
+         "Win32\cryptlib\DLL-Import Release\serpent.obj"
+         "Win32\cryptlib\DLL-Import Release\sha.obj"
+         "Win32\cryptlib\DLL-Import Release\sha3.obj"
+         "Win32\cryptlib\DLL-Import Release\shacal2.obj"
+         "Win32\cryptlib\DLL-Import Release\shark.obj"
+         "Win32\cryptlib\DLL-Import Release\sharkbox.obj"
+         "Win32\cryptlib\DLL-Import Release\simple.obj"
+         "Win32\cryptlib\DLL-Import Release\skipjack.obj"
+         "Win32\cryptlib\DLL-Import Release\socketft.obj"
+         "Win32\cryptlib\DLL-Import Release\sosemanuk.obj"
+         "Win32\cryptlib\DLL-Import Release\square.obj"
+         "Win32\cryptlib\DLL-Import Release\squaretb.obj"
+         "Win32\cryptlib\DLL-Import Release\strciphr.obj"
+         "Win32\cryptlib\DLL-Import Release\tea.obj"
+         "Win32\cryptlib\DLL-Import Release\tftables.obj"
+         "Win32\cryptlib\DLL-Import Release\tiger.obj"
+         "Win32\cryptlib\DLL-Import Release\tigertab.obj"
+         "Win32\cryptlib\DLL-Import Release\trdlocal.obj"
+         "Win32\cryptlib\DLL-Import Release\ttmac.obj"
+         "Win32\cryptlib\DLL-Import Release\twofish.obj"
+         "Win32\cryptlib\DLL-Import Release\vmac.obj"
+         "Win32\cryptlib\DLL-Import Release\wait.obj"
+         "Win32\cryptlib\DLL-Import Release\wake.obj"
+         "Win32\cryptlib\DLL-Import Release\whrlpool.obj"
+         "Win32\cryptlib\DLL-Import Release\winpipes.obj"
+         "Win32\cryptlib\DLL-Import Release\xtr.obj"
+         "Win32\cryptlib\DLL-Import Release\xtrcrypt.obj"
+         "Win32\cryptlib\DLL-Import Release\zdeflate.obj"
+         "Win32\cryptlib\DLL-Import Release\zinflate.obj"
+         "Win32\cryptlib\DLL-Import Release\zlib.obj"
+         cryptlib.vcxproj -> C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptlib.lib
+     1>Done Building Project "C:\Users\Samuel\Downloads\cryptopp562\cryptlib.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:23.97

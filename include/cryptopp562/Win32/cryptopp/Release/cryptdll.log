@@ -1,0 +1,71 @@
+﻿Build started 2014-12-06 5:07:13 AM.
+     1>Project "C:\Users\Samuel\Downloads\cryptopp562\cryptdll.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O1 /Ob2 /Oi /Os /Oy /GL /D NDEBUG /D WIN32 /D _WINDOWS /D _MBCS /D _USRDLL /D CRYPTOPP_EXPORTS /D CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2=1 /D USE_PRECOMPILED_HEADERS /GF /Gm- /EHsc /MT /GS /Gy /arch:SSE /fp:precise /Zc:wchar_t /Zc:forScope /Yu"pch.h" /Fp"Win32\cryptopp\Release\cryptopp.pch" /Fo"Win32\cryptopp\Release\\" /Fd"Win32\DLL_Output\Release\vc80.pdb" /Gd /TP /analyze- /errorReport:prompt /Zm200  cryptlib.cpp
+         cryptlib.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"Win32\DLL_Output\Release\cryptopp.dll" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptopp.pdb" /OPT:REF /LTCG /TLBID:1 /BASE:"0x42900000" /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptopp.lib" /MACHINE:X86 /SAFESEH /DLL Win32\cryptopp\Release\cryptopp.res
+         Win32\cryptopp\Release\algebra.obj
+         Win32\cryptopp\Release\algparam.obj
+         Win32\cryptopp\Release\asn.obj
+         Win32\cryptopp\Release\authenc.obj
+         Win32\cryptopp\Release\basecode.obj
+         Win32\cryptopp\Release\cbcmac.obj
+         Win32\cryptopp\Release\ccm.obj
+         Win32\cryptopp\Release\channels.obj
+         Win32\cryptopp\Release\cmac.obj
+         Win32\cryptopp\Release\cpu.obj
+         Win32\cryptopp\Release\cryptlib.obj
+         Win32\cryptopp\Release\des.obj
+         Win32\cryptopp\Release\dessp.obj
+         Win32\cryptopp\Release\dh.obj
+         Win32\cryptopp\Release\dll.obj
+         Win32\cryptopp\Release\dsa.obj
+         Win32\cryptopp\Release\ec2n.obj
+         Win32\cryptopp\Release\eccrypto.obj
+         Win32\cryptopp\Release\ecp.obj
+         Win32\cryptopp\Release\emsa2.obj
+         Win32\cryptopp\Release\eprecomp.obj
+         Win32\cryptopp\Release\files.obj
+         Win32\cryptopp\Release\filters.obj
+         Win32\cryptopp\Release\fips140.obj
+         Win32\cryptopp\Release\fipstest.obj
+         Win32\cryptopp\Release\gcm.obj
+         Win32\cryptopp\Release\gf2n.obj
+         Win32\cryptopp\Release\gfpcrypt.obj
+         Win32\cryptopp\Release\hex.obj
+         Win32\cryptopp\Release\hmac.obj
+         Win32\cryptopp\Release\hrtimer.obj
+         Win32\cryptopp\Release\integer.obj
+         Win32\cryptopp\Release\iterhash.obj
+         Win32\cryptopp\Release\misc.obj
+         Win32\cryptopp\Release\modes.obj
+         Win32\cryptopp\Release\mqueue.obj
+         Win32\cryptopp\Release\nbtheory.obj
+         Win32\cryptopp\Release\oaep.obj
+         Win32\cryptopp\Release\osrng.obj
+         Win32\cryptopp\Release\pch.obj
+         Win32\cryptopp\Release\pkcspad.obj
+         Win32\cryptopp\Release\pssr.obj
+         Win32\cryptopp\Release\pubkey.obj
+         Win32\cryptopp\Release\queue.obj
+         Win32\cryptopp\Release\randpool.obj
+         Win32\cryptopp\Release\rdtables.obj
+         Win32\cryptopp\Release\rijndael.obj
+         Win32\cryptopp\Release\rng.obj
+         Win32\cryptopp\Release\rsa.obj
+         Win32\cryptopp\Release\rw.obj
+         Win32\cryptopp\Release\sha.obj
+         Win32\cryptopp\Release\simple.obj
+         Win32\cryptopp\Release\skipjack.obj
+         Win32\cryptopp\Release\strciphr.obj
+         Win32\cryptopp\Release\trdlocal.obj
+            Creating library C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptopp.lib and object C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptopp.exp
+         Generating code
+         Finished generating code
+         cryptdll.vcxproj -> C:\Users\Samuel\Downloads\cryptopp562\Win32\DLL_Output\Release\cryptopp.dll
+     1>Done Building Project "C:\Users\Samuel\Downloads\cryptopp562\cryptdll.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:14.83
