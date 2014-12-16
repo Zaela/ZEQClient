@@ -69,30 +69,40 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>"lib\";"include\cryptopp562\Win32\Output\Release\";</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>"lib\";</AdditionalLibraryDirectories>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ack_manager.cpp" />
     <ClCompile Include="src\compression.cpp" />
+    <ClCompile Include="src\file_loader.cpp" />
+    <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\network_crc.cpp" />
     <ClCompile Include="src\packet.cpp" />
     <ClCompile Include="src\packet_receiver.cpp" />
+    <ClCompile Include="src\renderer.cpp" />
+    <ClCompile Include="src\s3d.cpp" />
     <ClCompile Include="src\socket.cpp" />
     <ClCompile Include="src\util.cpp" />
+    <ClCompile Include="src\wld.cpp" />
     <ClCompile Include="src\world_connection.cpp" />
     <ClCompile Include="src\zone_connection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ack_manager.h" />
+    <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\compression.h" />
     <ClInclude Include="src\connection.h" />
     <ClInclude Include="src\exception.h" />
+    <ClInclude Include="src\file_loader.h" />
+    <ClInclude Include="src\file_stream.h" />
+    <ClInclude Include="src\input.h" />
     <ClInclude Include="src\login_connection.h" />
+    <ClInclude Include="src\memory_stream.h" />
     <ClInclude Include="src\mob.h" />
     <ClInclude Include="src\network_crc.h" />
     <ClInclude Include="src\npc.h" />
@@ -104,10 +114,15 @@
     <ClInclude Include="src\packet_receiver.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\random.h" />
+    <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\s3d.h" />
     <ClInclude Include="src\socket.h" />
+    <ClInclude Include="src\structs_intermediate.h" />
     <ClInclude Include="src\structs_titanium.h" />
+    <ClInclude Include="src\structs_wld.h" />
     <ClInclude Include="src\types.h" />
     <ClInclude Include="src\util.h" />
+    <ClInclude Include="src\wld.h" />
     <ClInclude Include="src\world_connection.h" />
     <ClInclude Include="src\zone_connection.h" />
   </ItemGroup>

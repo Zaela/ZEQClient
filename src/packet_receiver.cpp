@@ -48,7 +48,7 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Combined:
 	{
-		printf("OP_Combined\n");
+		//printf("OP_Combined\n");
 		if (!validateCompletePacket(data, len))
 			break;
 
@@ -66,7 +66,7 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Packet:
 	{
-		printf("OP_Packet\n");
+		//printf("OP_Packet\n");
 		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 
@@ -75,7 +75,7 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Fragment:
 	{
-		printf("OP_Fragment\n");
+		//printf("OP_Fragment\n");
 		if (!fromCombined && !Compression::decompressPacket(data, len))
 			break;
 
@@ -84,7 +84,7 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Ack:
 	{
-		printf("OP_Ack\n");
+		//printf("OP_Ack\n");
 		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 

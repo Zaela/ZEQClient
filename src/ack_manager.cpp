@@ -1,7 +1,7 @@
 
 #include "ack_manager.h"
 
-extern Random RNG;
+extern Random gRNG;
 
 AckManager::AckManager(Socket* socket) : mSocket(socket), mNextSeq(65535), mExpectedSeq(0), mBuildingFrag(false)
 {
@@ -95,7 +95,7 @@ void AckManager::checkInboundFragment(byte* packet, uint32 len)
 		//max packet size is 512 - 4 = 508
 		mFragEnd = seq + (size / 508) + 1;
 
-		printf("FRAG END: %u -> %u\n", seq, mFragEnd);
+		//printf("FRAG END: %u -> %u\n", seq, mFragEnd);
 
 		checkFragmentComplete();
 	}
@@ -216,7 +216,7 @@ void AckManager::recordSentPacket(const Packet& packet, uint16 seq)
 
 void AckManager::sendSessionRequest()
 {
-	mSessionID = RNG();
+	mSessionID = gRNG();
 	SessionRequest sr;
 
 	sr.opcode = toNetworkShort(OP_SessionRequest);

@@ -110,7 +110,7 @@ void Socket::sendPacket(void* in_data, int len)
 		{
 			len -= sent;
 			data += sent;
-			printf("sent %i\n", sent);
+			//printf("sent %i\n", sent);
 		}
 		else if (sent == -1)
 		{

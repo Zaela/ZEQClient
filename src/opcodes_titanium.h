@@ -38,6 +38,7 @@
 #define OP_WearChange 0x7441
 #define OP_HPUpdate 0x3BCF
 #define OP_MobHealth 0x0695
+#define OP_ManaChange 0x4839
 
 //general zone packets
 #define OP_Weather 0x254D

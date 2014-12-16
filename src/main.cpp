@@ -3,11 +3,20 @@
 
 #include "socket.h"
 #include "random.h"
+#include "input.h"
+#include "renderer.h"
+#include "file_loader.h"
 #include "login_connection.h"
 #include "world_connection.h"
 #include "zone_connection.h"
 
-Random RNG;
+#include "s3d.h"
+#include "wld.h"
+
+Random gRNG;
+Input gInput;
+Renderer gRenderer;
+FileLoader gFileLoader;
 
 void showError(const char* fmt, ...)
 {
@@ -38,12 +47,23 @@ int main(int argc, char** argv)
 	WorldConnection* world = nullptr;
 	ZoneConnection* zone = nullptr;
 
+#ifdef _WIN32
+	SetConsoleTitle("ZEQClient");
+#endif
+
 	try
 	{
 		Socket::loadLibrary();
 
 		Args args;
 		readArgs(argc, argv, args);
+
+		gRenderer.initialize();
+		gFileLoader.setPathToEQ("C:\\Everquest\\");
+
+		WLD* wld = gFileLoader.getWLD("gfaydark");
+		wld->convertZoneGeometry();
+		throw ZEQException("Done");
 
 		//do stuff
 		login = new LoginConnection;
@@ -69,6 +89,7 @@ int main(int argc, char** argv)
 		showError("Uncaught standard exception: %s", e.what());
 	}
 
+	gRenderer.close();
 	if (login) delete login;
 	if (world) delete world;
 	if (zone) delete zone;
@@ -117,5 +138,5 @@ FINISH:
 
 void printUsage()
 {
-	printf("Usage:\n\t-a Account Name\n\t-p Password\n\t-c Character Name\n\t-s Server Name\n");
+	printf("Usage:\n\t-a <account name>\n\t-p <password>\n\t-c <character name>\n\t-s <server name>\n");
 }

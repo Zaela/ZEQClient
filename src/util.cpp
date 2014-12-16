@@ -18,4 +18,10 @@ namespace Util
 		}
 		dst[boundLen] = 0;
 	}
+
+	void toLower(char* str, uint32 len)
+	{
+		for (uint32 i = 0; i < len; ++i)
+			str[i] = tolower(str[i]);
+	}
 }

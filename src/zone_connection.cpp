@@ -33,7 +33,6 @@ void ZoneConnection::processInboundPackets()
 
 bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 {
-	printf("0x%0.4X\n", opcode);
 	switch (opcode)
 	{
 	case OP_PlayerProfile:
@@ -144,6 +143,12 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		printf("OP_MobHealth\n");
 		//percent hp update
 		HPUpdate_Struct* hp = (HPUpdate_Struct*)data;
+		break;
+	}
+	case OP_ManaChange:
+	{
+		printf("OP_ManaChange\n");
+		ManaChange_Struct* mc = (ManaChange_Struct*)data;
 		break;
 	}
 	case OP_SpawnAppearance:
