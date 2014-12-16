@@ -62,7 +62,10 @@ int main(int argc, char** argv)
 		gFileLoader.setPathToEQ("C:\\Everquest\\");
 
 		WLD* wld = gFileLoader.getWLD("gfaydark");
-		wld->convertZoneGeometry();
+		ZoneModel* zoneModel = wld->convertZoneGeometry();
+		gRenderer.useZoneModel(zoneModel);
+		gRenderer.loopStep();
+		Sleep(5000);
 		throw ZEQException("Done");
 
 		//do stuff

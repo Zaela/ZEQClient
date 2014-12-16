@@ -206,9 +206,9 @@ uint32 WLD::translateVisibilityFlag(Frag30* f30, bool isDDS)
 {
 	uint32 ret = 0;
 
-	if (f30->flag & Frag30::MASKED)
+	if (f30->visibility_flag & Frag30::MASKED)
 		ret |= IntermediateMaterialEntry::MASKED;
-	if (f30->flag & Frag30::SEMI_TRANSPARENT)
+	if (f30->visibility_flag & Frag30::SEMI_TRANSPARENT)
 		ret |= IntermediateMaterialEntry::SEMI_TRANSPARENT;
 	if (isDDS)
 		ret |= IntermediateMaterialEntry::DDS_TEXTURE;
@@ -358,7 +358,7 @@ void WLD::processMesh(Frag36* f36)
 	}
 }
 
-scene::IAnimatedMesh* WLD::convertZoneGeometry()
+ZoneModel* WLD::convertZoneGeometry()
 {
 	if (mFragsByType.count(0x36) == 0)
 		return nullptr;
@@ -383,6 +383,87 @@ scene::IAnimatedMesh* WLD::convertZoneGeometry()
 	}
 
 	//create the irrlicht mesh, transferring buffers and creating final materials
+	scene::SMesh* mesh = new scene::SMesh;
+	ZoneModel* zone = new ZoneModel;
 
-	return nullptr;
+	for (uint32 i = 0; i < mNumMaterials; ++i)
+	{
+		createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], zone);
+	}
+
+	mesh->recalculateBoundingBox();
+	zone->setMesh(mesh);
+
+	return zone;
+}
+
+void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
+		std::vector<uint32>& index_buf, IntermediateMaterial* mat, ZoneModel* zone)
+{
+	//irrlicht's default provided mesh buffers can take up to 65536 indices
+	//need to handle case of total > 65535 by splitting into separate buffers
+
+	//if using a DDS texture, one of the UV coords may need to be flipped
+	if (mat && mat->first.flag & IntermediateMaterialEntry::DDS_TEXTURE)
+	{
+		for (video::S3DVertex& vert : vert_buf)
+		{
+			if (vert.TCoords.Y > 0)
+				vert.TCoords.Y = -vert.TCoords.Y;
+		}
+	}
+
+	uint32 count = index_buf.size();
+	uint32 n = (count / 65535) + 1; //may want to make sure it's not an exact multiple
+	uint32 adj = 0;
+
+	AnimatedTexture* animTex = nullptr;
+	if (mat->num_frames > 1 && zone)
+	{
+		AnimatedTexture anim(mat, n);
+		animTex = zone->addAnimatedTexture(anim);
+	}
+
+	for (uint32 i = 0; i < n; ++i)
+	{
+		scene::SMeshBuffer* mesh_buffer = new scene::SMeshBuffer;
+		auto& vbuf = mesh_buffer->Vertices;
+		auto& ibuf = mesh_buffer->Indices;
+
+		//65535 is a multiple of 3, use 0 to 65534
+		uint32 max = count < 65535 ? count : 65535;
+
+		for (uint32 j = 0; j < max; ++j)
+		{
+			vbuf.push_back(vert_buf[j + adj]);
+			ibuf.push_back((uint16)(index_buf[j + adj] - adj));
+		}
+
+		//material
+		video::SMaterial& material = mesh_buffer->getMaterial();
+		if (mat)
+		{
+			if (mat->first.diffuse_map)
+				material.setTexture(0, mat->first.diffuse_map);
+			if (mat->first.flag & IntermediateMaterialEntry::MASKED)
+				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+			//put semi-transparent handling here (need to figure out how to do it and how to make it play nice with masking...)
+			//probably make a copy of the texture and change the alpha of the bitmap pixels, then use blending EMT_TRANSPARENT_ALPHA_CHANNEL
+			else if (mat->first.flag & IntermediateMaterialEntry::FULLY_TRANSPARENT)
+				material.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+		}
+		else
+		{
+			material.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+		}
+
+		mesh_buffer->recalculateBoundingBox();
+		mesh->addMeshBuffer(mesh_buffer);
+		if (animTex)
+			animTex->setMeshBuffer(i, mesh_buffer);
+		mesh_buffer->drop();
+
+		adj += 65535;
+		count -= 65535;
+	}
 }

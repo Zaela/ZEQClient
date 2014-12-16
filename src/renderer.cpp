@@ -76,10 +76,12 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 
 		tex = mDriver->addTexture(name.c_str(), img);
 	}
-	/*else if (fmt == FIF_BMP)
+	else if (fmt == FIF_BMP)
 	{
+		//need to process bitmaps to add an alpha channel in case they are masked
 		FIBITMAP* bitmap = FreeImage_LoadFromMemory(fmt, fi_mem);
 
+		//the first pixel (top left) is usually the mask color, is it always?
 		byte p;
 		RGBQUAD* palette = FreeImage_GetPalette(bitmap);
 		FreeImage_GetPixelIndex(bitmap, 0, 0, &p);
@@ -104,7 +106,7 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 		}
 
 		tex = mDriver->addTexture(name.c_str(), img);
-	}*/
+	}
 	else
 	{
 		IrrTextureFile* file = new IrrTextureFile(name.c_str(), data, len);
@@ -115,4 +117,26 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 	FreeImage_CloseMemory(fi_mem);
 
 	return tex;
+}
+
+void Renderer::loopStep()
+{
+	if (mDevice->run() && mDevice->isWindowActive() && mDevice->isWindowFocused())
+	{
+		mDriver->beginScene(true, true, video::SColor(255, 128, 128, 128));
+		mSceneMgr->drawAll();
+		mDriver->endScene();
+	}
+}
+
+void Renderer::useZoneModel(ZoneModel* zoneModel)
+{
+	mSceneMgr->clear();
+	scene::IMeshSceneNode* node = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
+	mSceneMgr->setAmbientLight(video::SColorf(1, 1, 1, 1));
+
+	node->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));
+
+	//change later
+	mSceneMgr->addCameraSceneNode();
 }

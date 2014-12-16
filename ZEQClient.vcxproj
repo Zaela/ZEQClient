@@ -90,10 +90,13 @@
     <ClCompile Include="src\wld.cpp" />
     <ClCompile Include="src\world_connection.cpp" />
     <ClCompile Include="src\zone_connection.cpp" />
+    <ClCompile Include="src\zone_model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ack_manager.h" />
+    <ClInclude Include="src\animated_texture.h" />
     <ClInclude Include="src\buffer.h" />
+    <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\compression.h" />
     <ClInclude Include="src\connection.h" />

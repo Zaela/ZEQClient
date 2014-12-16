@@ -16,7 +16,7 @@
 #include "exception.h"
 #include "s3d.h"
 #include "renderer.h"
-#include "buffer.h"
+#include "zone_model.h"
 
 using namespace WLD_Structs;
 
@@ -65,6 +65,11 @@ private:
 	void handleAnimatedMaterial(Frag04* f04, Frag30* f30, IntermediateMaterial* mat);
 	static uint32 translateVisibilityFlag(Frag30* f30, bool isDDS);
 	void processMesh(Frag36* f36);
+
+	/* --------------------------------------------- */
+	static void createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
+		std::vector<uint32>& index_buf, IntermediateMaterial* mat = nullptr, ZoneModel* zone = nullptr);
+	/* --------------------------------------------- */
 	
 public:
 	WLD(MemoryStream* mem, S3D* s3d, std::string shortname);
@@ -77,7 +82,7 @@ public:
 
 	uint32 getVersion() { return mVersion; }
 
-	scene::IAnimatedMesh* convertZoneGeometry();
+	ZoneModel* convertZoneGeometry();
 };
 
 #endif

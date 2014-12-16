@@ -11,6 +11,7 @@
 #include "memory_stream.h"
 #include "input.h"
 #include "exception.h"
+#include "zone_model.h"
 
 using namespace irr;
 
@@ -31,6 +32,9 @@ public:
 	void close();
 
 	video::ITexture* createTexture(MemoryStream* file, std::string name, bool& isDDS);
+
+	void loopStep();
+	void useZoneModel(ZoneModel* zoneModel);
 };
 
 
