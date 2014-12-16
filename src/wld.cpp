@@ -109,6 +109,8 @@ void WLD::processMaterials()
 	mNumMaterials = mFragsByType[0x30].size();
 
 	mMaterials = new IntermediateMaterial[mNumMaterials];
+	for (uint32 i = 0; i < mNumMaterials; ++i)
+		new (&mMaterials[i]) IntermediateMaterial;
 
 	int i = -1;
 	for (FragHeader* frag : mFragsByType[0x30])
@@ -117,11 +119,8 @@ void WLD::processMaterials()
 		Frag03* f03;
 
 		IntermediateMaterial* mat = &mMaterials[++i];
-		mat->first.diffuse_map = nullptr;
-		mat->first.normal_map = nullptr;
-		mat->additional = nullptr;
 
-		mMaterialsByFrag30[f30] = mat;
+		mMaterialIndicesByFrag30[f30] = i;
 		
 		//f30 -> f05 -> f04 -> f03
 		//OR
@@ -185,6 +184,8 @@ void WLD::handleAnimatedMaterial(Frag04* f04, Frag30* f30, IntermediateMaterial*
 	mat->frame_delay = f04a->milliseconds;
 	int add = f04a->count - 1;
 	mat->additional = new IntermediateMaterialEntry[add];
+	for (int i = 0; i < add; ++i)
+		new (&mat->additional[i]) IntermediateMaterialEntry;
 
 	int* ref_ptr = f04a->getRefList();
 
@@ -198,7 +199,6 @@ void WLD::handleAnimatedMaterial(Frag04* f04, Frag30* f30, IntermediateMaterial*
 		mat_ent = &mat->additional[i];
 		f03 = (Frag03*)getFragByRef(*ref_ptr++);
 		Frag03ToMaterialEntry(f03, f30, mat_ent);
-		mat_ent->normal_map = nullptr;
 	}
 }
 
@@ -226,6 +226,136 @@ void WLD::processMesh(Frag36* f36)
 	//raw vertices
 	RawVertex* wld_verts = (RawVertex*)(data + p);
 	p += sizeof(RawVertex) * f36->vert_count;
+
+	//raw uvs
+	RawUV16* uv16 = nullptr;
+	RawUV32* uv32 = nullptr;
+	if (f36->uv_count > 0)
+	{
+		if (getVersion() == 1)
+		{
+			uv16 = (RawUV16*)(data + p);
+			p += sizeof(RawUV16) * f36->uv_count;
+		}
+		else
+		{
+			uv32 = (RawUV32*)(data + p);
+			p += sizeof(RawUV32) * f36->uv_count;
+		}
+	}
+
+	//raw normals
+	RawNormal* wld_norm = (RawNormal*)(data + p);
+	p += sizeof(RawNormal) * f36->vert_count;
+
+	//skip vertex colors (for now?)
+	p += sizeof(uint32) * f36->color_count;
+
+	//raw triangles
+	RawTriangle* wld_tris = (RawTriangle*)(data + p);
+	p += sizeof(RawTriangle) * f36->poly_count;
+
+	//skip vertex pieces (dunno what these are for)
+	p += sizeof(uint16) * 2 * f36->vert_piece_count;
+
+	//get material indices for triangles
+	std::unordered_map<uint32, int> mat_index_list;
+	Frag31* f31 = (Frag31*)getFragByRef(f36->texture_list_ref);
+	int* ref_ptr = f31->getRefList();
+	for (uint32 i = 0; i < f31->ref_count; ++i)
+	{
+		Frag30* f30 = (Frag30*)getFragByRef(*ref_ptr++);
+		mat_index_list[i] = mMaterialIndicesByFrag30[f30];
+	}
+
+	//construct vertices and triangles based on their materials
+	for (uint16 m = 0; m < f36->poly_texture_count; ++m)
+	{
+		RawTextureEntry* rte = (RawTextureEntry*)(data + p);
+		p += sizeof(RawTextureEntry);
+
+		int mat_index = mat_index_list[rte->index];
+
+		//get buffers
+		std::vector<video::S3DVertex>& vert_buf = mMaterialVertexBuffers[mat_index];
+		std::vector<uint32>& index_buf = mMaterialIndexBuffers[mat_index];
+
+		uint32 base = vert_buf.size();
+
+		//handle uv conversions
+		if (uv16)
+		{
+			video::S3DVertex vertex;
+			for (uint16 i = 0; i < rte->count; ++i)
+			{
+				RawTriangle& tri = wld_tris[i];
+				for (int j = 0; j < 3; ++j)
+				{
+					static const float uv_scale = 1.0f / 256.0f;
+					RawUV16& uv = uv16[tri.index[j]];
+					vertex.TCoords.X = (float)uv.u * uv_scale;
+					vertex.TCoords.Y = -((float)uv.v * uv_scale);
+					vert_buf.push_back(vertex);
+				}
+			}
+		}
+		else if (uv32)
+		{
+			video::S3DVertex vertex;
+			for (uint16 i = 0; i < rte->count; ++i)
+			{
+				RawTriangle& tri = wld_tris[i];
+				for (int j = 0; j < 3; ++j)
+				{
+					RawUV32& uv = uv32[tri.index[j]];
+					vertex.TCoords.X = uv.u;
+					vertex.TCoords.Y = -uv.v;
+					vert_buf.push_back(vertex);
+				}
+			}
+		}
+		else
+		{
+			video::S3DVertex vertex;
+			vertex.TCoords.X = 0;
+			vertex.TCoords.Y = 0;
+			uint32 count = rte->count * 3;
+			for (uint32 i = 0; i < count; ++i)
+				vert_buf.push_back(vertex);
+		}
+
+		//handle vertex and normal conversions
+		uint32 buf_pos = base;
+		for (uint16 i = 0; i < rte->count; ++i)
+		{
+			RawTriangle& tri = wld_tris[i];
+			for (int j = 0; j < 3; ++j)
+			{
+				video::S3DVertex& vertex = vert_buf[buf_pos++];
+				uint16 idx = tri.index[j];
+				RawVertex& vert = wld_verts[idx];
+				vertex.Pos.X = f36->x + (float)vert.x * scale;
+				vertex.Pos.Z = f36->y + (float)vert.y * scale; //irrlicht uses Y for the "up" axis, need to switch
+				vertex.Pos.Y = f36->z + (float)vert.z * scale;
+				RawNormal& norm = wld_norm[idx];
+				static const float normal_scale = 1.0f / 127.0f;
+				vertex.Normal.X = (float)norm.i * normal_scale;
+				vertex.Normal.Z = (float)norm.j * normal_scale;
+				vertex.Normal.Y = (float)norm.k * normal_scale;
+			}
+			//if (tri.flag & RawTriangle::PERMEABLE)
+			//add vertices and indices to collision mesh buffers
+		}
+
+		//write indices (purely in order for now, no reused vertices)
+		//would be faster to do them all per material in one step, in that case... but we should look at reusing vertices instead
+		uint32 count = rte->count * 3;
+		for (uint32 i = 0; i < count; ++i)
+			index_buf.push_back(base++);
+
+		//advance triangles ptr for the next block
+		wld_tris += rte->count;
+	}
 }
 
 scene::IAnimatedMesh* WLD::convertZoneGeometry()
@@ -236,6 +366,8 @@ scene::IAnimatedMesh* WLD::convertZoneGeometry()
 	processMaterials();
 	
 	//initialize two buffers for each material
+	mMaterialVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
+	mMaterialIndexBuffers = new std::vector<uint32>[mNumMaterials];
 	for (uint32 i = 0; i < mNumMaterials; ++i)
 	{
 		//placement new
@@ -249,6 +381,8 @@ scene::IAnimatedMesh* WLD::convertZoneGeometry()
 	{
 		processMesh((Frag36*)frag);
 	}
+
+	//create the irrlicht mesh, transferring buffers and creating final materials
 
 	return nullptr;
 }

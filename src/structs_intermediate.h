@@ -10,6 +10,13 @@ using namespace irr;
 
 struct IntermediateMaterialEntry
 {
+	IntermediateMaterialEntry()
+	{
+		flag = 0;
+		diffuse_map = nullptr;
+		normal_map = nullptr;
+	}
+
 	enum Flags
 	{
 		MASKED = 1 << 0,
@@ -17,6 +24,7 @@ struct IntermediateMaterialEntry
 		FULLY_TRANSPARENT = 1 << 2,
 		DDS_TEXTURE = 1 << 3
 	};
+
 	uint32 flag;
 	video::ITexture* diffuse_map;
 	video::ITexture* normal_map;
@@ -24,6 +32,12 @@ struct IntermediateMaterialEntry
 
 struct IntermediateMaterial
 {
+	IntermediateMaterial()
+	{
+		num_frames = 1;
+		additional = nullptr;
+	}
+
 	int num_frames; //if > 1, material is animated
 	uint32 frame_delay;
 	IntermediateMaterialEntry first;

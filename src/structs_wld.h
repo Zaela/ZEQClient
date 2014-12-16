@@ -168,7 +168,7 @@ namespace WLD_Structs
 	{
 		enum Flags
 		{
-			PERMEABLE = 0x01 //i.e. not subject to collision
+			PERMEABLE = 0x10 //i.e. not subject to collision
 		};
 		uint16 flag;
 		uint16 index[3];

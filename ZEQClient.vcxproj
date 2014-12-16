@@ -125,6 +125,7 @@
     <ClInclude Include="src\wld.h" />
     <ClInclude Include="src\world_connection.h" />
     <ClInclude Include="src\zone_connection.h" />
+    <ClInclude Include="src\zone_model.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

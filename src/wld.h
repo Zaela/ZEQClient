@@ -45,11 +45,18 @@ private:
 	std::unordered_map<uint32, std::vector<FragHeader*>> mFragsByType;
 	std::unordered_map<uint32, FragHeader*> mFragsByNameRef;
 
+	/* probably move these off to a common superclass when other file types are used as zone model sources */
+	/* --------------------------------------------- */
 	uint32 mNumMaterials;
 	IntermediateMaterial* mMaterials;
+
 	std::vector<video::S3DVertex>* mMaterialVertexBuffers;
 	std::vector<uint32>* mMaterialIndexBuffers;
-	std::unordered_map<Frag30*, IntermediateMaterial*> mMaterialsByFrag30;
+	std::vector<video::S3DVertex> mCollisionVertexBuffer;
+	std::vector<uint32> mCollisionIndexBuffer;
+	/* --------------------------------------------- */
+
+	std::unordered_map<Frag30*, int> mMaterialIndicesByFrag30;
 	std::unordered_map<Frag03*, const char*> mTexturesByFrag03;
 
 private:
