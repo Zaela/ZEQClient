@@ -194,8 +194,13 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 		scene::IMesh* mesh = obj.mesh->getMesh(0);
 		for (AnimatedTexture& animTex : animTexturesTemp)
 		{
-			if (animTex.replaceMeshWithSceneNode(mesh, objNode))
-				mAnimatedTextures.push_back(animTex);
+			if (animTex.checkMesh(mesh))
+			{
+				//need to keep track of array ptrs for future deletion...
+				AnimatedTexture copy = animTex;
+				copy.setMeshPtr(objNode);
+				mAnimatedTextures.push_back(copy);
+			}
 		}
 	}
 }

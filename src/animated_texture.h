@@ -30,26 +30,8 @@ public:
 	void advanceFrame();
 	void recordTextures(ZoneModel* zone);
 	bool replaceMeshWithSceneNode(void* compare_mesh, void* node);
-};
-
-
-class AnimatedTextureFactory : public scene::ISceneNodeAnimatorFactory
-{
-public:
-	virtual scene::ISceneNodeAnimator* createSceneNodeAnimator(scene::ESCENE_NODE_ANIMATOR_TYPE type, scene::ISceneNode* target) override;
-	virtual scene::ISceneNodeAnimator* createSceneNodeAnimator(const char* typeName, scene::ISceneNode* target) override;
-	virtual uint32 getCreatableSceneNodeAnimatorTypeCount() const override;
-	virtual scene::ESCENE_NODE_ANIMATOR_TYPE getCreateableSceneNodeAnimatorType(uint32 idx) const override;
-	virtual const char* getCreateableSceneNodeAnimatorTypeName(uint32 idx) const override;
-	virtual const char* getCreateableSceneNodeAnimatorTypeName (scene::ESCENE_NODE_ANIMATOR_TYPE type) const override;
-};
-
-class TextureAnimator : public scene::ISceneNodeAnimator
-{
-public:
-	TextureAnimator(AnimatedTexture& animTex);
-	virtual void animateNode(scene::ISceneNode* node, uint32 milliseconds) override;
-	virtual scene::ISceneNodeAnimator* createClone(scene::ISceneNode* node, scene::ISceneManager* newManager = nullptr) override;
+	bool checkMesh(void* compare_mesh) { return mesh == compare_mesh; }
+	void setMeshPtr(void* ptr) { mesh = ptr; }
 };
 
 #endif
