@@ -18,6 +18,9 @@ typedef std::uint64_t uint64;
 #include <cstdio>
 #define snprintf sprintf_s
 #define itoa _itoa
+#include <winsock2.h>
+#include <windows.h>
+#include <ws2tcpip.h>
 #endif
 
 #endif

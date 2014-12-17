@@ -19,5 +19,27 @@ AnimatedTexture* ZoneModel::addAnimatedTexture(AnimatedTexture& animTex)
 {
 	//copy construction
 	mAnimatedTextures.push_back(animTex);
-	return &mAnimatedTextures.back();
+	AnimatedTexture* anim = &mAnimatedTextures.back();
+	//record textures
+	anim->recordTextures(this);
+
+	return anim;
+}
+
+void ZoneModel::addObjectDefinition(const char* name, scene::SMesh* mesh)
+{
+	scene::SAnimatedMesh* animMesh = new scene::SAnimatedMesh(mesh);
+	mesh->drop();
+	mObjectDefinitions[name] = animMesh;
+}
+
+void ZoneModel::addObjectPlacement(const char* name, ObjectPlacement& placement)
+{
+	if (mObjectDefinitions.count(name) == 0)
+		return;
+
+	scene::IAnimatedMesh* mesh = mObjectDefinitions[name];
+	placement.mesh = mesh;
+
+	mObjectPlacements.push_back(placement);
 }

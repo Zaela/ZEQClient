@@ -192,3 +192,24 @@ void ZoneConnection::connect()
 
 	processInboundPackets();
 }
+
+void ZoneConnection::poll()
+{
+	for (;;)
+	{
+		int len = recvPacket();
+		if (len <= 0)
+			break;
+		mPacketReceiver->handleProtocol(len);
+	}
+
+	std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
+	while (!queue.empty())
+	{
+		ReadPacket* packet = queue.front();
+		queue.pop();
+		uint16 opcode = *(uint16*)packet->data;
+		processPacket(opcode, packet->data + 2, packet->len - 2);
+		delete packet;
+	}
+}

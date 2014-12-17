@@ -2,16 +2,20 @@
 #ifndef _ZEQ_RENDERER_H
 #define _ZEQ_RENDERER_H
 
+#include "types.h"
+
 #include <irrlicht.h>
 #include <FreeImage.h>
 
 #include <string>
+#include <vector>
 
-#include "types.h"
 #include "memory_stream.h"
 #include "input.h"
 #include "exception.h"
 #include "zone_model.h"
+#include "camera.h"
+#include "animated_texture.h"
 
 using namespace irr;
 
@@ -21,6 +25,10 @@ private:
 	IrrlichtDevice* mDevice;
 	video::IVideoDriver* mDriver;
 	scene::ISceneManager* mSceneMgr;
+	uint32 mSleepMilliseconds;
+	uint32 mPrevTime;
+
+	std::vector<AnimatedTexture> mAnimatedTextures;
 
 private:
 	static IrrlichtDevice* createDevice(SIrrlichtCreationParameters& params);
@@ -32,9 +40,11 @@ public:
 	void close();
 
 	video::ITexture* createTexture(MemoryStream* file, std::string name, bool& isDDS);
+	Camera* createCamera(bool bind = true);
 
-	void loopStep();
+	float loopStep();
 	void useZoneModel(ZoneModel* zoneModel);
+	void checkAnimatedTextures(uint32 delta);
 };
 
 

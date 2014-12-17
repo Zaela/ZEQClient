@@ -7,7 +7,9 @@ WLD::WLD(MemoryStream* mem, S3D* s3d, std::string shortname) :
 	mShortName(shortname),
 	mContainingS3D(s3d),
 	mNumMaterials(0),
-	mMaterials(nullptr)
+	mMaterials(nullptr),
+	mMaterialVertexBuffers(nullptr),
+	mMaterialIndexBuffers(nullptr)
 {
 	byte* data = mem->getData();
 
@@ -42,6 +44,24 @@ WLD::WLD(MemoryStream* mem, S3D* s3d, std::string shortname) :
 			mFragsByNameRef[-fh->nameref] = fh;
 
 		p += FragHeader::SIZE + fh->len;
+	}
+}
+
+WLD::~WLD()
+{
+	if (mMaterials)
+		delete[] mMaterials;
+	if (mMaterialVertexBuffers)
+	{
+		for (uint32 i = 0; i < mNumMaterials; ++i)
+			mMaterialVertexBuffers[i].~vector();
+		delete[] mMaterialVertexBuffers;
+	}
+	if (mMaterialIndexBuffers)
+	{
+		for (uint32 i = 0; i < mNumMaterials; ++i)
+			mMaterialIndexBuffers[i].~vector();
+		delete[] mMaterialIndexBuffers;
 	}
 }
 
@@ -358,14 +378,8 @@ void WLD::processMesh(Frag36* f36)
 	}
 }
 
-ZoneModel* WLD::convertZoneGeometry()
+void WLD::initMaterialBuffers()
 {
-	if (mFragsByType.count(0x36) == 0)
-		return nullptr;
-
-	processMaterials();
-	
-	//initialize two buffers for each material
 	mMaterialVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
 	mMaterialIndexBuffers = new std::vector<uint32>[mNumMaterials];
 	for (uint32 i = 0; i < mNumMaterials; ++i)
@@ -374,6 +388,17 @@ ZoneModel* WLD::convertZoneGeometry()
 		new (&mMaterialVertexBuffers[i]) std::vector<video::S3DVertex>;
 		new (&mMaterialIndexBuffers[i]) std::vector<uint32>;
 	}
+}
+
+ZoneModel* WLD::convertZoneGeometry()
+{
+	if (mFragsByType.count(0x36) == 0)
+		return nullptr;
+
+	processMaterials();
+	
+	//initialize two buffers for each material
+	initMaterialBuffers();
 	//should also make a collision mesh buffer here...
 	
 	//process mesh fragments
@@ -395,6 +420,79 @@ ZoneModel* WLD::convertZoneGeometry()
 	zone->setMesh(mesh);
 
 	return zone;
+}
+
+void WLD::convertZoneObjectDefinitions(ZoneModel* zone)
+{
+	if (mFragsByType.count(0x14) == 0)
+		return;
+
+	processMaterials();
+	
+	//initialize two buffers for each material
+	initMaterialBuffers();
+
+	//process mesh fragments one by one
+	//0x14 -> 0x2D -> 0x36, 0x14 contains the name
+	for (FragHeader* frag : mFragsByType[0x14])
+	{
+		Frag14* f14 = (Frag14*)frag;
+		const char* model_name = getFragName(frag);
+		if (f14->size[1] < 1 || model_name == nullptr)
+			continue;
+
+		int* ref_ptr = f14->getRefList();
+		Frag2D* f2d = (Frag2D*)getFragByRef(*ref_ptr);
+		if (f2d == nullptr || f2d->type != 0x2D)
+			continue;
+
+		processMesh((Frag36*)getFragByRef(f2d->ref));
+
+		//create irrlicht mesh
+		scene::SMesh* mesh = new scene::SMesh;
+		//find any vertex + index buffers with data in them and use them to fill this mesh
+		for (uint32 i = 0; i < mNumMaterials; ++i)
+		{
+			if (!mMaterialVertexBuffers[i].empty())
+			{
+				createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], zone);
+				mMaterialVertexBuffers[i].clear();
+				mMaterialIndexBuffers[i].clear();
+			}
+		}
+
+		mesh->recalculateBoundingBox();
+		zone->addObjectDefinition(model_name, mesh);
+	}
+}
+
+void WLD::convertZoneObjectPlacements(ZoneModel* zone)
+{
+	if (mFragsByType.count(0x15) == 0)
+		return;
+
+	for (FragHeader* frag : mFragsByType[0x15])
+	{
+		Frag15* f15 = (Frag15*)frag;
+		const char* name = getFragName(f15->ref1);
+		if (name == nullptr)
+			continue;
+
+		ObjectPlacement obj;
+		obj.x = f15->pos.x;
+		obj.y = f15->pos.z; //irrlicht uses Y for the "up" axis
+		obj.z = f15->pos.y;
+
+		obj.rotX = f15->rot.y / 512.0f * 360.0f;
+		obj.rotY = -f15->rot.x / 512.0f * 360.0f; //don't even try to make sense of these
+		obj.rotZ = f15->rot.z / 512.0f * 360.0f;
+
+		obj.scaleX = f15->scale.z;
+		obj.scaleY = f15->scale.y; //scale order is also weird - x is generally not given, assumed to be equal to the others
+		obj.scaleZ = f15->scale.z;
+
+		zone->addObjectPlacement(name, obj);
+	}
 }
 
 void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
@@ -420,7 +518,7 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 	AnimatedTexture* animTex = nullptr;
 	if (mat->num_frames > 1 && zone)
 	{
-		AnimatedTexture anim(mat, n);
+		AnimatedTexture anim(mesh, mat, n, mesh->getMeshBufferCount());
 		animTex = zone->addAnimatedTexture(anim);
 	}
 
@@ -444,23 +542,27 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 		if (mat)
 		{
 			if (mat->first.diffuse_map)
+			{
 				material.setTexture(0, mat->first.diffuse_map);
+				zone->addUsedTexture(mat->first.diffuse_map);
+			}
+
 			if (mat->first.flag & IntermediateMaterialEntry::MASKED)
 				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
 			//put semi-transparent handling here (need to figure out how to do it and how to make it play nice with masking...)
 			//probably make a copy of the texture and change the alpha of the bitmap pixels, then use blending EMT_TRANSPARENT_ALPHA_CHANNEL
 			else if (mat->first.flag & IntermediateMaterialEntry::FULLY_TRANSPARENT)
-				material.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //fully transparent materials should have no texture; use VERTEX_ALPHA to show zone walls
 		}
 		else
 		{
-			material.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
+			material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
 		}
 
 		mesh_buffer->recalculateBoundingBox();
 		mesh->addMeshBuffer(mesh_buffer);
-		if (animTex)
-			animTex->setMeshBuffer(i, mesh_buffer);
+		//if (animTex)
+		//	animTex->setMeshBuffer(i, mesh_buffer);
 		mesh_buffer->drop();
 
 		adj += 65535;

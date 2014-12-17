@@ -11,6 +11,7 @@ namespace Util
 	//strcpy with proper bounding
 	void strcpy(char* dst, const char* src, uint32 boundLen);
 	void toLower(char* str, uint32 len);
+	float radiansToDegrees(float rad);
 }
 
 #endif

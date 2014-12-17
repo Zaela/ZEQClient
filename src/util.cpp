@@ -24,4 +24,9 @@ namespace Util
 		for (uint32 i = 0; i < len; ++i)
 			str[i] = tolower(str[i]);
 	}
+
+	float radiansToDegrees(float rad)
+	{
+		return rad * 180.0f / 3.14159f;
+	}
 }

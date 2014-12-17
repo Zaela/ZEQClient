@@ -75,6 +75,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ack_manager.cpp" />
+    <ClCompile Include="src\animated_texture.cpp" />
+    <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\compression.cpp" />
     <ClCompile Include="src\file_loader.cpp" />
     <ClCompile Include="src\input.cpp" />
@@ -83,6 +85,7 @@
     <ClCompile Include="src\network_crc.cpp" />
     <ClCompile Include="src\packet.cpp" />
     <ClCompile Include="src\packet_receiver.cpp" />
+    <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\s3d.cpp" />
     <ClCompile Include="src\socket.cpp" />

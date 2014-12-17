@@ -67,12 +67,14 @@ private:
 	void processMesh(Frag36* f36);
 
 	/* --------------------------------------------- */
+	void initMaterialBuffers();
 	static void createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
 		std::vector<uint32>& index_buf, IntermediateMaterial* mat = nullptr, ZoneModel* zone = nullptr);
 	/* --------------------------------------------- */
 	
 public:
 	WLD(MemoryStream* mem, S3D* s3d, std::string shortname);
+	~WLD();
 	
 	static void decodeString(void* str, size_t len);
 
@@ -83,6 +85,8 @@ public:
 	uint32 getVersion() { return mVersion; }
 
 	ZoneModel* convertZoneGeometry();
+	void convertZoneObjectDefinitions(ZoneModel* zone);
+	void convertZoneObjectPlacements(ZoneModel* zone);
 };
 
 #endif

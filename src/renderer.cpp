@@ -6,7 +6,11 @@ extern Input gInput;
 using namespace irr;
 
 Renderer::Renderer() :
-	mDevice(nullptr)
+	mDevice(nullptr),
+	mDriver(nullptr),
+	mSceneMgr(nullptr),
+	mSleepMilliseconds(20),
+	mPrevTime(0)
 {
 
 }
@@ -119,24 +123,90 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 	return tex;
 }
 
-void Renderer::loopStep()
+Camera* Renderer::createCamera(bool bind)
+{
+	scene::ICameraSceneNode* node = mSceneMgr->addCameraSceneNode();
+	node->bindTargetAndRotation(bind);
+	return new Camera(node);
+}
+
+float Renderer::loopStep()
 {
 	if (mDevice->run() && mDevice->isWindowActive() && mDevice->isWindowFocused())
 	{
 		mDriver->beginScene(true, true, video::SColor(255, 128, 128, 128));
 		mSceneMgr->drawAll();
 		mDriver->endScene();
+
+		mDevice->sleep(mSleepMilliseconds);
 	}
+	else
+	{
+		mDevice->sleep(100);
+	}
+
+	uint32 time = mDevice->getTimer()->getTime();
+	uint32 delta = time - mPrevTime;
+	mPrevTime = time;
+
+	//animated textures
+	if (!mAnimatedTextures.empty())
+		checkAnimatedTextures(delta);
+
+	return (float)delta * 0.001f;
 }
 
 void Renderer::useZoneModel(ZoneModel* zoneModel)
 {
 	mSceneMgr->clear();
+
+	//animated textures
+	std::vector<AnimatedTexture> animTexturesTemp;
+	for (const AnimatedTexture& animTex : zoneModel->getAnimatedTextures())
+	{
+		animTexturesTemp.push_back(animTex);
+	}
+
+	//main zone geometry
 	scene::IMeshSceneNode* node = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
 	mSceneMgr->setAmbientLight(video::SColorf(1, 1, 1, 1));
-
 	node->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));
 
-	//change later
-	mSceneMgr->addCameraSceneNode();
+	//update animated texture with target scene node, if applicable
+	scene::IMesh* mesh = zoneModel->getMesh()->getMesh(0);
+	for (AnimatedTexture& animTex : animTexturesTemp)
+	{
+		if (animTex.replaceMeshWithSceneNode(mesh, node))
+			mAnimatedTextures.push_back(animTex);
+	}
+
+	//placed objects
+	for (const ObjectPlacement& obj : zoneModel->getObjectPlacements())
+	{
+		scene::IAnimatedMeshSceneNode* objNode = mSceneMgr->addAnimatedMeshSceneNode(obj.mesh, nullptr, -1,
+			core::vector3df(obj.x, obj.y, obj.z),
+			core::vector3df(obj.rotX, obj.rotY, obj.rotZ),
+			core::vector3df(obj.scaleX, obj.scaleY, obj.scaleZ));
+
+		//update animated texture with target scene node, if applicable
+		scene::IMesh* mesh = obj.mesh->getMesh(0);
+		for (AnimatedTexture& animTex : animTexturesTemp)
+		{
+			if (animTex.replaceMeshWithSceneNode(mesh, objNode))
+				mAnimatedTextures.push_back(animTex);
+		}
+	}
+}
+
+void Renderer::checkAnimatedTextures(uint32 delta)
+{
+	for (AnimatedTexture& animTex : mAnimatedTextures)
+	{
+		animTex.time += delta;
+		if (animTex.time >= animTex.frame_delay)
+		{
+			animTex.advanceFrame();
+			animTex.time -= animTex.frame_delay;
+		}
+	}
 }

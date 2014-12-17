@@ -87,4 +87,9 @@ public:
 	DisconnectException() : ZEQBasicException(DISCONNECT) { }
 };
 
+class ExitException
+{
+
+};
+
 #endif

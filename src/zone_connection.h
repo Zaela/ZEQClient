@@ -22,6 +22,9 @@ public:
 	void processInboundPackets();
 	bool processPacket(uint16 opcode, byte* data, uint32 len);
 	void connect();
+
+	//use this outside the connection procedure
+	void poll();
 };
 
 #endif

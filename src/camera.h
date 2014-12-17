@@ -15,6 +15,8 @@ private:
 
 public:
 	Camera(scene::ICameraSceneNode* cam);
+
+	scene::ICameraSceneNode* getSceneNode() { return mCamera; }
 };
 
 #endif

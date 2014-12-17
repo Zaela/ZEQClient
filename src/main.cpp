@@ -6,6 +6,7 @@
 #include "input.h"
 #include "renderer.h"
 #include "file_loader.h"
+#include "player.h"
 #include "login_connection.h"
 #include "world_connection.h"
 #include "zone_connection.h"
@@ -17,6 +18,7 @@ Random gRNG;
 Input gInput;
 Renderer gRenderer;
 FileLoader gFileLoader;
+Player gPlayer;
 
 void showError(const char* fmt, ...)
 {
@@ -37,6 +39,8 @@ struct Args
 	std::string password;
 	std::string serverName;
 	std::string charName;
+	std::string pathToEQ;
+	std::string zoneShortname;
 };
 
 void readArgs(int c, char** args, Args& out);
@@ -59,25 +63,39 @@ int main(int argc, char** argv)
 		readArgs(argc, argv, args);
 
 		gRenderer.initialize();
-		gFileLoader.setPathToEQ("C:\\Everquest\\");
+		gFileLoader.setPathToEQ(args.pathToEQ);
 
-		WLD* wld = gFileLoader.getWLD("gfaydark");
-		ZoneModel* zoneModel = wld->convertZoneGeometry();
-		gRenderer.useZoneModel(zoneModel);
-		gRenderer.loopStep();
-		Sleep(5000);
-		throw ZEQException("Done");
+		if (!args.zoneShortname.empty())
+		{
+			std::string shortname = args.zoneShortname;
 
-		//do stuff
-		login = new LoginConnection;
-		login->setCredentials(args.acctName, args.password);
-		login->quickConnect(args.serverName);
+			WLD* wld = gFileLoader.getWLD(shortname);
+			if (wld == nullptr)
+				throw ZEQException("bad zone shortname");
+			ZoneModel* zoneModel = wld->convertZoneGeometry();
+			WLD* objWLD = gFileLoader.getWLD(shortname + "_obj");
+			objWLD->convertZoneObjectDefinitions(zoneModel);
+			WLD* placeWLD = gFileLoader.getWLD("objects", shortname.c_str());
+			placeWLD->convertZoneObjectPlacements(zoneModel);
 
-		world = new WorldConnection(login);
-		world->quickZoneInCharacter(args.charName);
+			gRenderer.useZoneModel(zoneModel);
 
-		zone = new ZoneConnection(world);
-		zone->connect();
+			gPlayer.setCamera(gRenderer.createCamera());
+			gPlayer.zoneViewerLoop();
+		}
+		else
+		{
+			//do stuff
+			login = new LoginConnection;
+			login->setCredentials(args.acctName, args.password);
+			login->quickConnect(args.serverName);
+
+			world = new WorldConnection(login);
+			world->quickZoneInCharacter(args.charName);
+
+			zone = new ZoneConnection(world);
+			zone->connect();
+		}
 	}
 	catch (ZEQException& e)
 	{
@@ -90,6 +108,10 @@ int main(int argc, char** argv)
 	catch (std::exception& e)
 	{
 		showError("Uncaught standard exception: %s", e.what());
+	}
+	catch (ExitException)
+	{
+		printf("Exiting\n");
 	}
 
 	gRenderer.close();
@@ -126,13 +148,21 @@ void readArgs(int c, char** args, Args& out)
 		case 's':
 			out.serverName = args[i + 1];
 			break;
+		case 'e':
+			out.pathToEQ = args[i + 1];
+			break;
+		case 'z':
+			out.zoneShortname = args[i + 1];
+			break;
 		default:
 			goto FINISH;
 		}
 		i += 2;
 	}
 FINISH:
-	if (out.acctName.empty() || out.password.empty() || out.charName.empty() || out.serverName.empty())
+	if (!out.pathToEQ.empty() && !out.zoneShortname.empty())
+		return;
+	if (out.pathToEQ.empty() || out.acctName.empty() || out.password.empty() || out.charName.empty() || out.serverName.empty())
 	{
 		printUsage();
 		throw ZEQException("bad arguments");
@@ -141,5 +171,14 @@ FINISH:
 
 void printUsage()
 {
-	printf("Usage:\n\t-a <account name>\n\t-p <password>\n\t-c <character name>\n\t-s <server name>\n");
+	printf("Usage:\n"
+		"To connect to a server:\n"
+		"\t-e <path\\to\\eq>\n"
+		"\t-a <account name>\n"
+		"\t-p <password>\n"
+		"\t-c <character name>\n"
+		"\t-s <server name>\n"
+		"To launch the zone viewer:\n"
+		"\t-e <path\\to\\eq>\n"
+		"\t-z <zone shortname>\n");
 }
