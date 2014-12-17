@@ -28,6 +28,8 @@ private:
 	uint32 mSleepMilliseconds;
 	uint32 mPrevTime;
 
+	scene::IMeshSceneNode* mCollisionNode;
+
 	std::vector<AnimatedTexture> mAnimatedTextures;
 
 private:

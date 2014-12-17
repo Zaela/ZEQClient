@@ -177,7 +177,7 @@ void printUsage()
 		"\t-a <account name>\n"
 		"\t-p <password>\n"
 		"\t-c <character name>\n"
-		"\t-s <server name>\n"
+		"\t-s <server longname>\n"
 		"To launch the zone viewer:\n"
 		"\t-e <path\\to\\eq>\n"
 		"\t-z <zone shortname>\n");

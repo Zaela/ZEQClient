@@ -85,14 +85,14 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 		//need to process bitmaps to add an alpha channel in case they are masked
 		FIBITMAP* bitmap = FreeImage_LoadFromMemory(fmt, fi_mem);
 
+		const uint32 w = FreeImage_GetWidth(bitmap);
+		const uint32 h = FreeImage_GetHeight(bitmap);
+
 		//the first pixel (top left) is usually the mask color, is it always?
 		byte p;
 		RGBQUAD* palette = FreeImage_GetPalette(bitmap);
 		FreeImage_GetPixelIndex(bitmap, 0, 0, &p);
 		RGBQUAD trans = palette[p];
-
-		const uint32 w = FreeImage_GetWidth(bitmap);
-		const uint32 h = FreeImage_GetHeight(bitmap);
 
 		video::IImage* img = mDriver->createImage(video::ECF_A8R8G8B8, core::dimension2d<uint32>(w, h));
 		video::SColor clr;
@@ -109,6 +109,7 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 			}
 		}
 
+		FreeImage_Unload(bitmap);
 		tex = mDriver->addTexture(name.c_str(), img);
 	}
 	else
@@ -159,6 +160,7 @@ float Renderer::loopStep()
 void Renderer::useZoneModel(ZoneModel* zoneModel)
 {
 	mSceneMgr->clear();
+	//mSceneMgr->getParameters()->setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true); 
 
 	//animated textures
 	std::vector<AnimatedTexture> animTexturesTemp;
@@ -168,22 +170,22 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 	}
 
 	//main zone geometry
-	scene::IMeshSceneNode* node = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
+	mCollisionNode = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
 	mSceneMgr->setAmbientLight(video::SColorf(1, 1, 1, 1));
-	node->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));
+	mCollisionNode->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));
 
 	//update animated texture with target scene node, if applicable
 	scene::IMesh* mesh = zoneModel->getMesh()->getMesh(0);
 	for (AnimatedTexture& animTex : animTexturesTemp)
 	{
-		if (animTex.replaceMeshWithSceneNode(mesh, node))
+		if (animTex.replaceMeshWithSceneNode(mesh, mCollisionNode))
 			mAnimatedTextures.push_back(animTex);
 	}
 
 	//placed objects
 	for (const ObjectPlacement& obj : zoneModel->getObjectPlacements())
 	{
-		scene::IAnimatedMeshSceneNode* objNode = mSceneMgr->addAnimatedMeshSceneNode(obj.mesh, nullptr, -1,
+		scene::IAnimatedMeshSceneNode* objNode = mSceneMgr->addAnimatedMeshSceneNode(obj.mesh, mCollisionNode, -1,
 			core::vector3df(obj.x, obj.y, obj.z),
 			core::vector3df(obj.rotX, obj.rotY, obj.rotZ),
 			core::vector3df(obj.scaleX, obj.scaleY, obj.scaleZ));

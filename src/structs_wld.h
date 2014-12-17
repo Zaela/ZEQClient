@@ -54,7 +54,7 @@ namespace WLD_Structs
 		{
 			//these aren't "right", but they work mostly
 			MASKED = 0x12,
-			SEMI_TRANSPARENT = 0x17
+			SEMI_TRANSPARENT = 0x5
 		};
 		uint32 flag;
 		uint32 visibility_flag;

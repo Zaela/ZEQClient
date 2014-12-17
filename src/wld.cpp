@@ -180,6 +180,8 @@ void WLD::Frag03ToMaterialEntry(Frag03* f03, Frag30* f30, IntermediateMaterialEn
 	{
 		//we have a texture name, create it in the renderer
 		MemoryStream* file = mContainingS3D->getFile((char*)f03->string);
+		if (file == nullptr)
+			return;
 		std::string name = mShortName;
 		name += '/';
 		name += getFragName((FragHeader*)f30);
@@ -226,9 +228,11 @@ uint32 WLD::translateVisibilityFlag(Frag30* f30, bool isDDS)
 {
 	uint32 ret = 0;
 
-	if (f30->visibility_flag & Frag30::MASKED)
+	if (f30->visibility_flag == 0)
+		return IntermediateMaterialEntry::FULLY_TRANSPARENT;
+	if ((f30->visibility_flag & Frag30::MASKED) == Frag30::MASKED)
 		ret |= IntermediateMaterialEntry::MASKED;
-	if (f30->visibility_flag & Frag30::SEMI_TRANSPARENT)
+	if ((f30->visibility_flag & Frag30::SEMI_TRANSPARENT) == Frag30::SEMI_TRANSPARENT)
 		ret |= IntermediateMaterialEntry::SEMI_TRANSPARENT;
 	if (isDDS)
 		ret |= IntermediateMaterialEntry::DDS_TEXTURE;
@@ -365,6 +369,8 @@ void WLD::processMesh(Frag36* f36)
 			}
 			//if (tri.flag & RawTriangle::PERMEABLE)
 			//add vertices and indices to collision mesh buffers
+			//alternatively, segregate non-collidable geometry into their own mesh buffers and scene node... probably better
+			//though more complicated to set up...
 		}
 
 		//write indices (purely in order for now, no reused vertices)
@@ -500,17 +506,6 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 {
 	//irrlicht's default provided mesh buffers can take up to 65536 indices
 	//need to handle case of total > 65535 by splitting into separate buffers
-
-	//if using a DDS texture, one of the UV coords may need to be flipped
-	if (mat && mat->first.flag & IntermediateMaterialEntry::DDS_TEXTURE)
-	{
-		for (video::S3DVertex& vert : vert_buf)
-		{
-			if (vert.TCoords.Y > 0)
-				vert.TCoords.Y = -vert.TCoords.Y;
-		}
-	}
-
 	uint32 count = index_buf.size();
 	uint32 n = (count / 65535) + 1; //may want to make sure it's not an exact multiple
 	uint32 adj = 0;
@@ -541,18 +536,21 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 		video::SMaterial& material = mesh_buffer->getMaterial();
 		if (mat)
 		{
-			if (mat->first.diffuse_map)
+			if (mat->first.flag & IntermediateMaterialEntry::FULLY_TRANSPARENT)
+			{
+				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //fully transparent materials should have no texture
+				//use TRANSPARENT_VERTEX_ALPHA to show zone walls
+			}
+			else if (mat->first.diffuse_map)
 			{
 				material.setTexture(0, mat->first.diffuse_map);
 				zone->addUsedTexture(mat->first.diffuse_map);
-			}
 
-			if (mat->first.flag & IntermediateMaterialEntry::MASKED)
-				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-			//put semi-transparent handling here (need to figure out how to do it and how to make it play nice with masking...)
-			//probably make a copy of the texture and change the alpha of the bitmap pixels, then use blending EMT_TRANSPARENT_ALPHA_CHANNEL
-			else if (mat->first.flag & IntermediateMaterialEntry::FULLY_TRANSPARENT)
-				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //fully transparent materials should have no texture; use VERTEX_ALPHA to show zone walls
+				if (mat->first.flag & IntermediateMaterialEntry::MASKED)
+					material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //should be blended
+				//put semi-transparent handling here (need to figure out how to do it and how to make it play nice with masking...)
+				//probably make a copy of the texture and change the alpha of the bitmap pixels, then use blending EMT_TRANSPARENT_ALPHA_CHANNEL
+			}
 		}
 		else
 		{
@@ -561,8 +559,6 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 
 		mesh_buffer->recalculateBoundingBox();
 		mesh->addMeshBuffer(mesh_buffer);
-		//if (animTex)
-		//	animTex->setMeshBuffer(i, mesh_buffer);
 		mesh_buffer->drop();
 
 		adj += 65535;
