@@ -52,8 +52,8 @@ private:
 
 	std::vector<video::S3DVertex>* mMaterialVertexBuffers;
 	std::vector<uint32>* mMaterialIndexBuffers;
-	std::vector<video::S3DVertex> mCollisionVertexBuffer;
-	std::vector<uint32> mCollisionIndexBuffer;
+	std::vector<video::S3DVertex>* mNoCollisionVertexBuffers;
+	std::vector<uint32>* mNoCollisionIndexBuffers;
 	/* --------------------------------------------- */
 
 	std::unordered_map<Frag30*, int> mMaterialIndicesByFrag30;
@@ -65,6 +65,8 @@ private:
 	void handleAnimatedMaterial(Frag04* f04, Frag30* f30, IntermediateMaterial* mat);
 	static uint32 translateVisibilityFlag(Frag30* f30, bool isDDS);
 	void processMesh(Frag36* f36);
+	void processTriangle(RawTriangle* tri, uint32 count, std::vector<video::S3DVertex>& vert_buf,
+		std::vector<uint32>& index_buf, RawVertex* vert, RawNormal* norm, RawUV16* uv16, RawUV32* uv32);
 
 	/* --------------------------------------------- */
 	void initMaterialBuffers();

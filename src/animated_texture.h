@@ -32,6 +32,7 @@ public:
 	bool replaceMeshWithSceneNode(void* compare_mesh, void* node);
 	bool checkMesh(void* compare_mesh) { return mesh == compare_mesh; }
 	void setMeshPtr(void* ptr) { mesh = ptr; }
+	void deleteArrays(); //don't want this to be in the destructor due to direct copies of the ptrs being made
 };
 
 #endif

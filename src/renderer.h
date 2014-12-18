@@ -29,6 +29,7 @@ private:
 	uint32 mPrevTime;
 
 	scene::IMeshSceneNode* mCollisionNode;
+	ZoneModel* mActiveZoneModel;
 
 	std::vector<AnimatedTexture> mAnimatedTextures;
 
@@ -41,7 +42,10 @@ public:
 	void initialize();
 	void close();
 
+	bool isOpenGL() { return mDriver->getDriverType() == video::EDT_OPENGL; }
+
 	video::ITexture* createTexture(MemoryStream* file, std::string name, bool& isDDS);
+	void destroyTexture(video::ITexture* tex);
 	Camera* createCamera(bool bind = true);
 
 	float loopStep();

@@ -45,3 +45,11 @@ bool AnimatedTexture::replaceMeshWithSceneNode(void* compare_mesh, void* node)
 	}
 	return false;
 }
+
+void AnimatedTexture::deleteArrays()
+{
+	if (texture_array)
+		delete[] texture_array;
+	if (material_index_array)
+		delete[] material_index_array;
+}

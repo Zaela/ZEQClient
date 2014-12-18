@@ -78,6 +78,10 @@ int main(int argc, char** argv)
 			WLD* placeWLD = gFileLoader.getWLD("objects", shortname.c_str());
 			placeWLD->convertZoneObjectPlacements(zoneModel);
 
+			delete wld;
+			delete objWLD;
+			delete placeWLD;
+
 			gRenderer.useZoneModel(zoneModel);
 
 			gPlayer.setCamera(gRenderer.createCamera());
@@ -165,7 +169,7 @@ FINISH:
 	if (out.pathToEQ.empty() || out.acctName.empty() || out.password.empty() || out.charName.empty() || out.serverName.empty())
 	{
 		printUsage();
-		throw ZEQException("bad arguments");
+		throw ExitException();
 	}
 }
 

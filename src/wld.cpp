@@ -230,7 +230,7 @@ uint32 WLD::translateVisibilityFlag(Frag30* f30, bool isDDS)
 
 	if (f30->visibility_flag == 0)
 		return IntermediateMaterialEntry::FULLY_TRANSPARENT;
-	if ((f30->visibility_flag & Frag30::MASKED) == Frag30::MASKED)
+	if ((f30->visibility_flag & Frag30::MASKED) == Frag30::MASKED || (f30->visibility_flag & 0xB) == 0xB)
 		ret |= IntermediateMaterialEntry::MASKED;
 	if ((f30->visibility_flag & Frag30::SEMI_TRANSPARENT) == Frag30::SEMI_TRANSPARENT)
 		ret |= IntermediateMaterialEntry::SEMI_TRANSPARENT;
@@ -292,6 +292,64 @@ void WLD::processMesh(Frag36* f36)
 		mat_index_list[i] = mMaterialIndicesByFrag30[f30];
 	}
 
+	auto processTriangle = [=](RawTriangle& tri, std::vector<video::S3DVertex>& vert_buf, std::vector<uint32>& index_buf)
+	{
+		uint32 base = vert_buf.size();
+
+		//handle uv conversions
+		video::S3DVertex vertex;
+		if (uv16)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				static const float uv_scale = 1.0f / 256.0f;
+				RawUV16& uv = uv16[tri.index[i]];
+				vertex.TCoords.X = (float)uv.u * uv_scale;
+				vertex.TCoords.Y = -((float)uv.v * uv_scale);
+				vert_buf.push_back(vertex);
+			}
+		}
+		else if (uv32)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				RawUV32& uv = uv32[tri.index[i]];
+				vertex.TCoords.X = uv.u;
+				vertex.TCoords.Y = -uv.v;
+				vert_buf.push_back(vertex);
+			}
+		}
+		else
+		{
+			vertex.TCoords.X = 0;
+			vertex.TCoords.Y = 0;
+			for (int i = 0; i < 3; ++i)
+				vert_buf.push_back(vertex);
+		}
+
+		//handle vertex and normal conversions
+		uint32 buf_pos = base;
+		for (int i = 0; i < 3; ++i)
+		{
+			video::S3DVertex& vertex = vert_buf[buf_pos++];
+			uint16 idx = tri.index[i];
+			RawVertex& vert = wld_verts[idx];
+			vertex.Pos.X = f36->x + (float)vert.x * scale;
+			vertex.Pos.Z = f36->y + (float)vert.y * scale; //irrlicht uses Y for the "up" axis, need to switch
+			vertex.Pos.Y = f36->z + (float)vert.z * scale;
+			RawNormal& norm = wld_norm[idx];
+			static const float normal_scale = 1.0f / 127.0f;
+			vertex.Normal.X = (float)norm.i * normal_scale;
+			vertex.Normal.Z = (float)norm.j * normal_scale;
+			vertex.Normal.Y = (float)norm.k * normal_scale;
+		}
+
+		//write indices (purely in order for now, no reused vertices)
+		//would be faster to do them all per material in one step, in that case... but we should look at reusing vertices instead
+		for (int i = 0; i < 3; ++i)
+			index_buf.push_back(base++);
+	};
+
 	//construct vertices and triangles based on their materials
 	for (uint16 m = 0; m < f36->poly_texture_count; ++m)
 	{
@@ -303,8 +361,19 @@ void WLD::processMesh(Frag36* f36)
 		//get buffers
 		std::vector<video::S3DVertex>& vert_buf = mMaterialVertexBuffers[mat_index];
 		std::vector<uint32>& index_buf = mMaterialIndexBuffers[mat_index];
+		std::vector<video::S3DVertex>& nocollide_vert_buf = mNoCollisionVertexBuffers[mat_index];
+		std::vector<uint32>& nocollide_index_buf = mNoCollisionIndexBuffers[mat_index];
 
-		uint32 base = vert_buf.size();
+		for (uint16 i = 0; i < rte->count; ++i)
+		{
+			RawTriangle& tri = wld_tris[i];
+			if ((tri.flag & RawTriangle::PERMEABLE) == 0)
+				processTriangle(tri, vert_buf, index_buf);
+			else
+				processTriangle(tri, nocollide_vert_buf, nocollide_index_buf);
+		}
+
+		/*uint32 base = vert_buf.size();
 
 		//handle uv conversions
 		if (uv16)
@@ -377,7 +446,7 @@ void WLD::processMesh(Frag36* f36)
 		//would be faster to do them all per material in one step, in that case... but we should look at reusing vertices instead
 		uint32 count = rte->count * 3;
 		for (uint32 i = 0; i < count; ++i)
-			index_buf.push_back(base++);
+			index_buf.push_back(base++);*/
 
 		//advance triangles ptr for the next block
 		wld_tris += rte->count;
@@ -388,11 +457,15 @@ void WLD::initMaterialBuffers()
 {
 	mMaterialVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
 	mMaterialIndexBuffers = new std::vector<uint32>[mNumMaterials];
+	mNoCollisionVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
+	mNoCollisionIndexBuffers = new std::vector<uint32>[mNumMaterials];
 	for (uint32 i = 0; i < mNumMaterials; ++i)
 	{
 		//placement new
 		new (&mMaterialVertexBuffers[i]) std::vector<video::S3DVertex>;
 		new (&mMaterialIndexBuffers[i]) std::vector<uint32>;
+		new (&mNoCollisionVertexBuffers[i]) std::vector<video::S3DVertex>;
+		new (&mNoCollisionIndexBuffers[i]) std::vector<uint32>;
 	}
 }
 
@@ -415,15 +488,20 @@ ZoneModel* WLD::convertZoneGeometry()
 
 	//create the irrlicht mesh, transferring buffers and creating final materials
 	scene::SMesh* mesh = new scene::SMesh;
+	scene::SMesh* nocollide_mesh = new scene::SMesh;
 	ZoneModel* zone = new ZoneModel;
 
 	for (uint32 i = 0; i < mNumMaterials; ++i)
 	{
-		createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], zone);
+		if (!mMaterialVertexBuffers[i].empty())
+			createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], zone);
+		if (!mNoCollisionVertexBuffers[i].empty())
+			createMeshBuffer(nocollide_mesh, mNoCollisionVertexBuffers[i], mNoCollisionIndexBuffers[i], &mMaterials[i], zone);
 	}
 
 	mesh->recalculateBoundingBox();
-	zone->setMesh(mesh);
+	nocollide_mesh->recalculateBoundingBox();
+	zone->setMeshes(mesh, nocollide_mesh);
 
 	return zone;
 }
@@ -456,6 +534,7 @@ void WLD::convertZoneObjectDefinitions(ZoneModel* zone)
 
 		//create irrlicht mesh
 		scene::SMesh* mesh = new scene::SMesh;
+		scene::SMesh* noncollision_mesh = new scene::SMesh;
 		//find any vertex + index buffers with data in them and use them to fill this mesh
 		for (uint32 i = 0; i < mNumMaterials; ++i)
 		{
@@ -465,10 +544,25 @@ void WLD::convertZoneObjectDefinitions(ZoneModel* zone)
 				mMaterialVertexBuffers[i].clear();
 				mMaterialIndexBuffers[i].clear();
 			}
+			if (!mNoCollisionVertexBuffers[i].empty())
+			{
+				createMeshBuffer(noncollision_mesh, mNoCollisionVertexBuffers[i], mNoCollisionIndexBuffers[i], &mMaterials[i], zone);
+				mNoCollisionVertexBuffers[i].clear();
+				mNoCollisionIndexBuffers[i].clear();
+			}
 		}
 
-		mesh->recalculateBoundingBox();
-		zone->addObjectDefinition(model_name, mesh);
+		if (mesh->getMeshBufferCount() > 0)
+		{
+			mesh->recalculateBoundingBox();
+			zone->addObjectDefinition(model_name, mesh);
+		}
+
+		if (noncollision_mesh->getMeshBufferCount() > 0)
+		{
+			noncollision_mesh->recalculateBoundingBox();
+			zone->addNoCollisionObjectDefinition(model_name, noncollision_mesh);
+		}
 	}
 }
 

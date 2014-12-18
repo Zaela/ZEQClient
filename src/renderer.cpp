@@ -10,7 +10,9 @@ Renderer::Renderer() :
 	mDriver(nullptr),
 	mSceneMgr(nullptr),
 	mSleepMilliseconds(20),
-	mPrevTime(0)
+	mPrevTime(0),
+	mCollisionNode(nullptr),
+	mActiveZoneModel(nullptr)
 {
 
 }
@@ -124,6 +126,11 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 	return tex;
 }
 
+void Renderer::destroyTexture(video::ITexture* tex)
+{
+	mDriver->removeTexture(tex);
+}
+
 Camera* Renderer::createCamera(bool bind)
 {
 	scene::ICameraSceneNode* node = mSceneMgr->addCameraSceneNode();
@@ -171,14 +178,17 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 
 	//main zone geometry
 	mCollisionNode = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
+	scene::IMeshSceneNode* noncollision_node = mSceneMgr->addOctreeSceneNode(zoneModel->getNonCollisionMesh());
 	mSceneMgr->setAmbientLight(video::SColorf(1, 1, 1, 1));
 	mCollisionNode->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));
 
 	//update animated texture with target scene node, if applicable
 	scene::IMesh* mesh = zoneModel->getMesh()->getMesh(0);
+	scene::IMesh* noncollision_mesh = zoneModel->getNonCollisionMesh()->getMesh(0);
 	for (AnimatedTexture& animTex : animTexturesTemp)
 	{
-		if (animTex.replaceMeshWithSceneNode(mesh, mCollisionNode))
+		if (animTex.replaceMeshWithSceneNode(mesh, mCollisionNode) ||
+			animTex.replaceMeshWithSceneNode(noncollision_mesh, noncollision_node))
 			mAnimatedTextures.push_back(animTex);
 	}
 
@@ -196,13 +206,14 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 		{
 			if (animTex.checkMesh(mesh))
 			{
-				//need to keep track of array ptrs for future deletion...
 				AnimatedTexture copy = animTex;
 				copy.setMeshPtr(objNode);
 				mAnimatedTextures.push_back(copy);
 			}
 		}
 	}
+
+	mActiveZoneModel = zoneModel;
 }
 
 void Renderer::checkAnimatedTextures(uint32 delta)
