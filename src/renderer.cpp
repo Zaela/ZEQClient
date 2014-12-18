@@ -9,6 +9,7 @@ Renderer::Renderer() :
 	mDevice(nullptr),
 	mDriver(nullptr),
 	mSceneMgr(nullptr),
+	mCollisionMgr(nullptr),
 	mSleepMilliseconds(20),
 	mPrevTime(0),
 	mCollisionNode(nullptr),
@@ -33,6 +34,7 @@ void Renderer::initialize()
 		
 		mDriver = mDevice->getVideoDriver();
 		mSceneMgr = mDevice->getSceneManager();
+		mCollisionMgr = mSceneMgr->getSceneCollisionManager();
 	}
 }
 
@@ -178,7 +180,13 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 
 	//main zone geometry
 	mCollisionNode = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
+	scene::ITriangleSelector* sel = mSceneMgr->createOctreeTriangleSelector(zoneModel->getMesh(), mCollisionNode);
+	mCollisionNode->setTriangleSelector(sel);
+	mCollisionSelector = sel;
+	sel->drop();
+
 	scene::IMeshSceneNode* noncollision_node = mSceneMgr->addOctreeSceneNode(zoneModel->getNonCollisionMesh());
+
 	mSceneMgr->setAmbientLight(video::SColorf(1, 1, 1, 1));
 	mCollisionNode->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));
 

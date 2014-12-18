@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "exception.h"
+#include "zone_viewer.h"
 
 using namespace irr;
 
@@ -20,6 +21,8 @@ private:
 	int32 mMouseY;
 	float mRelativeMouseX;
 	float mRelativeMouseY;
+
+	int mMode;
 
 public:
 	enum Movement
@@ -36,12 +39,22 @@ public:
 		TURN_RIGHT
 	};
 
+	enum Mode
+	{
+		ZONE_VIEWER
+	};
+
 private:
 	bool handleKeyboardEvent(const SEvent::SKeyInput& ev);
 	bool handleMouseEvent(const SEvent::SMouseInput& ev);
 
+	bool zoneViewerKeyboardEvent(const SEvent::SKeyInput& ev);
+	bool zoneViewerMouseEvent(const SEvent::SMouseInput& ev);
+
 public:
 	Input();
+
+	void setMode(Mode mode) { mMode = mode; }
 
 	void suspendInput(bool toggle) { mSuspendInput = toggle; }
 

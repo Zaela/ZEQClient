@@ -1,5 +1,8 @@
 
 #include "input.h"
+#include "player.h"
+
+extern Player gPlayer;
 
 using namespace irr;
 
@@ -19,62 +22,69 @@ bool Input::OnEvent(const SEvent& ev)
 	switch (ev.EventType)
 	{
 	case EET_KEY_INPUT_EVENT:
-	{
 		return handleKeyboardEvent(ev.KeyInput);
-	}
 	case EET_MOUSE_INPUT_EVENT:
-	{
 		return handleMouseEvent(ev.MouseInput);
-	}
 	default:
-		break;
+		return false;
 	}
-
-	return false;
 }
 
 bool Input::handleKeyboardEvent(const SEvent::SKeyInput& ev)
+{
+	switch (mMode)
+	{
+	case ZONE_VIEWER:
+		return zoneViewerKeyboardEvent(ev);
+	default:
+		return false;
+	}
+}
+
+bool Input::handleMouseEvent(const SEvent::SMouseInput& ev)
+{
+	switch (mMode)
+	{
+	case ZONE_VIEWER:
+		return zoneViewerMouseEvent(ev);
+	default:
+		return false;
+	}
+}
+
+bool Input::zoneViewerKeyboardEvent(const SEvent::SKeyInput& ev)
 {
 	switch (ev.Key)
 	{
 	case KEY_UP:
 		if (ev.PressedDown)
-		{
 			mMoveDirection = MOVE_FORWARD;
-		}
 		else if (mMoveDirection == MOVE_FORWARD)
-		{
 			mMoveDirection = MOVE_NONE;
-		}
 		break;
 	case KEY_DOWN:
 		if (ev.PressedDown)
-		{
 			mMoveDirection = MOVE_BACKWARD;
-		}
 		else if (mMoveDirection == MOVE_BACKWARD)
-		{
 			mMoveDirection = MOVE_NONE;
-		}
 		break;
 	case KEY_LEFT:
 		if (ev.PressedDown)
-		{
 			mTurnDirection = TURN_LEFT;
-		}
 		else if (mTurnDirection == TURN_LEFT)
-		{
 			mTurnDirection = TURN_NONE;
-		}
 		break;
 	case KEY_RIGHT:
 		if (ev.PressedDown)
-		{
 			mTurnDirection = TURN_RIGHT;
-		}
 		else if (mTurnDirection == TURN_RIGHT)
-		{
 			mTurnDirection = TURN_NONE;
+		break;
+	case KEY_KEY_G:
+		if (!ev.PressedDown)
+		{
+			ZoneViewerData* zv = gPlayer.getZoneViewer();
+			zv->applyGravity = !zv->applyGravity;
 		}
 		break;
 	case KEY_ESCAPE:
@@ -86,7 +96,7 @@ bool Input::handleKeyboardEvent(const SEvent::SKeyInput& ev)
 	return false;
 }
 
-bool Input::handleMouseEvent(const SEvent::SMouseInput& ev)
+bool Input::zoneViewerMouseEvent(const SEvent::SMouseInput& ev)
 {
 	switch (ev.Event)
 	{

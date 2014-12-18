@@ -10,6 +10,7 @@
 #include "login_connection.h"
 #include "world_connection.h"
 #include "zone_connection.h"
+#include "zone_viewer.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -69,6 +70,8 @@ int main(int argc, char** argv)
 		{
 			std::string shortname = args.zoneShortname;
 
+			gPlayer.setZoneViewer(new ZoneViewerData);
+
 			WLD* wld = gFileLoader.getWLD(shortname);
 			if (wld == nullptr)
 				throw ZEQException("bad zone shortname");
@@ -84,6 +87,7 @@ int main(int argc, char** argv)
 
 			gRenderer.useZoneModel(zoneModel);
 
+			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());
 			gPlayer.zoneViewerLoop();
 		}

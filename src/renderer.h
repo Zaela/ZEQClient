@@ -25,10 +25,12 @@ private:
 	IrrlichtDevice* mDevice;
 	video::IVideoDriver* mDriver;
 	scene::ISceneManager* mSceneMgr;
+	scene::ISceneCollisionManager* mCollisionMgr;
 	uint32 mSleepMilliseconds;
 	uint32 mPrevTime;
 
 	scene::IMeshSceneNode* mCollisionNode;
+	scene::ITriangleSelector* mCollisionSelector;
 	ZoneModel* mActiveZoneModel;
 
 	std::vector<AnimatedTexture> mAnimatedTextures;
@@ -47,6 +49,9 @@ public:
 	video::ITexture* createTexture(MemoryStream* file, std::string name, bool& isDDS);
 	void destroyTexture(video::ITexture* tex);
 	Camera* createCamera(bool bind = true);
+	scene::ISceneCollisionManager* getCollisionManager() { return mCollisionMgr; }
+	scene::IMeshSceneNode* getCollisionNode() { return mCollisionNode; }
+	scene::ITriangleSelector* getCollisionSelector() { return mCollisionSelector; }
 
 	float loopStep();
 	void useZoneModel(ZoneModel* zoneModel);
