@@ -14,7 +14,7 @@
 
 using namespace irr;
 
-class Player : public Mob
+class Player
 {
 private:
 	ZoneConnection* mZoneConnection;
@@ -22,6 +22,7 @@ private:
 	float mMovespeed;
 	float mFallspeed;
 	bool mIsFalling;
+	float mFallStartingY;
 
 	ZoneViewerData* mZoneViewer;
 
@@ -29,6 +30,12 @@ private:
 	//constants
 	static const uint32 FALLING_SPEED_DEFAULT = 125;
 	static const uint32 FALLING_SPEED_SWIMMING = 25;
+
+private:
+	void applyMovement(float delta);
+	void applyGravity(float delta);
+	void applyFallingDamage();
+	void checkCollision(core::vector3df& from, core::vector3df& dest);
 
 public:
 	Player();
@@ -40,10 +47,7 @@ public:
 	void setZoneViewer(ZoneViewerData* data) { mZoneViewer = data; }
 
 	void setZoneConnection(ZoneConnection* zc) { mZoneConnection = zc; }
-	void setCamera(Camera* cam) { if (mCamera) delete mCamera; mCamera = cam; }
-
-	void applyMovement(float delta);
-	void applyGravity(float delta);
+	void setCamera(Camera* cam);
 };
 
 #endif

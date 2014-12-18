@@ -68,6 +68,7 @@ void ZoneModel::addObjectPlacement(const char* name, ObjectPlacement& placement)
 	{
 		scene::IAnimatedMesh* mesh = mObjectDefinitions[name];
 		placement.mesh = mesh;
+		placement.collidable = true;
 
 		mObjectPlacements.push_back(placement);
 	}
@@ -76,6 +77,7 @@ void ZoneModel::addObjectPlacement(const char* name, ObjectPlacement& placement)
 	{
 		scene::IAnimatedMesh* mesh = mNoCollisionObjectDefinitions[name];
 		placement.mesh = mesh;
+		placement.collidable = false;
 
 		mObjectPlacements.push_back(placement);
 	}

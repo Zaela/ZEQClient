@@ -279,8 +279,8 @@ void WLD::processMesh(Frag36* f36)
 	RawTriangle* wld_tris = (RawTriangle*)(data + p);
 	p += sizeof(RawTriangle) * f36->poly_count;
 
-	//skip vertex pieces (dunno what these are for)
-	p += sizeof(uint16) * 2 * f36->vert_piece_count;
+	//skip bone assignments
+	p += sizeof(BoneAssignment) * f36->bone_assignment_count;
 
 	//get material indices for triangles
 	std::unordered_map<uint32, int> mat_index_list;
@@ -373,81 +373,6 @@ void WLD::processMesh(Frag36* f36)
 				processTriangle(tri, nocollide_vert_buf, nocollide_index_buf);
 		}
 
-		/*uint32 base = vert_buf.size();
-
-		//handle uv conversions
-		if (uv16)
-		{
-			video::S3DVertex vertex;
-			for (uint16 i = 0; i < rte->count; ++i)
-			{
-				RawTriangle& tri = wld_tris[i];
-				for (int j = 0; j < 3; ++j)
-				{
-					static const float uv_scale = 1.0f / 256.0f;
-					RawUV16& uv = uv16[tri.index[j]];
-					vertex.TCoords.X = (float)uv.u * uv_scale;
-					vertex.TCoords.Y = -((float)uv.v * uv_scale);
-					vert_buf.push_back(vertex);
-				}
-			}
-		}
-		else if (uv32)
-		{
-			video::S3DVertex vertex;
-			for (uint16 i = 0; i < rte->count; ++i)
-			{
-				RawTriangle& tri = wld_tris[i];
-				for (int j = 0; j < 3; ++j)
-				{
-					RawUV32& uv = uv32[tri.index[j]];
-					vertex.TCoords.X = uv.u;
-					vertex.TCoords.Y = -uv.v;
-					vert_buf.push_back(vertex);
-				}
-			}
-		}
-		else
-		{
-			video::S3DVertex vertex;
-			vertex.TCoords.X = 0;
-			vertex.TCoords.Y = 0;
-			uint32 count = rte->count * 3;
-			for (uint32 i = 0; i < count; ++i)
-				vert_buf.push_back(vertex);
-		}
-
-		//handle vertex and normal conversions
-		uint32 buf_pos = base;
-		for (uint16 i = 0; i < rte->count; ++i)
-		{
-			RawTriangle& tri = wld_tris[i];
-			for (int j = 0; j < 3; ++j)
-			{
-				video::S3DVertex& vertex = vert_buf[buf_pos++];
-				uint16 idx = tri.index[j];
-				RawVertex& vert = wld_verts[idx];
-				vertex.Pos.X = f36->x + (float)vert.x * scale;
-				vertex.Pos.Z = f36->y + (float)vert.y * scale; //irrlicht uses Y for the "up" axis, need to switch
-				vertex.Pos.Y = f36->z + (float)vert.z * scale;
-				RawNormal& norm = wld_norm[idx];
-				static const float normal_scale = 1.0f / 127.0f;
-				vertex.Normal.X = (float)norm.i * normal_scale;
-				vertex.Normal.Z = (float)norm.j * normal_scale;
-				vertex.Normal.Y = (float)norm.k * normal_scale;
-			}
-			//if (tri.flag & RawTriangle::PERMEABLE)
-			//add vertices and indices to collision mesh buffers
-			//alternatively, segregate non-collidable geometry into their own mesh buffers and scene node... probably better
-			//though more complicated to set up...
-		}
-
-		//write indices (purely in order for now, no reused vertices)
-		//would be faster to do them all per material in one step, in that case... but we should look at reusing vertices instead
-		uint32 count = rte->count * 3;
-		for (uint32 i = 0; i < count; ++i)
-			index_buf.push_back(base++);*/
-
 		//advance triangles ptr for the next block
 		wld_tris += rte->count;
 	}
@@ -455,6 +380,8 @@ void WLD::processMesh(Frag36* f36)
 
 void WLD::initMaterialBuffers()
 {
+	if (mMaterialVertexBuffers)
+		return; //already created
 	mMaterialVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
 	mMaterialIndexBuffers = new std::vector<uint32>[mNumMaterials];
 	mNoCollisionVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
@@ -638,7 +565,7 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 			else if (mat->first.diffuse_map)
 			{
 				material.setTexture(0, mat->first.diffuse_map);
-				zone->addUsedTexture(mat->first.diffuse_map);
+				//zone->addUsedTexture(mat->first.diffuse_map); //make a general Model class for this
 
 				if (mat->first.flag & IntermediateMaterialEntry::MASKED)
 					material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //should be blended
@@ -658,4 +585,98 @@ void WLD::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& ve
 		adj += 65535;
 		count -= 65535;
 	}
+}
+
+MobModel* WLD::convertMobModel(const char* id_name)
+{
+	if (mFragsByType.count(0x14) == 0)
+		return nullptr;
+
+	processMaterials();
+
+	size_t len = strlen(id_name);
+
+	for (FragHeader* frag : mFragsByType[0x14])
+	{
+		const char* name = getFragName(frag);
+		if (strncmp(id_name, name, len) == 0)
+		{
+			return convertMobModel((Frag14*)frag);
+		}
+	}
+
+	return nullptr;
+}
+
+MobModel* WLD::convertMobModel(Frag14* f14)
+{
+	if (f14->size[1] < 1)
+		return nullptr;
+
+	//should handle this separately from zones in a lot of ways
+	//should not load all material textures off the bat in case we are only using 1 out of 10 models in a WLD, for one
+	
+	//process bones to get all the joints in order (check for and record attachment points!)
+	//then process the 0x36s to get the bone assignments
+	//and maybe also do the 0x30 --> 0x03 part there too if you can avoid making a mess
+
+	//should flag chr wld's and remove hardware textures on their destructors
+	
+	//initialize two buffers for each material
+	initMaterialBuffers();
+
+	//0x14 -> 0x11 -> 0x10 -> 0x13 -> 0x12
+	//                   | -> 0x2D -> 0x36
+	int* ref_ptr = f14->getRefList();
+	Frag11* f11 = (Frag11*)getFragByRef(*ref_ptr);
+	if (f11->type != 0x11)
+		return nullptr;
+	Frag10* f10 = (Frag10*)getFragByRef(f11->ref);
+
+	MobModel* mob = new MobModel;
+
+	//handle skeleton here
+	Frag10Bone* bone = f10->getBoneList();
+	//the skeleton uses index-based recursion, so let's facilitate that
+	Frag10Bone* bone_ptr = bone;
+	std::vector<Frag10Bone*> skeletonSet;
+	for (int i = 0; i < f10->num_bones; ++i)
+	{
+		skeletonSet.push_back(bone_ptr);
+		bone_ptr = bone_ptr->getNext();
+	}
+
+	//find meshes
+	int numMeshes;
+	ref_ptr = f10->getRefList(numMeshes);
+	for (int n = 0; n < numMeshes; ++n)
+	{
+		Frag2D* f2d = (Frag2D*)getFragByRef(*ref_ptr++);
+
+		processMesh((Frag36*)getFragByRef(f2d->ref));
+
+		//create irrlicht mesh
+		scene::SMesh* mesh = new scene::SMesh;
+		//find any vertex + index buffers with data in them and use them to fill this mesh
+		for (uint32 i = 0; i < mNumMaterials; ++i)
+		{
+			if (!mMaterialVertexBuffers[i].empty())
+			{
+				createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i]);//, zone);
+				mMaterialVertexBuffers[i].clear();
+				mMaterialIndexBuffers[i].clear();
+			}
+			if (!mNoCollisionVertexBuffers[i].empty())
+			{
+				createMeshBuffer(mesh, mNoCollisionVertexBuffers[i], mNoCollisionIndexBuffers[i], &mMaterials[i]);//, zone);
+				mNoCollisionVertexBuffers[i].clear();
+				mNoCollisionIndexBuffers[i].clear();
+			}
+		}
+
+		mesh->recalculateBoundingBox();
+		mob->setMesh(n, mesh);
+	}
+
+	return mob;
 }

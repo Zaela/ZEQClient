@@ -17,6 +17,7 @@
 #include "s3d.h"
 #include "renderer.h"
 #include "zone_model.h"
+#include "mob_model.h"
 
 using namespace WLD_Structs;
 
@@ -68,6 +69,8 @@ private:
 	void processTriangle(RawTriangle* tri, uint32 count, std::vector<video::S3DVertex>& vert_buf,
 		std::vector<uint32>& index_buf, RawVertex* vert, RawNormal* norm, RawUV16* uv16, RawUV32* uv32);
 
+	MobModel* convertMobModel(Frag14* f14);
+
 	/* --------------------------------------------- */
 	void initMaterialBuffers();
 	static void createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
@@ -89,6 +92,8 @@ public:
 	ZoneModel* convertZoneGeometry();
 	void convertZoneObjectDefinitions(ZoneModel* zone);
 	void convertZoneObjectPlacements(ZoneModel* zone);
+
+	MobModel* convertMobModel(const char* id_name);
 };
 
 #endif

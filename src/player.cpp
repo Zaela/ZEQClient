@@ -44,6 +44,19 @@ void Player::zoneViewerLoop()
 	}
 }
 
+void Player::setCamera(Camera* cam)
+{
+	if (mCamera)
+		delete mCamera;
+	mCamera = cam;
+	//REPLACE THIS - crappy irrlicht collision thing for now
+	scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
+		gRenderer.getCollisionSelector(),
+		cam->getSceneNode(), core::vector3df(1.5f, 3.0f, 1.5f), core::vector3df(0.0f, 0.0f, 0.0f),
+		core::vector3df(0.0f, 3.0f, 0.0f), 0.0f);
+	cam->getSceneNode()->addAnimator(acr);
+}
+
 void Player::applyMovement(float delta)
 {
 	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
@@ -88,9 +101,10 @@ void Player::applyMovement(float delta)
 	core::vector3df movedir = target;
 	movedir.normalize();
 
+	core::vector3df dest = pos;
 	if (moveDir != Input::MOVE_NONE)
 	{
-		pos -= movedir * delta * mMovespeed * moveDir;
+		dest -= movedir * delta * mMovespeed * moveDir;
 	}
 
 	if (mouseDown && turnDir != Input::TURN_NONE)
@@ -99,17 +113,21 @@ void Player::applyMovement(float delta)
 		strafevect = strafevect.crossProduct(cam->getUpVector());
 		strafevect.normalize();
 
-		pos -= strafevect * delta * mMovespeed * turnDir;
+		dest -= strafevect * delta * mMovespeed * turnDir;
 	}
 
+	//check collision between pos and dest
+	checkCollision(pos, dest);
+
 	//write translation
-	cam->setPosition(pos);
+	cam->setPosition(dest);
 
 	//write right target
-	target += pos;
+	target += dest;
 	cam->setTarget(target);
 
 	mIsFalling = true;
+	mFallStartingY = pos.Y;
 	gInput.resetMoved();
 }
 
@@ -124,9 +142,8 @@ void Player::applyGravity(float delta)
 	ray.end = pos + core::vector3df(0, -5000, 0);
 	core::vector3df collisionPoint;
 	core::triangle3df unused;
-	scene::ISceneNode* node;
 
-	if (mgr->getCollisionPoint(ray, gRenderer.getCollisionSelector(), collisionPoint, unused, node))
+	if (mgr->getSceneNodeAndCollisionPointFromRay(ray, collisionPoint, unused))
 	{
 		//a collision was found along the ray
 		float min = collisionPoint.Y + 5.0f;
@@ -140,6 +157,7 @@ void Player::applyGravity(float delta)
 				//done falling
 				fallTo = min;
 				mIsFalling = false;
+				applyFallingDamage();
 			}
 			yDiff = pos.Y - fallTo;
 			pos.Y = fallTo;
@@ -160,4 +178,34 @@ void Player::applyGravity(float delta)
 		//nothing beneath us - don't fall into the void
 		mIsFalling = false;
 	}
+}
+
+void Player::checkCollision(core::vector3df& from, core::vector3df& dest)
+{
+	//just like gravity in another direction, really
+	//just need to get a vector from a -> b by vector subtraction
+	//normalize it to unit length and multiply it to the desired length
+	//then shoot your ray and do the same stuff with the collision point, if any
+	/*scene::ISceneCollisionManager* mgr = gRenderer.getCollisionManager();
+
+	core::line3df ray;
+	ray.start = from + core::vector3df(0, 5, 0);
+	ray.end = dest + core::vector3df(0, 5, 0);
+	core::vector3df collisionPoint;
+	core::triangle3df unused;
+
+	if (mgr->getSceneNodeAndCollisionPointFromRay(ray, collisionPoint, unused))
+	{
+		printf("collision: %g, %g, %g to %g, %g, %g\n", from.X, from.Y, from.Z, dest.X, dest.Y, dest.Z);
+		core::vector3df diff = from - collisionPoint;
+		diff.normalize();
+		dest = collisionPoint - core::vector3df(0, 5, 0) - diff;
+		printf("corrected to %g, %g, %g\n", dest.X, dest.Y, dest.Z);
+	}*/
+}
+
+void Player::applyFallingDamage()
+{
+	float dist = mFallStartingY - mCamera->getSceneNode()->getPosition().Y; //change this
+	//threshold and damage calculation, I have no idea at the moment
 }

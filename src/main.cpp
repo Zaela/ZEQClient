@@ -87,6 +87,13 @@ int main(int argc, char** argv)
 
 			gRenderer.useZoneModel(zoneModel);
 
+			wld = gFileLoader.getWLD("global_chr");
+			MobModel* mobModel = wld->convertMobModel("HUM");
+
+			auto* sceneMgr = gRenderer.getSceneManager();
+			auto* node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getMainMesh());
+			node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getHeadMesh(0), node);
+
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());
 			gPlayer.zoneViewerLoop();

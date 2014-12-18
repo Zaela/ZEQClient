@@ -82,6 +82,7 @@
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mob_model.cpp" />
     <ClCompile Include="src\network_crc.cpp" />
     <ClCompile Include="src\packet.cpp" />
     <ClCompile Include="src\packet_receiver.cpp" />
@@ -110,6 +111,7 @@
     <ClInclude Include="src\login_connection.h" />
     <ClInclude Include="src\memory_stream.h" />
     <ClInclude Include="src\mob.h" />
+    <ClInclude Include="src\mob_model.h" />
     <ClInclude Include="src\network_crc.h" />
     <ClInclude Include="src\npc.h" />
     <ClInclude Include="src\opcodes.h" />

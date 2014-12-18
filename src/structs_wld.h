@@ -16,6 +16,12 @@ namespace WLD_Structs
 		static const uint32 SIZE = 8; //nameref isn't considered part of the frag header, but it's always there
 	};
 
+	struct BoneAssignment
+	{
+		int16 count;
+		int16 index;
+	};
+
 	struct Frag36 : public FragHeader //mesh fragment
 	{
 		uint32 flag;
@@ -30,7 +36,7 @@ namespace WLD_Structs
 		uint16 normal_count;
 		uint16 color_count;
 		uint16 poly_count;
-		uint16 vert_piece_count;
+		uint16 bone_assignment_count;
 		uint16 poly_texture_count;
 		uint16 vert_texture_count;
 		uint16 size9;
@@ -103,6 +109,74 @@ namespace WLD_Structs
 			//skipping of various sizes
 			for (int i = 0; i < size[0]; ++i)
 				data += *(int*)data * 8 + sizeof(int);
+			return (int*)data;
+		}
+	};
+
+	struct Frag13 : public FragHeader
+	{
+		int ref;
+	};
+
+	struct Frag11 : public FragHeader //skeleton ref fragment
+	{
+		int ref;
+		uint32 flag;
+	};
+
+	struct Frag10Bone
+	{
+		int nameref;
+		uint32 flag;
+		int ref1;
+		int ref2;
+		int size;
+
+		int* getIndexList()
+		{
+			return (int*)((byte*)this + sizeof(Frag10Bone));
+		}
+
+		Frag10Bone* getNext()
+		{
+			return (Frag10Bone*)((byte*)this + sizeof(Frag10Bone) + size * sizeof(int));
+		}
+	};
+
+	struct Frag10 : public FragHeader //skeleton set fragment
+	{
+		uint32 flag;
+		int num_bones;
+		int ref;
+
+		Frag10Bone* getBoneList()
+		{
+			byte* data = (byte*)this + sizeof(Frag10);
+			//skip optional fields if they exist
+			if (flag & (1 << 0))
+				data += 12;
+			if (flag & (1 << 1))
+				data += 4;
+			return (Frag10Bone*)data;
+		}
+
+		int* getRefList(int& out_num)
+		{
+			byte* data = (byte*)this + sizeof(Frag10);
+			//skip optional fields if they exist
+			if (flag & (1 << 0))
+				data += 12;
+			if (flag & (1 << 1))
+				data += 4;
+			//skipping of various sizes
+			for (int i = 0; i < num_bones; ++i)
+			{
+				data += 16;
+				int count = *(int*)data;
+				data += count * 4 + sizeof(int);
+			}
+			out_num = *(int*)data;
+			data += sizeof(int);
 			return (int*)data;
 		}
 	};

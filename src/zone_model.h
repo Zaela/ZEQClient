@@ -21,6 +21,7 @@ struct ObjectPlacement
 	float x, y, z;
 	float rotX, rotY, rotZ;
 	float scaleX, scaleY, scaleZ;
+	bool collidable;
 };
 
 class ZoneModel

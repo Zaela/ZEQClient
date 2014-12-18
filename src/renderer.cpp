@@ -208,6 +208,13 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 			core::vector3df(obj.rotX, obj.rotY, obj.rotZ),
 			core::vector3df(obj.scaleX, obj.scaleY, obj.scaleZ));
 
+		if (obj.collidable)
+		{
+			sel = mSceneMgr->createTriangleSelector(objNode);
+			objNode->setTriangleSelector(sel);
+			sel->drop();
+		}
+
 		//update animated texture with target scene node, if applicable
 		scene::IMesh* mesh = obj.mesh->getMesh(0);
 		for (AnimatedTexture& animTex : animTexturesTemp)

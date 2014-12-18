@@ -53,6 +53,8 @@ public:
 	scene::IMeshSceneNode* getCollisionNode() { return mCollisionNode; }
 	scene::ITriangleSelector* getCollisionSelector() { return mCollisionSelector; }
 
+	scene::ISceneManager* getSceneManager() { return mSceneMgr; }
+
 	float loopStep();
 	void useZoneModel(ZoneModel* zoneModel);
 	void checkAnimatedTextures(uint32 delta);
