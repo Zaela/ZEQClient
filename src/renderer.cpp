@@ -179,13 +179,16 @@ void Renderer::useZoneModel(ZoneModel* zoneModel)
 	}
 
 	//main zone geometry
+	core::vector3df pos(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ());
 	mCollisionNode = mSceneMgr->addOctreeSceneNode(zoneModel->getMesh());
+	mCollisionNode->setPosition(pos);
 	scene::ITriangleSelector* sel = mSceneMgr->createOctreeTriangleSelector(zoneModel->getMesh(), mCollisionNode);
 	mCollisionNode->setTriangleSelector(sel);
 	mCollisionSelector = sel;
 	sel->drop();
 
 	scene::IMeshSceneNode* noncollision_node = mSceneMgr->addOctreeSceneNode(zoneModel->getNonCollisionMesh());
+	noncollision_node->setPosition(pos);
 
 	mSceneMgr->setAmbientLight(video::SColorf(1, 1, 1, 1));
 	mCollisionNode->setPosition(core::vector3df(zoneModel->getX(), zoneModel->getY(), zoneModel->getZ()));

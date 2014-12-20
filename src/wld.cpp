@@ -4,7 +4,7 @@
 extern Renderer gRenderer;
 
 WLD::WLD(MemoryStream* mem, S3D* s3d, std::string shortname) :
-	ZoneModelSource(s3d, shortname)
+	ModelSource(s3d, shortname)
 {
 	byte* data = mem->getData();
 
@@ -265,7 +265,7 @@ void WLD::processMesh(Frag36* f36, scene::CSkinnedMesh* skele)
 	if (jointArray)
 	{
 		printf("vert count: %u\n", f36->vert_count);
-		BoneAssignment* ba = (BoneAssignment*)(data + p);
+		WLD_Structs::BoneAssignment* ba = (WLD_Structs::BoneAssignment*)(data + p);
 		for (uint16 b = 0; b < f36->bone_assignment_count; ++b)
 		{
 			printf("\tbone %u count %u\n", ba->index, ba->count);
@@ -274,7 +274,7 @@ void WLD::processMesh(Frag36* f36, scene::CSkinnedMesh* skele)
 			++ba;
 		}
 	}
-	p += sizeof(BoneAssignment) * f36->bone_assignment_count;
+	p += sizeof(WLD_Structs::BoneAssignment) * f36->bone_assignment_count;
 
 	//get material indices for triangles
 	std::unordered_map<uint32, int> mat_index_list;

@@ -2,7 +2,7 @@
 #include "ter.h"
 
 TER::TER(MemoryStream* mem, S3D* s3d, std::string shortname) :
-	ZoneModelSource(s3d, shortname)
+	ModelSource(s3d, shortname)
 {
 	byte* data = mem->getData();
 
@@ -24,29 +24,8 @@ ZoneModel* TER::convertZoneModel()
 	byte* data = (byte*)mHeader;
 	uint32 p = sizeof(Header) + mHeader->strings_len;
 
-	initMaterials(mHeader->material_count + 1); //include extra null material, at index = mHeader->material_count
-	initMaterialBuffers();
-
-	mMaterials[mHeader->material_count].first.flag = IntermediateMaterialEntry::FULLY_TRANSPARENT;
-
-	auto& PropertyFunctions = getPropertyFunctions();
-
-	//read materials
-	for (uint32 m = 0; m < mHeader->material_count; ++m)
-	{
-		Material* mat = (Material*)(data + p);
-		p += sizeof(Material);
-
-		for (uint32 i = 0; i < mat->property_count; ++i)
-		{
-			Property* prop = (Property*)(data + p);
-			p += sizeof(Property);
-			const char* prop_name = &mStringBlock[prop->name_index];
-
-			if (PropertyFunctions.count(prop_name) != 0)
-				PropertyFunctions[prop_name](prop, mMaterials[m].first, this);
-		}
-	}
+	//materials
+	p = readEQGMaterials(mHeader->material_count, data, p);
 
 	//vertices
 	Vertex* vertices = nullptr;
@@ -63,120 +42,8 @@ ZoneModel* TER::convertZoneModel()
 	}
 
 	//triangles
-	video::S3DVertex irrvert;
-	std::vector<video::S3DVertex>* vert_buf;
-	std::vector<uint32>* index_buf;
 	Triangle* tris = (Triangle*)(data + p);
-
-	//not the most space-efficient code, but helps keep it fast
-	if (vertices)
-	{
-		for (uint32 i = 0; i < mHeader->triangle_count; ++i)
-		{
-			Triangle& tri = tris[i];
-			if ((tri.flag & Triangle::PERMEABLE) == 0)
-			{
-				if (tri.material < 0)
-				{
-					//null material
-					vert_buf = &mMaterialVertexBuffers[mHeader->material_count];
-					index_buf = &mMaterialIndexBuffers[mHeader->material_count];
-				}
-				else
-				{
-					vert_buf = &mMaterialVertexBuffers[tri.material];
-					index_buf = &mMaterialIndexBuffers[tri.material];
-				}
-			}
-			else
-			{
-				if (tri.material < 0)
-				{
-					//null material
-					vert_buf = &mNoCollisionVertexBuffers[mHeader->material_count];
-					index_buf = &mNoCollisionIndexBuffers[mHeader->material_count];
-				}
-				else
-				{
-					vert_buf = &mNoCollisionVertexBuffers[tri.material];
-					index_buf = &mNoCollisionIndexBuffers[tri.material];
-				}
-			}
-
-			for (int j = 0; j < 3; ++j)
-			{
-				Vertex& vert = vertices[tri.index[j]];
-				irrvert.Pos.X = vert.x;
-				irrvert.Pos.Y = vert.z;
-				irrvert.Pos.Z = vert.y;
-				irrvert.Normal.X = vert.i;
-				irrvert.Normal.Y = vert.k;
-				irrvert.Normal.Z = vert.j;
-				irrvert.TCoords.X = vert.u;
-				irrvert.TCoords.Y = vert.v;
-				vert_buf->push_back(irrvert);
-			}
-
-			//winding order needs to be reversed - joy
-			uint32 s = index_buf->size() + 3;
-			for (int j = 0; j < 3; ++j)
-				index_buf->push_back(--s);
-		}
-	}
-	else
-	{
-		for (uint32 i = 0; i < mHeader->triangle_count; ++i)
-		{
-			Triangle& tri = tris[i];
-			if ((tri.flag & Triangle::PERMEABLE) == 0)
-			{
-				if (tri.material < 0)
-				{
-					//null material
-					vert_buf = &mMaterialVertexBuffers[mHeader->material_count];
-					index_buf = &mMaterialIndexBuffers[mHeader->material_count];
-				}
-				else
-				{
-					vert_buf = &mMaterialVertexBuffers[tri.material];
-					index_buf = &mMaterialIndexBuffers[tri.material];
-				}
-			}
-			else
-			{
-				if (tri.material < 0)
-				{
-					//null material
-					vert_buf = &mNoCollisionVertexBuffers[mHeader->material_count];
-					index_buf = &mNoCollisionIndexBuffers[mHeader->material_count];
-				}
-				else
-				{
-					vert_buf = &mNoCollisionVertexBuffers[tri.material];
-					index_buf = &mNoCollisionIndexBuffers[tri.material];
-				}
-			}
-
-			for (int j = 0; j < 2; ++j)
-			{
-				VertexV3& vert = verticesV3[tri.index[j]];
-				irrvert.Pos.X = vert.x;
-				irrvert.Pos.Y = vert.z;
-				irrvert.Pos.Z = vert.y;
-				irrvert.Normal.X = vert.i;
-				irrvert.Normal.Y = vert.k;
-				irrvert.Normal.Z = vert.j;
-				irrvert.TCoords.X = vert.u;
-				irrvert.TCoords.Y = vert.v;
-				vert_buf->push_back(irrvert);
-			}
-
-			//winding order needs to be reversed
-			uint32 s = index_buf->size() + 3;
-			for (int j = 0; j < 3; ++j)
-				index_buf->push_back(--s);
-		}
-	}
+	readEQGTriangles(mHeader->material_count, mHeader->triangle_count, tris, vertices, verticesV3);
 
 	//create the irrlicht mesh, transferring buffers and creating final materials
 	scene::SMesh* mesh = new scene::SMesh;

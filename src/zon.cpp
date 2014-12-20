@@ -58,6 +58,7 @@ TER* ZON::getTER()
 		if (len < 5 || strcmp(name + len - 4, ".ter") != 0)
 			continue;
 
+		mTERPlacementIndex = i;
 		MemoryStream* file = mContainingS3D->getFile(name);
 		if (file == nullptr)
 			return nullptr;
@@ -66,4 +67,58 @@ TER* ZON::getTER()
 	}
 
 	return nullptr;
+}
+
+void ZON::setZonePosition(ZoneModel* zoneModel)
+{
+	Object* obj = mObjectPlacements + mTERPlacementIndex;
+
+	zoneModel->setPosition(obj->x, obj->z, obj->y);
+}
+
+void ZON::readObjects(ZoneModel* zoneModel)
+{
+	//find model definitions first
+	uint32* ptr = mModelNameIndices;
+	int n = mHeader->model_count;
+	for (int i = 0; i < n; ++i, ++ptr)
+	{
+		if (i == mTERPlacementIndex)
+			continue;
+
+		char* name = &mStringBlock[*ptr];
+		Util::toLower(name, strlen(name));
+
+		MemoryStream* file = mContainingS3D->getFile(name);
+		if (file == nullptr)
+			continue;
+
+		MOD mod(file, mContainingS3D, name);
+		mod.convertStaticModel(zoneModel);
+	}
+
+	//now on to model placements
+	for (uint32 i = 0; i < mHeader->object_count; ++i)
+	{
+		Object& obj = mObjectPlacements[i];
+		const char* name = &mStringBlock[mModelNameIndices[obj.id]];
+
+		ObjectPlacement op;
+		op.x = obj.x;
+		op.y = obj.z;
+		op.z = obj.y;
+
+		/*op.rotX = obj.rotX + 1.5708f; //zon subtracts 1.5708 from all x rotations for some reason, an orientation best known as completely sideways
+		op.rotY = obj.rotZ;
+		op.rotZ = obj.rotY;*/
+		op.rotX = obj.rotX;
+		op.rotY = obj.rotZ;
+		op.rotZ = obj.rotY;
+
+		op.scaleX = obj.scale;
+		op.scaleY = obj.scale;
+		op.scaleZ = obj.scale;
+
+		zoneModel->addObjectPlacement(name, op);
+	}
 }

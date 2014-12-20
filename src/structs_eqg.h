@@ -68,6 +68,29 @@ namespace EQG_Structs
 		int material;
 		uint32 flag;
 	};
+
+	struct Bone
+	{
+		uint32 name_index;
+		uint32 link_bone;
+		uint32 flag;
+		uint32 child_bone;
+		float x, y, z;
+		float rotX, rotY, rotZ, rotW;
+		float scaleX, scaleY, scaleZ;
+	};
+
+	struct BoneWeight
+	{
+		int bone;
+		float weight;
+	};
+
+	struct BoneAssignment
+	{
+		uint32 count; //max 4
+		BoneWeight weights[4];
+	};
 }
 
 #endif

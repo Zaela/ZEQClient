@@ -29,6 +29,18 @@ ModelSource::~ModelSource()
 			mMaterialIndexBuffers[i].~vector();
 		delete[] mMaterialIndexBuffers;
 	}
+	if (mNoCollisionVertexBuffers)
+	{
+		for (uint32 i = 0; i < mNumMaterials; ++i)
+			mNoCollisionVertexBuffers[i].~vector();
+		delete[] mNoCollisionVertexBuffers;
+	}
+	if (mNoCollisionIndexBuffers)
+	{
+		for (uint32 i = 0; i < mNumMaterials; ++i)
+			mNoCollisionIndexBuffers[i].~vector();
+		delete[] mNoCollisionIndexBuffers;
+	}
 }
 
 void ModelSource::initMaterials(uint32 num)
@@ -45,12 +57,16 @@ void ModelSource::initMaterialBuffers()
 		return; //already created
 	mMaterialVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
 	mMaterialIndexBuffers = new std::vector<uint32>[mNumMaterials];
+	mNoCollisionVertexBuffers = new std::vector<video::S3DVertex>[mNumMaterials];
+	mNoCollisionIndexBuffers = new std::vector<uint32>[mNumMaterials];
 
 	for (uint32 i = 0; i < mNumMaterials; ++i)
 	{
 		//placement new
 		new (&mMaterialVertexBuffers[i]) std::vector<video::S3DVertex>;
 		new (&mMaterialIndexBuffers[i]) std::vector<uint32>;
+		new (&mNoCollisionVertexBuffers[i]) std::vector<video::S3DVertex>;
+		new (&mNoCollisionIndexBuffers[i]) std::vector<uint32>;
 	}
 }
 
@@ -116,5 +132,112 @@ void ModelSource::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVer
 
 		adj += 65535;
 		count -= 65535;
+	}
+}
+
+uint32 ModelSource::readEQGMaterials(uint32 mat_count, byte* data, uint32 p)
+{
+	initMaterials(mat_count + 1); //include extra null material, at index = mat_count
+	initMaterialBuffers();
+
+	mMaterials[mat_count].first.flag = IntermediateMaterialEntry::FULLY_TRANSPARENT;
+
+	auto& PropertyFunctions = getPropertyFunctions();
+
+	//read materials
+	for (uint32 m = 0; m < mat_count; ++m)
+	{
+		Material* mat = (Material*)(data + p);
+		p += sizeof(Material);
+
+		for (uint32 i = 0; i < mat->property_count; ++i)
+		{
+			Property* prop = (Property*)(data + p);
+			p += sizeof(Property);
+			const char* prop_name = &mStringBlock[prop->name_index];
+
+			if (PropertyFunctions.count(prop_name) != 0)
+				PropertyFunctions[prop_name](prop, mMaterials[m].first, this);
+		}
+	}
+
+	return p;
+}
+
+void ModelSource::readEQGTriangles(uint32 mat_count, uint32 tri_count, Triangle* tris, Vertex* vertices, VertexV3* verticesV3)
+{
+	video::S3DVertex irrvert;
+	std::vector<video::S3DVertex>* vert_buf;
+	std::vector<uint32>* index_buf;
+
+	for (uint32 i = 0; i < tri_count; ++i)
+	{
+		Triangle& tri = tris[i];
+		if ((tri.flag & Triangle::PERMEABLE) == 0)
+		{
+			if (tri.material < 0)
+			{
+				//null material
+				vert_buf = &mMaterialVertexBuffers[mat_count];
+				index_buf = &mMaterialIndexBuffers[mat_count];
+			}
+			else
+			{
+				vert_buf = &mMaterialVertexBuffers[tri.material];
+				index_buf = &mMaterialIndexBuffers[tri.material];
+			}
+		}
+		else
+		{
+			if (tri.material < 0)
+			{
+				//null material
+				vert_buf = &mNoCollisionVertexBuffers[mat_count];
+				index_buf = &mNoCollisionIndexBuffers[mat_count];
+			}
+			else
+			{
+				vert_buf = &mNoCollisionVertexBuffers[tri.material];
+				index_buf = &mNoCollisionIndexBuffers[tri.material];
+			}
+		}
+
+		if (vertices)
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				Vertex& vert = vertices[tri.index[j]];
+				irrvert.Pos.X = vert.x;
+				irrvert.Pos.Y = vert.z;
+				irrvert.Pos.Z = vert.y;
+				irrvert.Normal.X = vert.i;
+				irrvert.Normal.Y = vert.k;
+				irrvert.Normal.Z = vert.j;
+				irrvert.TCoords.X = vert.u;
+				irrvert.TCoords.Y = vert.v;
+				vert_buf->push_back(irrvert);
+			}
+		}
+		else
+		{
+			for (int j = 0; j < 3; ++j)
+			{
+				VertexV3& vert = verticesV3[tri.index[j]];
+				irrvert.Pos.X = vert.x;
+				irrvert.Pos.Y = vert.z;
+				irrvert.Pos.Z = vert.y;
+				irrvert.Normal.X = vert.i;
+				irrvert.Normal.Y = vert.k;
+				irrvert.Normal.Z = vert.j;
+				irrvert.TCoords.X = vert.u;
+				irrvert.TCoords.Y = vert.v;
+				vert_buf->push_back(irrvert);
+			}
+		}
+
+		//winding order needs to be reversed
+		uint32 s = index_buf->size() + 3;
+		for (int j = 0; j < 3; ++j)
+			index_buf->push_back(--s);
 	}
 }

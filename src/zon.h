@@ -9,6 +9,7 @@
 #include "exception.h"
 #include "s3d.h"
 #include "ter.h"
+#include "mod.h"
 #include "zone_model.h"
 #include "model_source.h"
 #include "memory_stream.h"
@@ -67,6 +68,8 @@ public:
 	~ZON();
 
 	TER* getTER();
+	void setZonePosition(ZoneModel* zoneModel);
+	void readObjects(ZoneModel* zoneModel);
 };
 
 #endif

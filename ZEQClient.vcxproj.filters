@@ -96,9 +96,6 @@
     <ClCompile Include="src\model_source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\zone_model_source.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -106,6 +103,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\zon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -233,13 +233,13 @@
     <ClInclude Include="src\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\zone_model_source.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\zon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

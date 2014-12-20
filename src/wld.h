@@ -20,11 +20,10 @@
 #include "zone_model.h"
 #include "mob_model.h"
 #include "model_source.h"
-#include "zone_model_source.h"
 
 using namespace WLD_Structs;
 
-class WLD : public ZoneModelSource
+class WLD : public ModelSource
 {
 private:
 	struct Header

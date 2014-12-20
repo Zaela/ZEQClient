@@ -86,6 +86,7 @@
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mob_model.cpp" />
+    <ClCompile Include="src\mod.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\model_source.cpp" />
     <ClCompile Include="src\network_crc.cpp" />
@@ -103,7 +104,6 @@
     <ClCompile Include="src\zon.cpp" />
     <ClCompile Include="src\zone_connection.cpp" />
     <ClCompile Include="src\zone_model.cpp" />
-    <ClCompile Include="src\zone_model_source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ack_manager.h" />
@@ -121,6 +121,7 @@
     <ClInclude Include="src\memory_stream.h" />
     <ClInclude Include="src\mob.h" />
     <ClInclude Include="src\mob_model.h" />
+    <ClInclude Include="src\mod.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\model_source.h" />
     <ClInclude Include="src\network_crc.h" />
@@ -148,7 +149,6 @@
     <ClInclude Include="src\zon.h" />
     <ClInclude Include="src\zone_connection.h" />
     <ClInclude Include="src\zone_model.h" />
-    <ClInclude Include="src\zone_model_source.h" />
     <ClInclude Include="src\zone_viewer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

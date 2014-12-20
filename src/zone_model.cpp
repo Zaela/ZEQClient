@@ -123,6 +123,8 @@ ZoneModel* ZoneModel::loadFromZON(std::string shortname, ZON* zon)
 
 	ZoneModel* zoneModel = ter->convertZoneModel();
 
+	zon->setZonePosition(zoneModel);
+	zon->readObjects(zoneModel);
 
 	delete ter;
 	delete zon;
