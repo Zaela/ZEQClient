@@ -19,14 +19,8 @@ ZoneModel::~ZoneModel()
 	if (mNonCollisionMesh)
 		mNonCollisionMesh->drop();
 
-	for (AnimatedTexture& animTex : mAnimatedTextures)
-		animTex.deleteArrays();
-
 	for (auto& pair : mObjectDefinitions)
 		pair.second->drop();
-
-	for (video::ITexture* tex : mUsedTextures)
-		gRenderer.destroyTexture(tex);
 }
 
 void ZoneModel::setMeshes(scene::SMesh* mesh, scene::SMesh* nocollide_mesh)
@@ -37,6 +31,7 @@ void ZoneModel::setMeshes(scene::SMesh* mesh, scene::SMesh* nocollide_mesh)
 	nocollide_mesh->drop();
 }
 
+/*
 AnimatedTexture* ZoneModel::addAnimatedTexture(AnimatedTexture& animTex)
 {
 	//copy construction
@@ -47,6 +42,7 @@ AnimatedTexture* ZoneModel::addAnimatedTexture(AnimatedTexture& animTex)
 
 	return anim;
 }
+*/
 
 void ZoneModel::addObjectDefinition(const char* name, scene::SMesh* mesh)
 {

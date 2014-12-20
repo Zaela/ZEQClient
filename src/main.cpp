@@ -11,6 +11,7 @@
 #include "world_connection.h"
 #include "zone_connection.h"
 #include "zone_viewer.h"
+#include "structs_eqg.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -59,6 +60,7 @@ int main(int argc, char** argv)
 	try
 	{
 		Socket::loadLibrary();
+		EQG_Structs::initialize();
 
 		Args args;
 		readArgs(argc, argv, args);
@@ -75,7 +77,7 @@ int main(int argc, char** argv)
 			WLD* wld = gFileLoader.getWLD(shortname);
 			if (wld == nullptr)
 				throw ZEQException("bad zone shortname");
-			ZoneModel* zoneModel = wld->convertZoneGeometry();
+			ZoneModel* zoneModel = wld->convertZoneModel();
 			WLD* objWLD = gFileLoader.getWLD(shortname + "_obj");
 			objWLD->convertZoneObjectDefinitions(zoneModel);
 			WLD* placeWLD = gFileLoader.getWLD("objects", shortname.c_str());
@@ -85,14 +87,24 @@ int main(int argc, char** argv)
 			delete objWLD;
 			delete placeWLD;
 
+			/*
+			TER* ter = gFileLoader.getTER("anguish", "ter_island.ter");
+			if (ter == nullptr)
+				throw ZEQException("bad zone shortname");
+			ZoneModel* zoneModel = ter->convertZoneModel();
+
+			delete ter;
+			*/
+
 			gRenderer.useZoneModel(zoneModel);
 
-			wld = gFileLoader.getWLD("global_chr");
-			MobModel* mobModel = wld->convertMobModel("HUM");
+			/*wld = gFileLoader.getWLD("global_chr");
+			MobModel* mobModel = wld->convertMobModel("ELE");
 
 			auto* sceneMgr = gRenderer.getSceneManager();
 			auto* node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getMainMesh());
-			node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getHeadMesh(0), node);
+			node->setAnimationSpeed(2000.0f);*/
+			//node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getHeadMesh(0), node);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());

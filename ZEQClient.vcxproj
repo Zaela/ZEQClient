@@ -80,9 +80,14 @@
     <ClCompile Include="src\compression.cpp" />
     <ClCompile Include="src\file_loader.cpp" />
     <ClCompile Include="src\input.cpp" />
+    <ClCompile Include="src\irr\CBoneSceneNode.cpp" />
+    <ClCompile Include="src\irr\CSkinnedMesh.cpp" />
+    <ClCompile Include="src\irr\os.cpp" />
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mob_model.cpp" />
+    <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\model_source.cpp" />
     <ClCompile Include="src\network_crc.cpp" />
     <ClCompile Include="src\packet.cpp" />
     <ClCompile Include="src\packet_receiver.cpp" />
@@ -90,11 +95,14 @@
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\s3d.cpp" />
     <ClCompile Include="src\socket.cpp" />
+    <ClCompile Include="src\structs_eqg.cpp" />
+    <ClCompile Include="src\ter.cpp" />
     <ClCompile Include="src\util.cpp" />
     <ClCompile Include="src\wld.cpp" />
     <ClCompile Include="src\world_connection.cpp" />
     <ClCompile Include="src\zone_connection.cpp" />
     <ClCompile Include="src\zone_model.cpp" />
+    <ClCompile Include="src\zone_model_source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ack_manager.h" />
@@ -112,6 +120,8 @@
     <ClInclude Include="src\memory_stream.h" />
     <ClInclude Include="src\mob.h" />
     <ClInclude Include="src\mob_model.h" />
+    <ClInclude Include="src\model.h" />
+    <ClInclude Include="src\model_source.h" />
     <ClInclude Include="src\network_crc.h" />
     <ClInclude Include="src\npc.h" />
     <ClInclude Include="src\opcodes.h" />
@@ -125,15 +135,18 @@
     <ClInclude Include="src\renderer.h" />
     <ClInclude Include="src\s3d.h" />
     <ClInclude Include="src\socket.h" />
+    <ClInclude Include="src\structs_eqg.h" />
     <ClInclude Include="src\structs_intermediate.h" />
     <ClInclude Include="src\structs_titanium.h" />
     <ClInclude Include="src\structs_wld.h" />
+    <ClInclude Include="src\ter.h" />
     <ClInclude Include="src\types.h" />
     <ClInclude Include="src\util.h" />
     <ClInclude Include="src\wld.h" />
     <ClInclude Include="src\world_connection.h" />
     <ClInclude Include="src\zone_connection.h" />
     <ClInclude Include="src\zone_model.h" />
+    <ClInclude Include="src\zone_model_source.h" />
     <ClInclude Include="src\zone_viewer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

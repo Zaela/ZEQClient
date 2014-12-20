@@ -7,19 +7,16 @@ MobModel::MobModel() :
 
 }
 
-void MobModel::setMesh(int n, scene::SMesh* mesh)
+void MobModel::setMesh(int n, scene::ISkinnedMesh* mesh)
 {
-	scene::SAnimatedMesh* animMesh = new scene::SAnimatedMesh(mesh);
-	mesh->drop();
-
 	if (n == 0)
 	{
 		//main mesh
-		mMesh = animMesh;
+		mMesh = mesh;
 	}
 	else
 	{
 		//head mesh
-		mHeadMeshes.push_back(animMesh);
+		mHeadMeshes.push_back(mesh);
 	}
 }

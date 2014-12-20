@@ -11,6 +11,7 @@
 #include <unordered_set>
 
 #include "types.h"
+#include "model.h"
 #include "animated_texture.h"
 
 using namespace irr;
@@ -24,17 +25,15 @@ struct ObjectPlacement
 	bool collidable;
 };
 
-class ZoneModel
+class ZoneModel : public Model
 {
 private:
 	float mX, mY, mZ;
 	scene::IAnimatedMesh* mMesh;
 	scene::IAnimatedMesh* mNonCollisionMesh;
-	std::vector<AnimatedTexture> mAnimatedTextures;
 	std::unordered_map<std::string, scene::IAnimatedMesh*, std::hash<std::string>> mObjectDefinitions;
 	std::unordered_map<std::string, scene::IAnimatedMesh*, std::hash<std::string>> mNoCollisionObjectDefinitions;
 	std::vector<ObjectPlacement> mObjectPlacements;
-	std::unordered_set<video::ITexture*> mUsedTextures;
 
 public:
 	ZoneModel();
@@ -48,10 +47,7 @@ public:
 	void setMeshes(scene::SMesh* mesh, scene::SMesh* nocollide_mesh);
 	scene::IAnimatedMesh* getMesh() { return mMesh; }
 	scene::IAnimatedMesh* getNonCollisionMesh() { return mNonCollisionMesh; }
-	AnimatedTexture* addAnimatedTexture(AnimatedTexture& animTex);
-	const std::vector<AnimatedTexture>& getAnimatedTextures() { return mAnimatedTextures; }
 
-	void addUsedTexture(video::ITexture* texture) { mUsedTextures.insert(texture); }
 	void addObjectDefinition(const char* name, scene::SMesh* mesh);
 	void addNoCollisionObjectDefinition(const char* name, scene::SMesh* mesh);
 	void addObjectPlacement(const char* name, ObjectPlacement& placement);

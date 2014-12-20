@@ -116,6 +116,23 @@ namespace WLD_Structs
 	struct Frag13 : public FragHeader
 	{
 		int ref;
+		uint32 flag;
+		uint32 param;
+	};
+
+	struct Frag12Entry
+	{
+		int16 rotDenom;
+		int16 rotX, rotY, rotZ;
+		int16 shiftX, shiftY, shiftZ;
+		int16 shiftDenom;
+	};
+
+	struct Frag12 : public FragHeader //skeleton bone track fragment
+	{
+		uint32 flag;
+		uint32 count;
+		Frag12Entry entry[1];
 	};
 
 	struct Frag11 : public FragHeader //skeleton ref fragment

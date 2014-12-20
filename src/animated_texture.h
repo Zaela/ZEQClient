@@ -8,7 +8,7 @@
 #include "types.h"
 #include "structs_intermediate.h"
 
-class ZoneModel;
+class Model;
 
 struct AnimatedTexture
 {
@@ -28,7 +28,7 @@ public:
 	AnimatedTexture(scene::SMesh* mesh, IntermediateMaterial* mat, uint32 index_count, uint32 index_base);
 
 	void advanceFrame();
-	void recordTextures(ZoneModel* zone);
+	void recordTextures(Model* model);
 	bool replaceMeshWithSceneNode(void* compare_mesh, void* node);
 	bool checkMesh(void* compare_mesh) { return mesh == compare_mesh; }
 	void setMeshPtr(void* ptr) { mesh = ptr; }

@@ -10,6 +10,7 @@
 #include "file_stream.h"
 #include "s3d.h"
 #include "wld.h"
+#include "ter.h"
 
 class FileLoader
 {
@@ -26,6 +27,8 @@ public:
 	S3D* getS3D(std::string name);
 	//omit file extension
 	WLD* getWLD(std::string name, const char* fromS3D = nullptr);
+	//emit file extension
+	TER* getTER(std::string name, std::string ter_model_name);
 };
 
 #endif

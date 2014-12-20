@@ -26,9 +26,19 @@ S3D* FileLoader::getS3D(std::string name)
 		mS3Ds[name] = s3d;
 		return s3d;
 	}
-	catch (ZEQException& e)
+	catch (ZEQException&)
 	{
-		printf("Error: %s\n", e.what());
+		try
+		{
+			ext_name = mPathToEQ + name + ".eqg";
+			S3D* s3d = new S3D(ext_name.c_str());
+			mS3Ds[name] = s3d;
+			return s3d;
+		}
+		catch (ZEQException& e)
+		{
+			printf("Error: %s\n", e.what());
+		}
 	}
 
 	return nullptr;
@@ -61,6 +71,29 @@ WLD* FileLoader::getWLD(std::string name, const char* fromS3D)
 		WLD* wld = new WLD(file, s3d, name);
 		mWLDs[name] = wld;
 		return wld;
+	}
+	catch (ZEQException& e)
+	{
+		printf("Error: %s\n", e.what());
+	}
+
+	return nullptr;
+}
+
+TER* FileLoader::getTER(std::string name, std::string ter_model_name)
+{
+	S3D* s3d = getS3D(name);
+	if (s3d == nullptr)
+		return nullptr;
+
+	MemoryStream* file = s3d->getFile(ter_model_name.c_str());
+	if (file == nullptr)
+		return nullptr;
+
+	try
+	{
+		TER* ter = new TER(file, s3d, name);
+		return ter;
 	}
 	catch (ZEQException& e)
 	{

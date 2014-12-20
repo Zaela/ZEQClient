@@ -1,6 +1,6 @@
 
 #include "animated_texture.h"
-#include "zone_model.h"
+#include "model.h"
 
 AnimatedTexture::AnimatedTexture(scene::SMesh* in_mesh, IntermediateMaterial* mat, uint32 index_count, uint32 index_base) :
 	num_frames(mat->num_frames),
@@ -30,10 +30,10 @@ void AnimatedTexture::advanceFrame()
 		node->getMaterial(material_index_array[i]).setTexture(0, texture);
 }
 
-void AnimatedTexture::recordTextures(ZoneModel* zone)
+void AnimatedTexture::recordTextures(Model* model)
 {
 	for (uint32 i = 0; i < num_frames; ++i)
-		zone->addUsedTexture(texture_array[i]);
+		model->addUsedTexture(texture_array[i]);
 }
 
 bool AnimatedTexture::replaceMeshWithSceneNode(void* compare_mesh, void* node)
