@@ -9,9 +9,11 @@ struct ZoneViewerData
 	ZoneViewerData()
 	{
 		applyGravity = false;
+		applyCollision = false;
 	}
 
 	bool applyGravity;
+	bool applyCollision;
 };
 
 #endif

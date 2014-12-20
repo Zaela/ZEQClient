@@ -50,11 +50,11 @@ void Player::setCamera(Camera* cam)
 		delete mCamera;
 	mCamera = cam;
 	//REPLACE THIS - crappy irrlicht collision thing for now
-	scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
+	/*scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
 		gRenderer.getCollisionSelector(),
 		cam->getSceneNode(), core::vector3df(1.5f, 3.0f, 1.5f), core::vector3df(0.0f, 0.0f, 0.0f),
 		core::vector3df(0.0f, 3.0f, 0.0f), 0.0f);
-	cam->getSceneNode()->addAnimator(acr);
+	cam->getSceneNode()->addAnimator(acr);*/
 }
 
 void Player::applyMovement(float delta)
@@ -117,7 +117,8 @@ void Player::applyMovement(float delta)
 	}
 
 	//check collision between pos and dest
-	checkCollision(pos, dest);
+	if (!mZoneViewer || mZoneViewer->applyCollision)
+		checkCollision(pos, dest);
 
 	//write translation
 	cam->setPosition(dest);

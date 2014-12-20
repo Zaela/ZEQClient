@@ -6,17 +6,17 @@
 #include <unordered_map>
 
 #include "types.h"
+#include "util.h"
 #include "structs_intermediate.h"
 
-class TER;
+class ModelSource;
 
 namespace EQG_Structs
 {
 	struct Property;
 
-	typedef void(*PropertyFunction)(Property*, IntermediateMaterialEntry&, TER*);
-	//static std::unordered_map<std::string, PropertyFunction, std::hash<std::string>> PropertyFunctions;
-#define PROP_FUNC(x) void x(Property* prop, IntermediateMaterialEntry& mat_ent, TER* ter)
+	typedef void(*PropertyFunction)(Property*, IntermediateMaterialEntry&, ModelSource*);
+#define PROP_FUNC(x) void x(Property* prop, IntermediateMaterialEntry& mat_ent, ModelSource* modelSource)
 
 	std::unordered_map<std::string, PropertyFunction, std::hash<std::string>>& getPropertyFunctions();
 	void initialize();

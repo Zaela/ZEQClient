@@ -10,7 +10,7 @@
 #include "file_stream.h"
 #include "s3d.h"
 #include "wld.h"
-#include "ter.h"
+#include "zon.h"
 
 class FileLoader
 {
@@ -25,10 +25,11 @@ public:
 
 	//omit file extension
 	S3D* getS3D(std::string name);
+	void unloadS3D(std::string name);
 	//omit file extension
-	WLD* getWLD(std::string name, const char* fromS3D = nullptr);
+	WLD* getWLD(std::string name, const char* fromS3D = nullptr, bool cache = true); //no point in caching zone wlds
 	//emit file extension
-	TER* getTER(std::string name, std::string ter_model_name);
+	ZON* getZON(std::string name);
 };
 
 #endif

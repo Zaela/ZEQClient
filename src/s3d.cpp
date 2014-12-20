@@ -108,8 +108,6 @@ void S3D::open(MemoryStream* mem_stream)
 
 MemoryStream* S3D::decompressFile(InternalFile& file)
 {
-	//static const uint32 BUFFER_SIZE = 16384;
-	//static byte buffer[BUFFER_SIZE];
 	uint32 pos = 0;
 	Buffer buf;
 	byte* data = mRawData->getData() + file.offset;
@@ -122,8 +120,6 @@ MemoryStream* S3D::decompressFile(InternalFile& file)
 		byte* decompressed = &data[pos];
 		uint32 len = bh->deflatedLen;
 		Compression::decompressBlock(decompressed, len);
-		//unsigned long out_size = BUFFER_SIZE;
-		//uncompress(buffer, &out_size, &data[pos], bh->deflatedLen);
 
 		pos += bh->deflatedLen;
 

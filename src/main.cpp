@@ -74,27 +74,9 @@ int main(int argc, char** argv)
 
 			gPlayer.setZoneViewer(new ZoneViewerData);
 
-			WLD* wld = gFileLoader.getWLD(shortname);
-			if (wld == nullptr)
+			ZoneModel* zoneModel = ZoneModel::load(shortname);
+			if (zoneModel == nullptr)
 				throw ZEQException("bad zone shortname");
-			ZoneModel* zoneModel = wld->convertZoneModel();
-			WLD* objWLD = gFileLoader.getWLD(shortname + "_obj");
-			objWLD->convertZoneObjectDefinitions(zoneModel);
-			WLD* placeWLD = gFileLoader.getWLD("objects", shortname.c_str());
-			placeWLD->convertZoneObjectPlacements(zoneModel);
-
-			delete wld;
-			delete objWLD;
-			delete placeWLD;
-
-			/*
-			TER* ter = gFileLoader.getTER("anguish", "ter_island.ter");
-			if (ter == nullptr)
-				throw ZEQException("bad zone shortname");
-			ZoneModel* zoneModel = ter->convertZoneModel();
-
-			delete ter;
-			*/
 
 			gRenderer.useZoneModel(zoneModel);
 

@@ -87,6 +87,13 @@ bool Input::zoneViewerKeyboardEvent(const SEvent::SKeyInput& ev)
 			zv->applyGravity = !zv->applyGravity;
 		}
 		break;
+	case KEY_KEY_C:
+		if (!ev.PressedDown)
+		{
+			ZoneViewerData* zv = gPlayer.getZoneViewer();
+			zv->applyCollision = !zv->applyCollision;
+		}
+		break;
 	case KEY_ESCAPE:
 		throw ExitException();
 	default:

@@ -21,13 +21,21 @@ namespace EQG_Structs
 
 	PROP_FUNC(e_TextureDiffuse0)
 	{
-		const char* name = &ter->getStringBlock()[prop->value.i];
-		S3D* s3d = ter->getContainingS3D();
+		char* name = &modelSource->getStringBlock()[prop->value.i];
+		S3D* s3d = modelSource->getContainingS3D();
 
 		MemoryStream* file = s3d->getFile(name);
 		if (file == nullptr)
-			return;
-		std::string texname = ter->getShortName();
+		{
+			Util::toLower(name, strlen(name));
+			file = s3d->getFile(name);
+			if (file == nullptr)
+			{
+				printf("Could not find texture '%s'\n", name);
+				return;
+			}
+		}
+		std::string texname = modelSource->getShortName();
 		texname += '/';
 		texname += name;
 		bool isDDS = false;

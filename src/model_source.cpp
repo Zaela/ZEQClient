@@ -1,7 +1,10 @@
 
 #include "model_source.h"
 
-ModelSource::ModelSource() :
+ModelSource::ModelSource(S3D* s3d, std::string shortname) :
+	mContainingS3D(s3d),
+	mStringBlock(nullptr),
+	mShortName(shortname),
 	mNumMaterials(0),
 	mMaterials(nullptr),
 	mMaterialVertexBuffers(nullptr),

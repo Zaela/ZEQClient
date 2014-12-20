@@ -1,7 +1,8 @@
 
 #include "zone_model_source.h"
 
-ZoneModelSource::ZoneModelSource() :
+ZoneModelSource::ZoneModelSource(S3D* s3d, std::string shortname) :
+	ModelSource(s3d, shortname),
 	mNoCollisionVertexBuffers(nullptr),
 	mNoCollisionIndexBuffers(nullptr)
 {

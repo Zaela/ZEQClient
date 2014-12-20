@@ -31,16 +31,14 @@ public:
 
 private:
 	Header* mHeader;
-	const char* mStringBlock;
-	S3D* mContainingS3D; //put in super class (which?)
-	std::string mShortName;
+	//const char* mStringBlock;
+	//std::string mShortName;
 
 public:
 	TER(MemoryStream* mem, S3D* s3d, std::string shortname);
 
-	const char* getStringBlock() { return mStringBlock; }
-	S3D* getContainingS3D() { return mContainingS3D; }
-	std::string& getShortName() { return mShortName; }
+	//const char* getStringBlock() { return mStringBlock; }
+	//std::string& getShortName() { return mShortName; }
 
 	ZoneModel* convertZoneModel();
 };

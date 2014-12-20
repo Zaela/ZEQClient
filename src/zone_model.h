@@ -12,9 +12,13 @@
 
 #include "types.h"
 #include "model.h"
+#include "s3d.h"
 #include "animated_texture.h"
 
 using namespace irr;
+
+class WLD;
+class ZON;
 
 struct ObjectPlacement
 {
@@ -35,6 +39,10 @@ private:
 	std::unordered_map<std::string, scene::IAnimatedMesh*, std::hash<std::string>> mNoCollisionObjectDefinitions;
 	std::vector<ObjectPlacement> mObjectPlacements;
 
+private:
+	static ZoneModel* loadFromWLD(std::string shortname, WLD* wld);
+	static ZoneModel* loadFromZON(std::string shortname, ZON* zon);
+
 public:
 	ZoneModel();
 	~ZoneModel();
@@ -52,6 +60,8 @@ public:
 	void addNoCollisionObjectDefinition(const char* name, scene::SMesh* mesh);
 	void addObjectPlacement(const char* name, ObjectPlacement& placement);
 	const std::vector<ObjectPlacement>& getObjectPlacements() { return mObjectPlacements; }
+
+	static ZoneModel* load(std::string shortname);
 };
 
 #endif

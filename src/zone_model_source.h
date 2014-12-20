@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <string>
 
 #include "types.h"
 #include "model_source.h"
@@ -17,7 +18,7 @@ protected:
 	std::vector<uint32>* mNoCollisionIndexBuffers;
 
 protected:
-	ZoneModelSource();
+	ZoneModelSource(S3D* s3d, std::string shortname);
 	virtual ~ZoneModelSource();
 
 	virtual void initMaterialBuffers() override;

@@ -20,31 +20,42 @@ S3D* FileLoader::getS3D(std::string name)
 		return mS3Ds[name];
 
 	std::string ext_name = mPathToEQ + name + ".s3d";
-	try
+	
+	//try .s3d, then .eqg (live client does it in the opposite order, but oh well)
+	for (int i = 0; i < 2; ++i)
 	{
-		S3D* s3d = new S3D(ext_name.c_str());
-		mS3Ds[name] = s3d;
-		return s3d;
-	}
-	catch (ZEQException&)
-	{
-		try
+		FileStream* file = FileStream::open(ext_name.c_str());
+		if (file)
 		{
-			ext_name = mPathToEQ + name + ".eqg";
-			S3D* s3d = new S3D(ext_name.c_str());
-			mS3Ds[name] = s3d;
-			return s3d;
+			try
+			{
+				S3D* s3d = new S3D(file);
+				mS3Ds[name] = s3d;
+				return s3d;
+			}
+			catch (ZEQException& e)
+			{
+				printf("Error: %s\n", e.what());
+				delete file;
+			}
 		}
-		catch (ZEQException& e)
-		{
-			printf("Error: %s\n", e.what());
-		}
+
+		ext_name = mPathToEQ + name + ".eqg";
 	}
 
 	return nullptr;
 }
 
-WLD* FileLoader::getWLD(std::string name, const char* fromS3D)
+void FileLoader::unloadS3D(std::string name)
+{
+	if (mS3Ds.count(name) == 0)
+		return;
+
+	delete mS3Ds[name];
+	mS3Ds.erase(name);
+}
+
+WLD* FileLoader::getWLD(std::string name, const char* fromS3D, bool cache)
 {
 	//some WLDs have generic names (e.g. 'objects.wld'), use fromS3D to specify source
 	std::string orig_name;
@@ -54,7 +65,7 @@ WLD* FileLoader::getWLD(std::string name, const char* fromS3D)
 		name = fromS3D + '/' + name;
 	}
 
-	if (mWLDs.count(name) != 0)
+	if (cache && mWLDs.count(name) != 0)
 		return mWLDs[name];
 
 	S3D* s3d = getS3D(fromS3D ? fromS3D : name);
@@ -69,7 +80,8 @@ WLD* FileLoader::getWLD(std::string name, const char* fromS3D)
 	try
 	{
 		WLD* wld = new WLD(file, s3d, name);
-		mWLDs[name] = wld;
+		if (cache)
+			mWLDs[name] = wld;
 		return wld;
 	}
 	catch (ZEQException& e)
@@ -80,24 +92,58 @@ WLD* FileLoader::getWLD(std::string name, const char* fromS3D)
 	return nullptr;
 }
 
-TER* FileLoader::getTER(std::string name, std::string ter_model_name)
+ZON* FileLoader::getZON(std::string name)
 {
+	//the zon may not be in the s3d, but we need it regardless because that's where everything else is
 	S3D* s3d = getS3D(name);
 	if (s3d == nullptr)
 		return nullptr;
 
-	MemoryStream* file = s3d->getFile(ter_model_name.c_str());
-	if (file == nullptr)
-		return nullptr;
+	//check inside the s3d first
+	std::string ext_name = name + ".zon";
+	MemoryStream* file = s3d->getFile(ext_name.c_str());
+	
+	for (int i = 0; i < 2; ++i)
+	{
+		if (file)
+		{
+			try
+			{
+				ZON* zon = new ZON(file, s3d, name, (i > 0));
+				return zon;
+			}
+			catch (ZEQException& e)
+			{
+				printf("Error: %s\n", e.what());
+			}
+		}
 
-	try
-	{
-		TER* ter = new TER(file, s3d, name);
-		return ter;
+		ext_name = mPathToEQ + ext_name;
+		file = FileStream::open(ext_name.c_str());
 	}
-	catch (ZEQException& e)
+
+	//file-in-s3d won't reach here, which is good because s3ds manage their internal files themselves
+	if (file)
+		delete file;
+
+	//the zon may be in the s3d under the wrong name (e.g. chambersa.zon in chambersb.eqg)
+	//which is why s3ds also sort by extension for us
+	uint32 n = s3d->getNumFilesWithExtension("zon");
+	for (uint32 i = 0; i < n; ++i)
 	{
-		printf("Error: %s\n", e.what());
+		file = s3d->getFileByExtension("zon", i);
+		if (file)
+		{
+			try
+			{
+				ZON* zon = new ZON(file, s3d, name, false);
+				return zon;
+			}
+			catch (ZEQException& e)
+			{
+				printf("Error: %s\n", e.what());
+			}
+		}
 	}
 
 	return nullptr;

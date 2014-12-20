@@ -4,8 +4,7 @@
 extern Renderer gRenderer;
 
 WLD::WLD(MemoryStream* mem, S3D* s3d, std::string shortname) :
-	mShortName(shortname),
-	mContainingS3D(s3d)
+	ZoneModelSource(s3d, shortname)
 {
 	byte* data = mem->getData();
 
@@ -155,7 +154,10 @@ void WLD::Frag03ToMaterialEntry(Frag03* f03, Frag30* f30, IntermediateMaterialEn
 		//we have a texture name, create it in the renderer
 		MemoryStream* file = mContainingS3D->getFile((char*)f03->string);
 		if (file == nullptr)
+		{
+			printf("Could not find texture '%s'\n", (char*)f03->string);
 			return;
+		}
 		std::string name = mShortName;
 		name += '/';
 		name += getFragName((FragHeader*)f30);

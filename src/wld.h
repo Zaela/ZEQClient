@@ -41,9 +41,6 @@ private:
 
 	Header* mHeader;
 	int mVersion;
-	const char* mStringBlock;
-	std::string mShortName;
-	S3D* mContainingS3D;
 
 	std::vector<FragHeader*> mFragsByIndex;
 	std::unordered_map<uint32, std::vector<FragHeader*>> mFragsByType;

@@ -2,8 +2,7 @@
 #include "ter.h"
 
 TER::TER(MemoryStream* mem, S3D* s3d, std::string shortname) :
-	mContainingS3D(s3d),
-	mShortName(shortname)
+	ZoneModelSource(s3d, shortname)
 {
 	byte* data = mem->getData();
 
@@ -17,7 +16,7 @@ TER::TER(MemoryStream* mem, S3D* s3d, std::string shortname) :
 	if (mHeader->version > 3)
 		throw ZEQException("TER::TER: bad TER vesion (use TERv4)");
 
-	mStringBlock = (const char*)(data + p);
+	mStringBlock = (char*)(data + p);
 }
 
 ZoneModel* TER::convertZoneModel()
@@ -118,8 +117,10 @@ ZoneModel* TER::convertZoneModel()
 				vert_buf->push_back(irrvert);
 			}
 
+			//winding order needs to be reversed - joy
+			uint32 s = index_buf->size() + 3;
 			for (int j = 0; j < 3; ++j)
-				index_buf->push_back(index_buf->size());
+				index_buf->push_back(--s);
 		}
 	}
 	else
@@ -170,8 +171,10 @@ ZoneModel* TER::convertZoneModel()
 				vert_buf->push_back(irrvert);
 			}
 
-			for (int j = 0; j < 2; ++j)
-				index_buf->push_back(index_buf->size());
+			//winding order needs to be reversed
+			uint32 s = index_buf->size() + 3;
+			for (int j = 0; j < 3; ++j)
+				index_buf->push_back(--s);
 		}
 	}
 
