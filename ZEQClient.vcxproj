@@ -100,6 +100,7 @@
     <ClCompile Include="src\ter.cpp" />
     <ClCompile Include="src\util.cpp" />
     <ClCompile Include="src\wld.cpp" />
+    <ClCompile Include="src\wld_skeleton.cpp" />
     <ClCompile Include="src\world_connection.cpp" />
     <ClCompile Include="src\zon.cpp" />
     <ClCompile Include="src\zone_connection.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="src\types.h" />
     <ClInclude Include="src\util.h" />
     <ClInclude Include="src\wld.h" />
+    <ClInclude Include="src\wld_skeleton.h" />
     <ClInclude Include="src\world_connection.h" />
     <ClInclude Include="src\zon.h" />
     <ClInclude Include="src\zone_connection.h" />

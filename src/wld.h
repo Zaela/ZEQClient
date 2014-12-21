@@ -20,6 +20,7 @@
 #include "zone_model.h"
 #include "mob_model.h"
 #include "model_source.h"
+#include "wld_skeleton.h"
 
 using namespace WLD_Structs;
 
@@ -55,11 +56,13 @@ private:
 	void Frag03ToMaterialEntry(Frag03* f03, Frag30* f30, IntermediateMaterialEntry* mat_ent);
 	void handleAnimatedMaterial(Frag04* f04, Frag30* f30, IntermediateMaterial* mat);
 	static uint32 translateVisibilityFlag(Frag30* f30, bool isDDS);
-	void processMesh(Frag36* f36, scene::CSkinnedMesh* skele = nullptr);
+	//void processMesh(Frag36* f36, scene::CSkinnedMesh* skele = nullptr);
+	void processMesh(Frag36* f36, WLDSkeleton* skele = nullptr);
 	void processTriangle(RawTriangle* tri, uint32 count, std::vector<video::S3DVertex>& vert_buf,
 		std::vector<uint32>& index_buf, RawVertex* vert, RawNormal* norm, RawUV16* uv16, RawUV32* uv32);
 
-	MobModel* convertMobModel(Frag14* f14);
+	//MobModel* convertMobModel(Frag14* f14);
+	WLDSkeletonInstance* convertMobModel(Frag14* f14);
 	static void createSkinnedMeshBuffer(scene::CSkinnedMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
 		std::vector<uint32>& index_buf, IntermediateMaterial* mat = nullptr);
 	void findAnimations(const char* baseName, scene::CSkinnedMesh::SJoint* joint);
@@ -82,7 +85,8 @@ public:
 	void convertZoneObjectDefinitions(ZoneModel* zone);
 	void convertZoneObjectPlacements(ZoneModel* zone);
 
-	MobModel* convertMobModel(const char* id_name);
+	//MobModel* convertMobModel(const char* id_name);
+	WLDSkeletonInstance* convertMobModel(const char* id_name);
 };
 
 #endif

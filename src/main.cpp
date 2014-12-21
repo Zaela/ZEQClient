@@ -80,12 +80,15 @@ int main(int argc, char** argv)
 
 			gRenderer.useZoneModel(zoneModel);
 
-			/*wld = gFileLoader.getWLD("global_chr");
-			MobModel* mobModel = wld->convertMobModel("ELE");
+			WLD* wld = gFileLoader.getWLD("global_chr");
+			//MobModel* mobModel = wld->convertMobModel("ELE");
+			WLDSkeletonInstance* skele = wld->convertMobModel("ELE");
 
 			auto* sceneMgr = gRenderer.getSceneManager();
-			auto* node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getMainMesh());
-			node->setAnimationSpeed(2000.0f);*/
+			auto* node = sceneMgr->addAnimatedMeshSceneNode(new scene::SAnimatedMesh(skele->mMesh));
+			skele->assumeBasePosition();
+			//auto* node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getMainMesh());
+			//node->setAnimationSpeed(2000.0f);
 			//node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getHeadMesh(0), node);
 
 			gInput.setMode(Input::ZONE_VIEWER);

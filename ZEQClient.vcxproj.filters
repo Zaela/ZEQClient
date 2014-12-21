@@ -108,6 +108,9 @@
     <ClCompile Include="src\mod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\wld_skeleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\socket.h">
@@ -240,6 +243,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\wld_skeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

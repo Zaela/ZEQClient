@@ -113,6 +113,7 @@ void ModelSource::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVer
 			else if (mat->first.diffuse_map)
 			{
 				material.setTexture(0, mat->first.diffuse_map);
+				if (model) //temp
 				model->addUsedTexture(mat->first.diffuse_map); //make a general Model class for this?
 
 				if (mat->first.flag & IntermediateMaterialEntry::MASKED)
