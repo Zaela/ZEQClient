@@ -2,6 +2,7 @@
 #include "wld.h"
 
 extern Renderer gRenderer;
+extern MobManager gMobMgr;
 
 WLD::WLD(MemoryStream* mem, S3D* s3d, std::string shortname) :
 	ModelSource(s3d, shortname)
@@ -349,7 +350,6 @@ void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)//scene::CSkinnedMesh* 
 			}*/
 			if (skeleton)
 			{
-				printf("weight %u %u\n", mat_index, buf_pos);
 				skeleton->addWeight(vertToBoneAssignment[idx], mat_index, buf_pos);
 			}
 
@@ -574,7 +574,7 @@ WLDSkeletonInstance* WLD::convertMobModel(const char* id_name)
 		const char* name = getFragName(frag);
 		if (strncmp(id_name, name, len) == 0)
 		{
-			return convertMobModel((Frag14*)frag);
+			return convertMobModel((Frag14*)frag, id_name);
 		}
 	}
 
@@ -582,7 +582,7 @@ WLDSkeletonInstance* WLD::convertMobModel(const char* id_name)
 }
 
 //MobModel* WLD::convertMobModel(Frag14* f14)
-WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14)
+WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
 {
 	if (f14->size[1] < 1)
 		return nullptr;
@@ -618,37 +618,135 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14)
 	Frag10Bone* rootBone = f10->getBoneList();
 	Frag10Bone* bone = rootBone;
 	std::vector<Frag10Bone*> bones;
-	printf("a\n");
+	
 	for (int i = 0; i < f10->num_bones; ++i)
 	{
 		bones.push_back(bone);
 		bone = bone->getNext();
 	}
-	WLDSkeleton* skele = new WLDSkeleton(f10->num_bones);
+
+	WLDSkeleton* skele = new WLDSkeleton(f10->num_bones, mesh);
+	//change to animation id numbers later
+	std::unordered_map<int, std::unordered_map<std::string, Frag13*, std::hash<std::string>>> animFragsByBone;
+
+	auto findAnimations = [&, this](const char* baseName, int bonePos)
+	{
+		for (FragHeader* frag : mFragsByType[0x13])
+		{
+			const char* name = getFragName(frag);
+			if (strcmp(name + 3, baseName) != 0)
+				continue;
+
+			Frag13* f13 = (Frag13*)frag;
+			auto& anims = animFragsByBone[bonePos];
+			anims[std::string(name, 3)] = f13;
+		}
+	};
 
 	//handle root bone
+	int* ptr;
 	Frag13* f13 = (Frag13*)getFragByRef(rootBone->ref1);
+	const char* f13name = getFragName(f13);
 	Frag12* f12 = (Frag12*)getFragByRef(f13->ref);
 	skele->setBasePosition(0, f12->entry[0]);
+	findAnimations(f13name, 0);
 
-	printf("b\n");
 	bone = rootBone;
 	for (int i = 0; i < f10->num_bones; ++i)
 	{
 		if (bone->size > 0)
 		{
-			int* ptr = bone->getIndexList();
+			ptr = bone->getIndexList();
 			for (int j = 0; j < bone->size; ++j)
 			{
 				Frag10Bone* b = bones[*ptr];
 				f13 = (Frag13*)getFragByRef(b->ref1);
 				f12 = (Frag12*)getFragByRef(f13->ref);
-				skele->setBasePosition(*ptr++, f12->entry[0], i);
+				//check if this is an attachment point
+				int point = -1;
+				f13name = getFragName(f13);
+				size_t len = strlen(f13name);
+				if (len > 13 && strcmp(f13name + len - 12, "_POINT_TRACK") == 0)
+				{
+					const char* c = f13name + len - 13;
+					switch (*c)
+					{
+					case 'R': //right
+						point = WLDSkeleton::POINT_RIGHT;
+						break;
+					case 'L': //left
+						point = WLDSkeleton::POINT_LEFT;
+						break;
+					case 'D': //shielD or heaD
+						if (*(c - 1) == 'L')
+							point = WLDSkeleton::POINT_SHIELD;
+						else
+							point = WLDSkeleton::POINT_HEAD;
+						break;
+					}
+				}
+				else
+				{
+					//attachment points never have animation frames
+					findAnimations(f13name, *ptr);
+				}
+
+				skele->setBasePosition(*ptr++, f12->entry[0], i, point);
 			}
 		}
 		bone = bone->getNext();
 	}
-	printf("c\n");
+
+	//create animations
+	//the root bone's frag13 has the timing information,
+	//while its children's frag12s have the number of frames
+	for (auto& pair : animFragsByBone[0])
+	{
+		ptr = rootBone->getIndexList();
+		uint32 timing = pair.second->param;
+
+		for (int i = 0; i < rootBone->size; ++i)
+		{
+			if (animFragsByBone.count(*ptr) && animFragsByBone[*ptr].count(pair.first))
+			{
+				//we're taking it on faith that the first one we find has more than 1 frame
+				f13 = animFragsByBone[*ptr][pair.first];
+				f12 = (Frag12*)getFragByRef(f13->ref);
+				skele->addAnimation(pair.first, f12->count, timing);
+			}
+			++ptr;
+		}
+	}
+
+	//read animations
+	//root bone first and separately
+	for (auto& pair : animFragsByBone[0])
+	{
+		f12 = (Frag12*)getFragByRef(pair.second->ref);
+		skele->addAnimationFrames(pair.first, f12, 0);
+	}
+
+	//now for all child bones
+	for (auto& pair : animFragsByBone[0]) //for each animation name
+	{
+		bone = rootBone;
+		for (int i = 0; i < f10->num_bones; ++i)
+		{
+			if (bone->size > 0)
+			{
+				ptr = bone->getIndexList();
+				for (int j = 0; j < bone->size; ++j)
+				{
+					f12 = nullptr;
+					if (animFragsByBone.count(*ptr) && animFragsByBone[*ptr].count(pair.first))
+						f12 = (Frag12*)getFragByRef(animFragsByBone[*ptr][pair.first]->ref);
+
+					skele->addAnimationFrames(pair.first, f12, *ptr++, i);
+				}
+			}
+			bone = bone->getNext();
+		}
+	}
 	
 #if 0
 	//first, create the individual bones
@@ -772,12 +870,10 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14)
 		uint32 usedBuffers = 0;
 		for (uint32 i = 0; i < mNumMaterials; ++i)
 		{
-			printf("%u %u\n", i, (uint32)!mMaterialVertexBuffers[i].empty());
 			if (!mMaterialVertexBuffers[i].empty())
 			{
 				//createSkinnedMeshBuffer(mainMesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i]);
 				createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i]);
-				printf("post createMeshBuffer\n");
 				mMaterialVertexBuffers[i].clear();
 				mMaterialIndexBuffers[i].clear();
 				//need to correct any bone assignment weights to point to the correct buffer index
@@ -812,9 +908,37 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14)
 		//
 		break;
 	}
-	printf("d\n");
+
+	/*scene::SMesh* copy = new scene::SMesh;
+	for (uint32 i = 0; i < mesh->getMeshBufferCount(); ++i)
+	{
+		scene::SMeshBuffer* copyBuf = new scene::SMeshBuffer;
+		scene::IMeshBuffer* buf = mesh->getMeshBuffer(i);
+
+		copyBuf->Material = buf->getMaterial();
+
+		video::S3DVertex* verts = (video::S3DVertex*)buf->getVertices();
+		for (uint32 j = 0; j < buf->getVertexCount(); ++j)
+			copyBuf->Vertices.push_back(verts[j]);
+
+		uint16* indices = buf->getIndices();
+		for (uint32 j = 0; j < buf->getIndexCount(); ++j)
+			copyBuf->Indices.push_back(indices[j]);
+		//copyBuf->Vertices.reallocate(buf->getVertexCount());
+		//memcpy(copyBuf->Vertices.pointer(), buf->getVertices(), sizeof(video::S3DVertex) * buf->getVertexCount());
+
+		//copyBuf->Indices.reallocate(buf->getIndexCount());
+		//memcpy(copyBuf->Indices.pointer(), buf->getIndices(), sizeof(uint16) * buf->getIndexCount());
+
+		copyBuf->recalculateBoundingBox();
+		copy->addMeshBuffer(copyBuf);
+	}
+	copy->recalculateBoundingBox();*/
+
+	gMobMgr.addModelPrototype(model_id, skele);
+
 	//return mob;
-	return new WLDSkeletonInstance(mesh, skele);
+	return nullptr;//new WLDSkeletonInstance(copy, skele);
 }
 
 void WLD::findAnimations(const char* baseName, scene::CSkinnedMesh::SJoint* joint)

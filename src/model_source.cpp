@@ -8,7 +8,9 @@ ModelSource::ModelSource(S3D* s3d, std::string shortname) :
 	mNumMaterials(0),
 	mMaterials(nullptr),
 	mMaterialVertexBuffers(nullptr),
-	mMaterialIndexBuffers(nullptr)
+	mMaterialIndexBuffers(nullptr),
+	mNoCollisionVertexBuffers(nullptr),
+	mNoCollisionIndexBuffers(nullptr)
 {
 
 }

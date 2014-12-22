@@ -85,6 +85,8 @@
     <ClCompile Include="src\irr\os.cpp" />
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mob.cpp" />
+    <ClCompile Include="src\mob_manager.cpp" />
     <ClCompile Include="src\mob_model.cpp" />
     <ClCompile Include="src\mod.cpp" />
     <ClCompile Include="src\model.cpp" />
@@ -121,6 +123,7 @@
     <ClInclude Include="src\login_connection.h" />
     <ClInclude Include="src\memory_stream.h" />
     <ClInclude Include="src\mob.h" />
+    <ClInclude Include="src\mob_manager.h" />
     <ClInclude Include="src\mob_model.h" />
     <ClInclude Include="src\mod.h" />
     <ClInclude Include="src\model.h" />

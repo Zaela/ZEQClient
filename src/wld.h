@@ -21,6 +21,7 @@
 #include "mob_model.h"
 #include "model_source.h"
 #include "wld_skeleton.h"
+#include "mob_manager.h"
 
 using namespace WLD_Structs;
 
@@ -62,7 +63,7 @@ private:
 		std::vector<uint32>& index_buf, RawVertex* vert, RawNormal* norm, RawUV16* uv16, RawUV32* uv32);
 
 	//MobModel* convertMobModel(Frag14* f14);
-	WLDSkeletonInstance* convertMobModel(Frag14* f14);
+	WLDSkeletonInstance* convertMobModel(Frag14* f14, std::string model_id);
 	static void createSkinnedMeshBuffer(scene::CSkinnedMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
 		std::vector<uint32>& index_buf, IntermediateMaterial* mat = nullptr);
 	void findAnimations(const char* baseName, scene::CSkinnedMesh::SJoint* joint);

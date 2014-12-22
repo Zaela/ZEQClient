@@ -10,12 +10,14 @@ Renderer::Renderer() :
 	mDriver(nullptr),
 	mSceneMgr(nullptr),
 	mCollisionMgr(nullptr),
-	mSleepMilliseconds(20),
+	mSleepMilliseconds(SLEEP_TIME_DEFAULT),
 	mPrevTime(0),
 	mCollisionNode(nullptr),
-	mActiveZoneModel(nullptr)
+	mActiveZoneModel(nullptr),
+	mNumSkeletons(0),
+	mCapacitySkeletons(WLD_SKELETON_INSTANCES_DEFAULT)
 {
-
+	mSkeletons = new WLDSkeletonInstance[WLD_SKELETON_INSTANCES_DEFAULT];
 }
 
 void Renderer::initialize()
@@ -163,7 +165,14 @@ float Renderer::loopStep()
 	if (!mAnimatedTextures.empty())
 		checkAnimatedTextures(delta);
 
-	return (float)delta * 0.001f;
+	float delta_f = (float)delta * 0.001f;
+
+	//wld skeleton animation
+	//add a distance checking mechanism later
+	for (uint32 i = 0; i < mNumSkeletons; ++i)
+		mSkeletons[i].animate(delta_f);
+
+	return delta_f;
 }
 
 void Renderer::useZoneModel(ZoneModel* zoneModel)
@@ -245,4 +254,57 @@ void Renderer::checkAnimatedTextures(uint32 delta)
 			animTex.time -= animTex.frame_delay;
 		}
 	}
+}
+
+scene::SMesh* Renderer::copyMesh(scene::SMesh* mesh)
+{
+	scene::SMesh* copy = new scene::SMesh;
+
+	for (uint32 i = 0; i < mesh->getMeshBufferCount(); ++i)
+	{
+		scene::SMeshBuffer* copyBuf = new scene::SMeshBuffer;
+		scene::IMeshBuffer* buf = mesh->getMeshBuffer(i);
+
+		copyBuf->Material = buf->getMaterial();
+
+		//making space and memcpying the data directly doesn't work for whatever reason
+		video::S3DVertex* verts = (video::S3DVertex*)buf->getVertices();
+		for (uint32 j = 0; j < buf->getVertexCount(); ++j)
+			copyBuf->Vertices.push_back(verts[j]);
+
+		uint16* indices = buf->getIndices();
+		for (uint32 j = 0; j < buf->getIndexCount(); ++j)
+			copyBuf->Indices.push_back(indices[j]);
+
+		copyBuf->recalculateBoundingBox();
+		copy->addMeshBuffer(copyBuf);
+	}
+	copy->recalculateBoundingBox();
+
+	return copy;
+}
+
+WLDSkeletonInstance* Renderer::addSkeletonInstance(WLDSkeleton* skele)
+{
+	scene::SMesh* mesh = copyMesh(skele->getReferenceMesh());
+	uint32 n = mNumSkeletons++;
+
+	if (n == mCapacitySkeletons)
+		reallocSkeletons();
+
+	new (&mSkeletons[n]) WLDSkeletonInstance(mesh, skele);
+
+	return &mSkeletons[n];
+}
+
+void Renderer::reallocSkeletons()
+{
+	uint32 cap = mCapacitySkeletons;
+	mCapacitySkeletons *= 2;
+
+	WLDSkeletonInstance* data = new WLDSkeletonInstance[mCapacitySkeletons];
+	memcpy(data, mSkeletons, sizeof(WLDSkeletonInstance) * cap);
+
+	delete[] mSkeletons;
+	mSkeletons = data;
 }

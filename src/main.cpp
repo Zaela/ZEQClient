@@ -12,6 +12,7 @@
 #include "zone_connection.h"
 #include "zone_viewer.h"
 #include "structs_eqg.h"
+#include "mob_manager.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -21,6 +22,7 @@ Input gInput;
 Renderer gRenderer;
 FileLoader gFileLoader;
 Player gPlayer;
+MobManager gMobMgr;
 
 void showError(const char* fmt, ...)
 {
@@ -82,11 +84,18 @@ int main(int argc, char** argv)
 
 			WLD* wld = gFileLoader.getWLD("global_chr");
 			//MobModel* mobModel = wld->convertMobModel("ELE");
-			WLDSkeletonInstance* skele = wld->convertMobModel("ELE");
+			//WLDSkeletonInstance* skele = wld->convertMobModel("ELE");
+			wld->convertMobModel("ELE");
 
-			auto* sceneMgr = gRenderer.getSceneManager();
-			auto* node = sceneMgr->addAnimatedMeshSceneNode(new scene::SAnimatedMesh(skele->mMesh));
-			skele->assumeBasePosition();
+			Mob* mob = gMobMgr.addMob("ELE");
+			WLDSkeletonInstance* skele = mob->mSkeletonWLD;
+
+			//auto* sceneMgr = gRenderer.getSceneManager();
+			//auto* node = sceneMgr->addAnimatedMeshSceneNode(new scene::SAnimatedMesh(skele->mMesh));
+			//skele->assumeBasePosition();
+			skele->setAnimation("T06");
+			//skele->animate(0.75f);
+
 			//auto* node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getMainMesh());
 			//node->setAnimationSpeed(2000.0f);
 			//node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getHeadMesh(0), node);
@@ -111,11 +120,11 @@ int main(int argc, char** argv)
 	}
 	catch (ZEQException& e)
 	{
-		showError("Uncaught exception: %s", e.what());
+		showError("Exception: %s", e.what());
 	}
 	catch (ZEQBasicException& e)
 	{
-		showError("Uncaught basic exception: %s", e.getTypeName());
+		showError("Basic exception: %s", e.getTypeName());
 	}
 	catch (std::exception& e)
 	{

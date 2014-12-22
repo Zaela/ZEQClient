@@ -16,11 +16,17 @@
 #include "zone_model.h"
 #include "camera.h"
 #include "animated_texture.h"
+#include "mob_manager.h"
+#include "wld_skeleton.h"
 
 using namespace irr;
 
 class Renderer
 {
+private:
+	static const uint32 SLEEP_TIME_DEFAULT = 20; //milliseconds
+	static const uint32 WLD_SKELETON_INSTANCES_DEFAULT = 1024; //power of 2 is best
+
 private:
 	IrrlichtDevice* mDevice;
 	video::IVideoDriver* mDriver;
@@ -35,8 +41,13 @@ private:
 
 	std::vector<AnimatedTexture> mAnimatedTextures;
 
+	uint32 mNumSkeletons;
+	uint32 mCapacitySkeletons;
+	WLDSkeletonInstance* mSkeletons;
+
 private:
 	static IrrlichtDevice* createDevice(SIrrlichtCreationParameters& params);
+	void reallocSkeletons();
 
 public:
 	Renderer();
@@ -58,6 +69,9 @@ public:
 	float loopStep();
 	void useZoneModel(ZoneModel* zoneModel);
 	void checkAnimatedTextures(uint32 delta);
+
+	scene::SMesh* copyMesh(scene::SMesh* mesh);
+	WLDSkeletonInstance* addSkeletonInstance(WLDSkeleton* skele);
 };
 
 
