@@ -23,12 +23,16 @@ Renderer::Renderer() :
 void Renderer::initialize()
 {
 	SIrrlichtCreationParameters p;
-	p.Vsync = true;
-	p.WindowSize = core::dimension2du(640, 480);
+	p.Vsync = Lua::getConfigBool(CONFIG_VAR_VSYNC, false);
+	p.WindowSize = core::dimension2du(
+		Lua::getConfigInt(CONFIG_VAR_SCREEN_WIDTH, 640),
+		Lua::getConfigInt(CONFIG_VAR_SCREEN_HEIGHT, 480)
+	);
+	p.Fullscreen = Lua::getConfigBool(CONFIG_VAR_FULLSCREEN, false);
 
 	p.EventReceiver = &gInput;
 
-	mDevice = createDevice(p);
+	mDevice = createDevice(p, Lua::getConfigString(CONFIG_VAR_RENDERER, ""));
 
 	if (mDevice)
 	{
@@ -46,11 +50,35 @@ void Renderer::close()
 		mDevice->drop();
 }
 
-IrrlichtDevice* Renderer::createDevice(SIrrlichtCreationParameters& params)
+IrrlichtDevice* Renderer::createDevice(SIrrlichtCreationParameters& params, std::string selectedRenderer)
 {
+	IrrlichtDevice* device = nullptr;
+	//try user-selected
+	if (selectedRenderer.size())
+	{
+		if (selectedRenderer.compare("OpenGL") == 0)
+		{
+			params.DriverType = video::EDT_OPENGL;
+			device = createDeviceEx(params);
+		}
+		else if (selectedRenderer.compare("DirectX") == 0)
+		{
+			params.DriverType = video::EDT_DIRECT3D9;
+			device = createDeviceEx(params);
+		}
+		else if (selectedRenderer.compare("Software") == 0)
+		{
+			params.DriverType = video::EDT_SOFTWARE;
+			device = createDeviceEx(params);
+		}
+
+		if (device)
+			return device;
+	}
+
 	//try DirectX
 	params.DriverType = video::EDT_DIRECT3D9;
-	IrrlichtDevice* device = createDeviceEx(params);
+	device = createDeviceEx(params);
 
 	if (device)
 		return device;

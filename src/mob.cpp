@@ -15,3 +15,10 @@ Mob::Mob(uint32 index, WLDSkeletonInstance* skele, MobPosition* pos) :
 		core::vector3df(pos->x, pos->y, pos->z));
 	mesh->drop();
 }
+
+Mob::~Mob()
+{
+	if (mSkeletonWLD)
+		delete mSkeletonWLD;
+	mNode->drop();
+}

@@ -1,5 +1,8 @@
 
 #include "model_source.h"
+#include "renderer.h"
+
+extern Renderer gRenderer;
 
 ModelSource::ModelSource(S3D* s3d, std::string shortname) :
 	mContainingS3D(s3d),
@@ -109,17 +112,24 @@ void ModelSource::createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVer
 		{
 			if (mat->first.flag & IntermediateMaterialEntry::FULLY_TRANSPARENT)
 			{
-				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //fully transparent materials should have no texture
-				//use TRANSPARENT_VERTEX_ALPHA to show zone walls
+				if (!Lua::getConfigBool(CONFIG_VAR_SHOW_ZONE_WALLS, false))
+					material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //fully transparent materials should have no texture
+				else
+					material.MaterialType = video::EMT_TRANSPARENT_VERTEX_ALPHA;
 			}
 			else if (mat->first.diffuse_map)
 			{
 				material.setTexture(0, mat->first.diffuse_map);
-				if (model) //temp
-				model->addUsedTexture(mat->first.diffuse_map); //make a general Model class for this?
+				if (model) //should always be a model, but just in case...
+					model->addUsedTexture(mat->first.diffuse_map);
 
 				if (mat->first.flag & IntermediateMaterialEntry::MASKED)
-					material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //should be blended
+				{
+					if (gRenderer.isOpenGL())
+						material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+					else
+						material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //should be blended
+				}
 				//put semi-transparent handling here (need to figure out how to do it and how to make it play nice with masking...)
 				//probably make a copy of the texture and change the alpha of the bitmap pixels, then use blending EMT_TRANSPARENT_ALPHA_CHANNEL
 			}

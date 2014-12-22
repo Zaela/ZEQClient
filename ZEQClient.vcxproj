@@ -61,7 +61,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>"include\irrlicht\";"include\freeimage\";"include\zlib\";"include\cryptopp562\";</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>"include\irrlicht\";"include\freeimage\";"include\zlib\";"include\cryptopp562\";"include\lua\";</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -70,7 +70,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>"lib\";</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib.lib;lua5.1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -87,7 +87,6 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mob.cpp" />
     <ClCompile Include="src\mob_manager.cpp" />
-    <ClCompile Include="src\mob_model.cpp" />
     <ClCompile Include="src\mod.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\model_source.cpp" />
@@ -100,10 +99,12 @@
     <ClCompile Include="src\socket.cpp" />
     <ClCompile Include="src\structs_eqg.cpp" />
     <ClCompile Include="src\ter.cpp" />
+    <ClCompile Include="src\translate.cpp" />
     <ClCompile Include="src\util.cpp" />
     <ClCompile Include="src\wld.cpp" />
     <ClCompile Include="src\wld_skeleton.cpp" />
     <ClCompile Include="src\world_connection.cpp" />
+    <ClCompile Include="src\zeq_lua.cpp" />
     <ClCompile Include="src\zon.cpp" />
     <ClCompile Include="src\zone_connection.cpp" />
     <ClCompile Include="src\zone_model.cpp" />
@@ -124,7 +125,6 @@
     <ClInclude Include="src\memory_stream.h" />
     <ClInclude Include="src\mob.h" />
     <ClInclude Include="src\mob_manager.h" />
-    <ClInclude Include="src\mob_model.h" />
     <ClInclude Include="src\mod.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\model_source.h" />
@@ -146,11 +146,13 @@
     <ClInclude Include="src\structs_titanium.h" />
     <ClInclude Include="src\structs_wld.h" />
     <ClInclude Include="src\ter.h" />
+    <ClInclude Include="src\translate.h" />
     <ClInclude Include="src\types.h" />
     <ClInclude Include="src\util.h" />
     <ClInclude Include="src\wld.h" />
     <ClInclude Include="src\wld_skeleton.h" />
     <ClInclude Include="src\world_connection.h" />
+    <ClInclude Include="src\zeq_lua.h" />
     <ClInclude Include="src\zon.h" />
     <ClInclude Include="src\zone_connection.h" />
     <ClInclude Include="src\zone_model.h" />

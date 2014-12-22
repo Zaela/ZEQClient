@@ -134,7 +134,6 @@ void WLDSkeleton::addAnimation(std::string animName, uint32 num_frames, uint32 f
 
 void WLDSkeleton::addAnimationFrames(std::string animName, Frag12* f12, int bone_id, int parent_id)
 {
-	printf("addAnimationFrames for %s bone %i parent %i\n", animName.c_str(), bone_id, parent_id);
 	core::vector3df pos, rot;
 	Animation& anim = mAnimations[animName];
 	uint32 num_frames = (anim.end_frame - anim.start_frame) + 1;

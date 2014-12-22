@@ -2,7 +2,11 @@
 #include "login_connection.h"
 
 LoginConnection::LoginConnection() :
-	Connection("login.eqemulator.net", 5998, true),
+	Connection(
+		Lua::getConfigString(CONFIG_VAR_LOGIN_IP, LOGIN_IP_DEFAULT).c_str(),
+		Lua::getConfigInt(CONFIG_VAR_LOGIN_PORT, LOGIN_PORT_DEFAULT), 
+		true
+	),
 	mSuccess(false)
 {
 	memset(mDES.key, 0, CryptoPP::DES::DEFAULT_KEYLENGTH);

@@ -11,13 +11,14 @@
 #include "types.h"
 #include "util.h"
 #include "structs_wld.h"
+#include "model.h"
 
 using namespace irr;
 using namespace WLD_Structs;
 
 class Mob;
 
-class WLDSkeleton
+class WLDSkeleton : public Model
 {
 public:
 	struct Weight

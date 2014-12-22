@@ -12,6 +12,7 @@
 #include "model.h"
 #include "s3d.h"
 #include "structs_eqg.h"
+#include "zeq_lua.h"
 
 using namespace irr;
 using namespace EQG_Structs;
@@ -38,7 +39,7 @@ protected:
 	void initMaterials(uint32 num);
 	void initMaterialBuffers();
 	static void createMeshBuffer(scene::SMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
-		std::vector<uint32>& index_buf, IntermediateMaterial* mat = nullptr, Model* zone = nullptr);
+		std::vector<uint32>& index_buf, IntermediateMaterial* mat = nullptr, Model* model = nullptr);
 
 	uint32 readEQGMaterials(uint32 mat_count, byte* data, uint32 p);
 	void readEQGTriangles(uint32 mat_count, uint32 tri_count, Triangle* tris, Vertex* vertices, VertexV3* verticesV3);

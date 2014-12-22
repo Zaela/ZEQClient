@@ -23,18 +23,32 @@ struct MobPrototypeWLD
 	std::vector<WLDSkeleton*> heads;
 };
 
+struct MobPrototypeSetWLD
+{
+	MobPrototypeSetWLD()
+	{
+		for (int i = 0; i < 3; ++i)
+			set[i].skeleton = nullptr;
+	}
+
+	MobPrototypeWLD set[3]; //0 = male, 1 = female, 2 = neuter
+};
+
 class MobManager
 {
 private:
 	std::vector<MobEntry> mMobList;
 	std::vector<MobPosition> mMobPositionList; //kept separate for faster computation on the whole set
 
-	//change to race ids later
-	std::unordered_map<std::string, MobPrototypeWLD, std::hash<std::string>> mPrototypesWLD;
+	std::unordered_map<int, MobPrototypeSetWLD> mPrototypesWLD;
 
 public:
-	void addModelPrototype(std::string model_id, WLDSkeleton* skele);
-	Mob* addMob(std::string model_id);
+	void addModelPrototype(int race_id, int gender, WLDSkeleton* skele);
+	Mob* spawnMob(int race_id, int gender, int level = 1);
+	Mob* spawnMob(Spawn_Struct* spawn);
+
+	void handleHPUpdate(HPUpdate_Struct* update);
+	void handleHPUpdate(ExactHPUpdate_Struct* update);
 };
 
 #endif

@@ -1,19 +1,28 @@
 
 #include "mob_manager.h"
 #include "renderer.h"
+#include "player.h"
 
 extern Renderer gRenderer;
+extern Player gPlayer;
 
-void MobManager::addModelPrototype(std::string model_id, WLDSkeleton* skele)
+void MobManager::addModelPrototype(int race_id, int gender, WLDSkeleton* skele)
 {
-	MobPrototypeWLD proto;
-	proto.skeleton = skele;
-	mPrototypesWLD[model_id] = proto;
+	MobPrototypeSetWLD& proto = mPrototypesWLD[race_id];
+
+	if (proto.set[gender].skeleton) //don't overwrite
+		return;
+
+	proto.set[gender].skeleton = skele;
 }
 
-Mob* MobManager::addMob(std::string model_id)
+Mob* MobManager::spawnMob(int race_id, int gender, int level)
 {
-	WLDSkeleton* skele = mPrototypesWLD[model_id].skeleton;
+	//make sure we have the model, else default to human - add this later
+	if (mPrototypesWLD.count(race_id) == 0 || mPrototypesWLD[race_id].set[gender].skeleton == nullptr)
+		return nullptr;
+
+	WLDSkeleton* skele = mPrototypesWLD[race_id].set[gender].skeleton;
 
 	MobPosition pos;
 	pos.x = 0;
@@ -29,4 +38,40 @@ Mob* MobManager::addMob(std::string model_id)
 	mMobList.push_back(ent);
 
 	return ent.ptr;
+}
+
+Mob* MobManager::spawnMob(Spawn_Struct* spawn)
+{
+	return nullptr;
+}
+
+void MobManager::handleHPUpdate(HPUpdate_Struct* update)
+{
+	int entity = update->spawn_id;
+	//if (entity == gPlayer.getEntityID())
+	
+	for (MobEntry& mob : mMobList)
+	{
+		if (mob.entity_id == entity)
+		{
+			mob.ptr->setPercentHP(update->hp);
+			return;
+		}
+	}
+}
+
+void MobManager::handleHPUpdate(ExactHPUpdate_Struct* update)
+{
+	int entity = update->spawn_id;
+	//if (entity == gPlayer.getEntityID())
+
+	for (MobEntry& mob : mMobList)
+	{
+		if (mob.entity_id == entity)
+		{
+			mob.ptr->setExactHPMax(update->max_hp);
+			mob.ptr->setExactHPCurrent(update->cur_hp);
+			return;
+		}
+	}
 }

@@ -1,5 +1,6 @@
 
 #include <cstdarg>
+#include <lua.hpp>
 
 #include "socket.h"
 #include "random.h"
@@ -13,6 +14,8 @@
 #include "zone_viewer.h"
 #include "structs_eqg.h"
 #include "mob_manager.h"
+#include "zeq_lua.h"
+#include "translate.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -62,7 +65,11 @@ int main(int argc, char** argv)
 	try
 	{
 		Socket::loadLibrary();
+		Lua::initialize();
 		EQG_Structs::initialize();
+		Translate::initialize();
+
+		Lua::fileToTable(CONFIG_FILE, CONFIG_TABLE);
 
 		Args args;
 		readArgs(argc, argv, args);
@@ -78,27 +85,15 @@ int main(int argc, char** argv)
 
 			ZoneModel* zoneModel = ZoneModel::load(shortname);
 			if (zoneModel == nullptr)
-				throw ZEQException("bad zone shortname");
+				throw ZEQException("bad zone shortname '%s'", shortname.c_str());
 
 			gRenderer.useZoneModel(zoneModel);
 
 			WLD* wld = gFileLoader.getWLD("global_chr");
-			//MobModel* mobModel = wld->convertMobModel("ELE");
-			//WLDSkeletonInstance* skele = wld->convertMobModel("ELE");
 			wld->convertMobModel("ELE");
 
-			Mob* mob = gMobMgr.addMob("ELE");
-			WLDSkeletonInstance* skele = mob->mSkeletonWLD;
-
-			//auto* sceneMgr = gRenderer.getSceneManager();
-			//auto* node = sceneMgr->addAnimatedMeshSceneNode(new scene::SAnimatedMesh(skele->mMesh));
-			//skele->assumeBasePosition();
-			skele->setAnimation("T06");
-			//skele->animate(0.75f);
-
-			//auto* node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getMainMesh());
-			//node->setAnimationSpeed(2000.0f);
-			//node = sceneMgr->addAnimatedMeshSceneNode(mobModel->getHeadMesh(0), node);
+			Mob* mob = gMobMgr.spawnMob(75, 2);
+			mob->startAnimation("T06");
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());
@@ -140,6 +135,7 @@ int main(int argc, char** argv)
 	if (world) delete world;
 	if (zone) delete zone;
 
+	Lua::close();
 	Socket::closeLibrary();
 	return 0;
 }
@@ -148,6 +144,13 @@ void printUsage();
 
 void readArgs(int c, char** args, Args& out)
 {
+	//check config file first
+	out.pathToEQ = Lua::getConfigString(CONFIG_VAR_EQ_PATH, "");
+	out.acctName = Lua::getConfigString(CONFIG_VAR_ACCOUNT, "");
+	out.charName = Lua::getConfigString(CONFIG_VAR_CHARACTER, "");
+	out.serverName = Lua::getConfigString(CONFIG_VAR_SERVER, "");
+
+	//read command line arguments
 	int i = 1;
 	while (i < c)
 	{
@@ -181,9 +184,9 @@ void readArgs(int c, char** args, Args& out)
 		i += 2;
 	}
 FINISH:
-	if (!out.pathToEQ.empty() && !out.zoneShortname.empty())
+	if (out.pathToEQ.size() && out.zoneShortname.size())
 		return;
-	if (out.pathToEQ.empty() || out.acctName.empty() || out.password.empty() || out.charName.empty() || out.serverName.empty())
+	if (!out.pathToEQ.size() || !out.acctName.size() || !out.password.size() || !out.charName.size() || !out.serverName.size())
 	{
 		printUsage();
 		throw ExitException();

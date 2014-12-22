@@ -9,6 +9,7 @@
 #include "exception.h"
 #include "world_connection.h"
 #include "structs_titanium.h"
+#include "mob_manager.h"
 
 class ZoneConnection : public Connection
 {

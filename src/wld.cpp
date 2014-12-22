@@ -217,7 +217,7 @@ uint32 WLD::translateVisibilityFlag(Frag30* f30, bool isDDS)
 	return ret;
 }
 
-void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)//scene::CSkinnedMesh* skele)
+void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)
 {
 	byte* data = (byte*)f36;
 	uint32 p = sizeof(Frag36);
@@ -226,9 +226,6 @@ void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)//scene::CSkinnedMesh* 
 
 	//for bone assignments
 	std::vector<uint16> vertToBoneAssignment;
-	core::array<scene::CSkinnedMesh::SJoint*>* jointArray = nullptr;
-	//if (skele)
-	//	jointArray = &skele->getAllJoints();
 
 	//raw vertices
 	RawVertex* wld_verts = (RawVertex*)(data + p);
@@ -263,14 +260,11 @@ void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)//scene::CSkinnedMesh* 
 	p += sizeof(RawTriangle) * f36->poly_count;
 
 	//bone assignments
-	//if (jointArray)
 	if (skeleton)
 	{
-		printf("vert count: %u\n", f36->vert_count);
 		WLD_Structs::BoneAssignment* ba = (WLD_Structs::BoneAssignment*)(data + p);
 		for (uint16 b = 0; b < f36->bone_assignment_count; ++b)
 		{
-			printf("\tbone %u count %u\n", ba->index, ba->count);
 			for (uint16 i = 0; i < ba->count; ++i)
 				vertToBoneAssignment.push_back(ba->index);
 			++ba;
@@ -340,14 +334,6 @@ void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)//scene::CSkinnedMesh* 
 			vertex.Normal.Z = (float)norm.j * normal_scale;
 			vertex.Normal.Y = (float)norm.k * normal_scale;
 
-			/*if (jointArray)
-			{
-				scene::CSkinnedMesh::SJoint* joint = (*jointArray)[vertToBoneAssignment[idx]];
-				scene::ISkinnedMesh::SWeight* wt = skele->addWeight(joint);
-				wt->buffer_id = mat_index;
-				wt->strength = 1.0f;
-				wt->vertex_id = buf_pos;
-			}*/
 			if (skeleton)
 			{
 				skeleton->addWeight(vertToBoneAssignment[idx], mat_index, buf_pos);
@@ -517,53 +503,10 @@ void WLD::convertZoneObjectPlacements(ZoneModel* zone)
 	}
 }
 
-void WLD::createSkinnedMeshBuffer(scene::CSkinnedMesh* mesh, std::vector<video::S3DVertex>& vert_buf,
-		std::vector<uint32>& index_buf, IntermediateMaterial* mat)
-{
-	scene::SSkinMeshBuffer* mesh_buffer = mesh->addMeshBuffer();
-	auto& vbuf = mesh_buffer->Vertices_Standard;
-	auto& ibuf = mesh_buffer->Indices;
-
-	uint32 count = index_buf.size();
-	for (uint32 j = 0; j < count; ++j)
-	{
-		vbuf.push_back(vert_buf[j]);
-		ibuf.push_back((uint16)(index_buf[j]));
-	}
-
-	//material
-	video::SMaterial& material = mesh_buffer->getMaterial();
-	if (mat)
-	{
-		if (mat->first.flag & IntermediateMaterialEntry::FULLY_TRANSPARENT)
-		{
-			material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //fully transparent materials should have no texture
-			//use TRANSPARENT_VERTEX_ALPHA to show zone walls
-		}
-		else if (mat->first.diffuse_map)
-		{
-			material.setTexture(0, mat->first.diffuse_map);
-			//zone->addUsedTexture(mat->first.diffuse_map); //make a general Model class for this
-
-			if (mat->first.flag & IntermediateMaterialEntry::MASKED)
-				material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF; //should be blended
-			//put semi-transparent handling here (need to figure out how to do it and how to make it play nice with masking...)
-			//probably make a copy of the texture and change the alpha of the bitmap pixels, then use blending EMT_TRANSPARENT_ALPHA_CHANNEL
-		}
-	}
-	else
-	{
-		material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-	}
-
-	mesh_buffer->recalculateBoundingBox();
-}
-
-//MobModel* WLD::convertMobModel(const char* id_name)
-WLDSkeletonInstance* WLD::convertMobModel(const char* id_name)
+void WLD::convertMobModel(const char* id_name)
 {
 	if (mFragsByType.count(0x14) == 0)
-		return nullptr;
+		return;
 
 	processMaterials();
 
@@ -574,29 +517,33 @@ WLDSkeletonInstance* WLD::convertMobModel(const char* id_name)
 		const char* name = getFragName(frag);
 		if (strncmp(id_name, name, len) == 0)
 		{
-			return convertMobModel((Frag14*)frag, id_name);
+			convertMobModel((Frag14*)frag, id_name);
+			return;
 		}
 	}
-
-	return nullptr;
 }
 
-//MobModel* WLD::convertMobModel(Frag14* f14)
-WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
+void WLD::convertAllMobModels()
+{
+	if (mFragsByType.count(0x14) == 0)
+		return;
+
+	processMaterials();
+
+	for (FragHeader* frag : mFragsByType[0x14])
+	{
+		convertMobModel((Frag14*)frag, getFragName(frag));
+	}
+}
+
+void WLD::convertMobModel(Frag14* f14, std::string model_id)
 {
 	if (f14->size[1] < 1)
-		return nullptr;
+		return;
 
 	//should handle this separately from zones in a lot of ways
 	//should not load all material textures off the bat in case we are only using 1 out of 10 models in a WLD, for one
 	
-	//process bones to get all the joints in order (check for and record attachment points!)
-	//then process the 0x36s to get the bone assignments
-	//and maybe also do the 0x30 --> 0x03 part there too if you can avoid making a mess
-
-	//should flag chr wld's and remove hardware textures on their destructors ?
-	
-	//initialize two buffers for each material
 	initMaterialBuffers();
 
 	//0x14 -> 0x11 -> 0x10 -> 0x13 -> 0x12
@@ -604,14 +551,10 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
 	int* ref_ptr = f14->getRefList();
 	Frag11* f11 = (Frag11*)getFragByRef(*ref_ptr);
 	if (f11->type != 0x11)
-		return nullptr;
+		return;
 	Frag10* f10 = (Frag10*)getFragByRef(f11->ref);
 
-	//MobModel* mob = new MobModel;
-	//try doing the manual rotate and shift by parent for each keyframe of each joint
-
-	//handle skeleton here
-	//scene::CSkinnedMesh* mainMesh = new scene::CSkinnedMesh;
+	//handle skeleton
 	scene::SMesh* mesh = new scene::SMesh;
 
 	//the skeleton uses index-based recursion
@@ -747,114 +690,6 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
 			bone = bone->getNext();
 		}
 	}
-	
-#if 0
-	//first, create the individual bones
-	Frag10Bone* bone = rootBone;
-	std::vector<core::vector3df> rotationsVec;
-	for (int i = 0; i < f10->num_bones; ++i)
-	{
-		scene::CSkinnedMesh::SJoint* joint = mainMesh->addJoint();
-
-		Frag13* f13 = (Frag13*)getFragByRef(bone->ref1);
-
-		const char* name = getFragName(f13);
-		printf("%s\n", name);
-
-		findAnimations(name, joint);
-
-		joint->Name = name;
-
-		Frag12* f12 = (Frag12*)getFragByRef(f13->ref);
-		Frag12Entry& ent = f12->entry[0];
-
-		float denom = (float)ent.rotDenom;
-		core::vector3df rot(
-			(float)ent.rotY / denom * 3.14159f * 0.5f,
-			(float)ent.rotZ / denom * 3.14159f * 0.5f,
-			(float)ent.rotX / denom * 3.14159f * 0.5f
-		);
-
-		rotationsVec.push_back(rot);
-		joint->Animatedrotation = core::quaternion(rot);
-
-		denom = (float)ent.shiftDenom;
-		joint->Animatedposition = core::vector3df(
-			(float)ent.shiftX / denom,
-			(float)ent.shiftZ / denom,
-			(float)ent.shiftY / denom
-		);
-
-		joint->Animatedscale = core::vector3df(1.0f, 1.0f, 1.0f);
-
-		core::matrix4 positionMatrix;
-		positionMatrix.setTranslation(joint->Animatedposition);
-		core::matrix4 scaleMatrix;
-		scaleMatrix.setScale(joint->Animatedscale);
-		core::matrix4 rotationMatrix;
-
-		joint->Animatedrotation.getMatrix_transposed(rotationMatrix);
-
-		joint->LocalMatrix = positionMatrix * rotationMatrix * scaleMatrix;
-		//set global matrix during next step, when we know the parent for this bone
-
-		bone = bone->getNext();
-	}
-
-	//handle parent -> child relationships
-	bone = rootBone;
-	//the root bone has no parent
-	core::array<scene::CSkinnedMesh::SJoint*>& jointArray = mainMesh->getAllJoints();
-	jointArray[0]->GlobalMatrix = jointArray[0]->LocalMatrix;
-	for (int i = 0; i < f10->num_bones; ++i)
-	{
-		if (bone->size > 0)
-		{
-			scene::CSkinnedMesh::SJoint* parent = jointArray[i];
-			core::vector3df& parentRot = rotationsVec[i];
-			int* index_ptr = bone->getIndexList();
-			for (int j = 0; j < bone->size; ++j)
-			{
-				scene::CSkinnedMesh::SJoint* child = jointArray[*index_ptr];
-
-				core::vector3df& rot = rotationsVec[*index_ptr++];
-				Util::rotateBy(child->Animatedposition, parentRot);
-
-				child->Animatedposition += parent->Animatedposition;
-				rot = parentRot + rot;
-
-				child->Animatedrotation = core::quaternion(rot);
-
-				core::matrix4 positionMatrix;
-				positionMatrix.setTranslation(child->Animatedposition);
-				core::matrix4 scaleMatrix;
-				scaleMatrix.setScale(child->Animatedscale);
-				core::matrix4 rotationMatrix;
-
-				child->Animatedrotation.getMatrix_transposed(rotationMatrix);
-
-				child->LocalMatrix = positionMatrix * rotationMatrix * scaleMatrix;
-				child->GlobalMatrix = child->LocalMatrix;
-
-				parent->Children.push_back(child);
-			}
-		}
-		bone = bone->getNext();
-	}
-
-	//build animations
-	scene::CSkinnedMesh::SJoint* root = jointArray[0];
-	uint32 high_frame = 0;
-	for (auto& pair : mAnimFragsByJoint[root])
-	{
-		const char* animName = pair.first.c_str();
-		buildAnimation(animName, mainMesh, root, mob, high_frame);
-		for (uint32 i = 0; i < root->Children.size(); ++i)
-			buildAnimation(animName, mainMesh, root->Children[i], mob, high_frame, root);
-		//for (uint32 i = 1; i < jointArray.size(); ++i)
-		//	buildAnimation(animName, mainMesh, jointArray[i], mob, high_frame);
-	}
-#endif
 
 	//find meshes
 	int numMeshes;
@@ -863,7 +698,6 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
 	{
 		Frag2D* f2d = (Frag2D*)getFragByRef(*ref_ptr++);
 
-		//processMesh((Frag36*)getFragByRef(f2d->ref), mainMesh);
 		processMesh((Frag36*)getFragByRef(f2d->ref), skele);
 
 		//find any vertex + index buffers with data in them and use them to fill this mesh
@@ -872,22 +706,11 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
 		{
 			if (!mMaterialVertexBuffers[i].empty())
 			{
-				//createSkinnedMeshBuffer(mainMesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i]);
-				createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i]);
+				createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], skele);
 				mMaterialVertexBuffers[i].clear();
 				mMaterialIndexBuffers[i].clear();
+
 				//need to correct any bone assignment weights to point to the correct buffer index
-				//do this better, way too much wasted iteration
-				/*for (uint32 j = 0; j < jointArray.size(); ++j)
-				{
-					auto& weights = jointArray[j]->Weights;
-					for (uint32 w = 0; w < weights.size(); ++w)
-					{
-						scene::ISkinnedMesh::SWeight& wt = weights[w];
-						if (wt.buffer_id == i)
-							wt.buffer_id = usedBuffers;
-					}
-				}*/
 				for (uint32 j = 0; j < skele->getNumBones(); ++j)
 				{
 					auto& weights = skele->getWeights(j);
@@ -902,138 +725,8 @@ WLDSkeletonInstance* WLD::convertMobModel(Frag14* f14, std::string model_id)
 			}
 		}
 
-		//mainMesh->finalize();
-		//mob->setMesh(n, mainMesh);
-
-		//
-		break;
+		break; //remove when we can handle head meshes
 	}
 
-	/*scene::SMesh* copy = new scene::SMesh;
-	for (uint32 i = 0; i < mesh->getMeshBufferCount(); ++i)
-	{
-		scene::SMeshBuffer* copyBuf = new scene::SMeshBuffer;
-		scene::IMeshBuffer* buf = mesh->getMeshBuffer(i);
-
-		copyBuf->Material = buf->getMaterial();
-
-		video::S3DVertex* verts = (video::S3DVertex*)buf->getVertices();
-		for (uint32 j = 0; j < buf->getVertexCount(); ++j)
-			copyBuf->Vertices.push_back(verts[j]);
-
-		uint16* indices = buf->getIndices();
-		for (uint32 j = 0; j < buf->getIndexCount(); ++j)
-			copyBuf->Indices.push_back(indices[j]);
-		//copyBuf->Vertices.reallocate(buf->getVertexCount());
-		//memcpy(copyBuf->Vertices.pointer(), buf->getVertices(), sizeof(video::S3DVertex) * buf->getVertexCount());
-
-		//copyBuf->Indices.reallocate(buf->getIndexCount());
-		//memcpy(copyBuf->Indices.pointer(), buf->getIndices(), sizeof(uint16) * buf->getIndexCount());
-
-		copyBuf->recalculateBoundingBox();
-		copy->addMeshBuffer(copyBuf);
-	}
-	copy->recalculateBoundingBox();*/
-
-	gMobMgr.addModelPrototype(model_id, skele);
-
-	//return mob;
-	return nullptr;//new WLDSkeletonInstance(copy, skele);
-}
-
-void WLD::findAnimations(const char* baseName, scene::CSkinnedMesh::SJoint* joint)
-{
-	for (FragHeader* frag : mFragsByType[0x13])
-	{
-		const char* name = getFragName(frag);
-		if (strcmp(name + 3, baseName) != 0)
-			continue;
-
-		printf("joint %p found f13 %s\n", joint, name);
-		Frag13* f13 = (Frag13*)frag;
-		auto& anims = mAnimFragsByJoint[joint];
-		anims[std::string(name, 3)] = f13;
-	}
-}
-
-void WLD::buildAnimation(const char* animName, scene::CSkinnedMesh* skele, scene::CSkinnedMesh::SJoint* joint, 
-	MobModel* mob, uint32& high_frame, scene::CSkinnedMesh::SJoint* parent)
-{
-	Frag13* f13 = mAnimFragsByJoint[joint][animName];
-	if (f13 == nullptr)
-		return;
-
-	Frag12* f12 = (Frag12*)getFragByRef(f13->ref);
-
-
-	Animation* anim = mob->getAnimation(animName);
-	if (parent == nullptr) //new animation, root bone
-	{
-		anim->frame_delay = f13->param;
-		anim->start_frame = high_frame;
-		printf("%s delay: %u, start_frame: %u\n", animName, f13->param, high_frame);
-	}
-	else if (anim->end_frame == 0)
-	{
-		uint32 frames_len = anim->frame_delay * f12->count;
-		anim->end_frame = high_frame + frames_len;
-		high_frame += frames_len + 1;
-		printf("%s end_frame: %u\n", animName, anim->end_frame);
-	}
-
-	//create keyframes
-	float frame = (float)anim->start_frame;
-
-	for (uint32 i = 0; i < f12->count; ++i)
-	{
-		Frag12Entry& ent = f12->entry[i];
-
-		float denom = (float)ent.rotDenom;
-		core::vector3df rot(
-			(float)ent.rotY / denom * 3.14159f * 0.5f,
-			(float)ent.rotZ / denom * 3.14159f * 0.5f,
-			(float)ent.rotX / denom * 3.14159f * 0.5f
-		);
-
-		denom = (float)ent.shiftDenom;
-		scene::ISkinnedMesh::SPositionKey* pos = skele->addPositionKey(joint);
-		pos->frame = frame;
-		pos->position = core::vector3df(
-			(float)ent.shiftX / denom,
-			(float)ent.shiftZ / denom,
-			(float)ent.shiftY / denom
-		);
-
-		if (parent)
-		{
-			core::vector3df parentPos;
-			core::vector3df parentRot;
-			//uint32 k = parent->PositionKeys.size() > i ? i : 0;
-			uint32 k;
-			for (k = 0; k < parent->PositionKeys.size(); ++k)
-			{
-				if (parent->PositionKeys[k].frame == frame)
-					break;
-			}
-			parentPos = parent->PositionKeys[k].position;
-			parent->RotationKeys[k].rotation.toEuler(parentRot);
-
-			//Util::rotateBy(pos->position, parentRot);
-			//pos->position += parentPos;
-			//rot = parentRot - rot;
-		}
-
-		scene::ISkinnedMesh::SRotationKey* rotKey = skele->addRotationKey(joint);
-		rotKey->frame = frame;
-		rotKey->rotation = core::quaternion(rot);
-
-		scene::ISkinnedMesh::SScaleKey* scale = skele->addScaleKey(joint);
-		scale->frame = frame;
-		scale->scale = core::vector3df(1.0f, 1.0f, 1.0f);
-
-		frame += (float)anim->frame_delay;
-	}
-
-	for (uint32 i = 0; i < joint->Children.size(); ++i)
-		buildAnimation(animName, skele, joint->Children[i], mob, high_frame, joint);
+	gMobMgr.addModelPrototype(Translate::raceID(model_id), Translate::gender(model_id), skele);
 }

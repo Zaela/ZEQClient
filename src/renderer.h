@@ -18,6 +18,7 @@
 #include "animated_texture.h"
 #include "mob_manager.h"
 #include "wld_skeleton.h"
+#include "zeq_lua.h"
 
 using namespace irr;
 
@@ -41,12 +42,13 @@ private:
 
 	std::vector<AnimatedTexture> mAnimatedTextures;
 
+	//better off keeping skeleton instances in MobManager since you'll have to to a distance check anyway
 	uint32 mNumSkeletons;
 	uint32 mCapacitySkeletons;
 	WLDSkeletonInstance* mSkeletons;
 
 private:
-	static IrrlichtDevice* createDevice(SIrrlichtCreationParameters& params);
+	static IrrlichtDevice* createDevice(SIrrlichtCreationParameters& params, std::string selectedRenderer);
 	void reallocSkeletons();
 
 public:

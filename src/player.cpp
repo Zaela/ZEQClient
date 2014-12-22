@@ -210,3 +210,13 @@ void Player::applyFallingDamage()
 	float dist = mFallStartingY - mCamera->getSceneNode()->getPosition().Y; //change this
 	//threshold and damage calculation, I have no idea at the moment
 }
+
+void Player::handleSpawn(Spawn_Struct* spawn)
+{
+
+}
+
+void Player::handlePlayerProfile(PlayerProfile_Struct* pp)
+{
+
+}

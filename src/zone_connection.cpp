@@ -1,5 +1,9 @@
 
 #include "zone_connection.h"
+#include "player.h"
+
+extern MobManager gMobMgr;
+extern Player gPlayer;
 
 ZoneConnection::ZoneConnection(WorldConnection* world) :
 	Connection(world->getZoneServer()->ip, world->getZoneServer()->port),
@@ -39,12 +43,14 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	{
 		printf("OP_PlayerProfile\n");
 		PlayerProfile_Struct* pp = (PlayerProfile_Struct*)data;
+		gPlayer.handlePlayerProfile(pp);
 		break;
 	}
 	case OP_ZoneEntry:
 	{
 		printf("OP_ZoneEntry\n");
 		Spawn_Struct* spawn = (Spawn_Struct*)data;
+		gPlayer.handleSpawn(spawn);
 		break;
 	}
 	case OP_TimeOfDay:
@@ -99,7 +105,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		uint32 count = len / sizeof(Spawn_Struct);
 		for (uint32 i = 0; i < count; ++i)
 		{
-			//handle spawn
+			gMobMgr.spawnMob(spawn++);
 		}
 		break;
 	}
@@ -108,6 +114,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		printf("OP_NewSpawn\n");
 		//happens when a mob spawns!
 		Spawn_Struct* spawn = (Spawn_Struct*)data;
+		gMobMgr.spawnMob(spawn);
 		break;
 	}
 	case OP_SendAAStats:
@@ -136,6 +143,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		printf("OP_HPUpdate\n");
 		//exact hp update
 		ExactHPUpdate_Struct* hp = (ExactHPUpdate_Struct*)data;
+		gMobMgr.handleHPUpdate(hp);
 		break;
 	}
 	case OP_MobHealth:
@@ -143,6 +151,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		printf("OP_MobHealth\n");
 		//percent hp update
 		HPUpdate_Struct* hp = (HPUpdate_Struct*)data;
+		gMobMgr.handleHPUpdate(hp);
 		break;
 	}
 	case OP_ManaChange:
@@ -172,7 +181,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	case OP_Unknown:
 		break;
 	default:
-		printf("ZoneConnection received unknown opcode 0x%0.4X\n", opcode);
+		printf("ZoneConnection received unhandled opcode 0x%0.4X\n", opcode);
 		break;
 	}
 

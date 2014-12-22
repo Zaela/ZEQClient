@@ -48,6 +48,11 @@ public:
 
 	void setZoneConnection(ZoneConnection* zc) { mZoneConnection = zc; }
 	void setCamera(Camera* cam);
+
+	int getEntityID() { return -1; } //put this in later
+
+	void handleSpawn(Spawn_Struct* spawn);
+	void handlePlayerProfile(PlayerProfile_Struct* pp);
 };
 
 #endif

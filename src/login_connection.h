@@ -18,6 +18,10 @@
 #include "connection.h"
 #include "opcodes_login.h"
 #include "exception.h"
+#include "zeq_lua.h"
+
+#define LOGIN_IP_DEFAULT "login.eqemulator.net"
+#define LOGIN_PORT_DEFAULT 5998
 
 class LoginConnection : public Connection
 {

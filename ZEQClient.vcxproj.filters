@@ -78,9 +78,6 @@
     <ClCompile Include="src\animated_texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\mob_model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\irr\CBoneSceneNode.cpp">
       <Filter>Source Files\Irr</Filter>
     </ClCompile>
@@ -115,6 +112,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\mob.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\translate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\zeq_lua.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -230,9 +233,6 @@
     <ClInclude Include="src\zone_viewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\mob_model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\structs_eqg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -255,6 +255,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\mob_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\translate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\zeq_lua.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
