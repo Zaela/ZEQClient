@@ -90,10 +90,18 @@ int main(int argc, char** argv)
 			gRenderer.useZoneModel(zoneModel);
 
 			WLD* wld = gFileLoader.getWLD("global_chr");
-			wld->convertMobModel("ELE");
+			//wld->convertMobModel("ELE");
+			wld->convertAllMobModels();
 
 			Mob* mob = gMobMgr.spawnMob(75, 2);
-			mob->startAnimation("T06");
+			gMobMgr.spawnMob(9, 0, 1, 5, 5, 5);
+			gMobMgr.spawnMob(60, 2, 1, -5, 5, -5);
+			//mob->startAnimation("T06");
+
+			wld = gFileLoader.getWLD("dra_chr");
+			wld->convertMobModel("DRA");
+
+			gMobMgr.spawnMob(49, 2, 1, 20, 5, 20);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());

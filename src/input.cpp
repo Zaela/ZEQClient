@@ -121,6 +121,7 @@ bool Input::zoneViewerMouseEvent(const SEvent::SMouseInput& ev)
 		}
 		mMouseX = ev.X;
 		mMouseY = ev.Y;
+		mGUIContext->injectMousePosition((float)ev.X, (float)ev.Y);
 		break;
 	default:
 		break;

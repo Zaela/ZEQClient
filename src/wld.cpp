@@ -219,6 +219,9 @@ uint32 WLD::translateVisibilityFlag(Frag30* f30, bool isDDS)
 
 void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)
 {
+	if (f36->type != 0x36)
+		return;
+
 	byte* data = (byte*)f36;
 	uint32 p = sizeof(Frag36);
 
@@ -365,7 +368,6 @@ void WLD::processMesh(Frag36* f36, WLDSkeleton* skeleton)
 		for (uint16 i = 0; i < rte->count; ++i)
 		{
 			RawTriangle& tri = wld_tris[i];
-			//if ((tri.flag & RawTriangle::PERMEABLE) == 0 || skele)
 			if ((tri.flag & RawTriangle::PERMEABLE) == 0 || skeleton)
 				processTriangle(tri, vert_buf, index_buf, mat_index);
 			else
@@ -383,11 +385,8 @@ ZoneModel* WLD::convertZoneModel()
 		return nullptr;
 
 	processMaterials();
-	
-	//initialize two buffers for each material
 	initMaterialBuffers();
-	//should also make a collision mesh buffer here...
-	
+
 	//process mesh fragments
 	for (FragHeader* frag : mFragsByType[0x36])
 	{
@@ -530,11 +529,16 @@ void WLD::convertAllMobModels()
 
 	processMaterials();
 
+	int n = mFragsByType[0x14].size();
+	int i = 0;
 	for (FragHeader* frag : mFragsByType[0x14])
 	{
-		convertMobModel((Frag14*)frag, getFragName(frag));
+		printf("%i of %i: %s\n", i++, n, getFragName(frag));
+		convertMobModel((Frag14*)frag, std::string(getFragName(frag), 3));
 	}
 }
+
+//#define ZEQ_LOAD_WLD_ANIMATIONS 1
 
 void WLD::convertMobModel(Frag14* f14, std::string model_id)
 {
@@ -570,6 +574,7 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 
 	WLDSkeleton* skele = new WLDSkeleton(f10->num_bones, mesh);
 	//change to animation id numbers later
+#ifdef ZEQ_LOAD_WLD_ANIMATIONS
 	std::unordered_map<int, std::unordered_map<std::string, Frag13*, std::hash<std::string>>> animFragsByBone;
 
 	auto findAnimations = [&, this](const char* baseName, int bonePos)
@@ -585,6 +590,7 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 			anims[std::string(name, 3)] = f13;
 		}
 	};
+#endif
 
 	//handle root bone
 	int* ptr;
@@ -592,7 +598,9 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 	const char* f13name = getFragName(f13);
 	Frag12* f12 = (Frag12*)getFragByRef(f13->ref);
 	skele->setBasePosition(0, f12->entry[0]);
+#ifdef ZEQ_LOAD_WLD_ANIMATIONS
 	findAnimations(f13name, 0);
+#endif
 
 	bone = rootBone;
 	for (int i = 0; i < f10->num_bones; ++i)
@@ -628,11 +636,13 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 						break;
 					}
 				}
+#ifdef ZEQ_LOAD_WLD_ANIMATIONS
 				else
 				{
 					//attachment points never have animation frames
 					findAnimations(f13name, *ptr);
 				}
+#endif
 
 				skele->setBasePosition(*ptr++, f12->entry[0], i, point);
 			}
@@ -640,6 +650,7 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 		bone = bone->getNext();
 	}
 
+#ifdef ZEQ_LOAD_WLD_ANIMATIONS
 	//create animations
 	//the root bone's frag13 has the timing information,
 	//while its children's frag12s have the number of frames
@@ -653,6 +664,7 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 			if (animFragsByBone.count(*ptr) && animFragsByBone[*ptr].count(pair.first))
 			{
 				//we're taking it on faith that the first one we find has more than 1 frame
+				//^ not reliable, as it turns out
 				f13 = animFragsByBone[*ptr][pair.first];
 				f12 = (Frag12*)getFragByRef(f13->ref);
 				skele->addAnimation(pair.first, f12->count, timing);
@@ -690,43 +702,64 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 			bone = bone->getNext();
 		}
 	}
+#endif
 
 	//find meshes
-	int numMeshes;
-	ref_ptr = f10->getRefList(numMeshes);
-	for (int n = 0; n < numMeshes; ++n)
+	//some models (really simple ones?) don't have the reference section
+	//refs to the model mesh frags are probably in the frag10bone parts instead
+	if (f10->hasRefList())
 	{
-		Frag2D* f2d = (Frag2D*)getFragByRef(*ref_ptr++);
-
-		processMesh((Frag36*)getFragByRef(f2d->ref), skele);
-
-		//find any vertex + index buffers with data in them and use them to fill this mesh
-		uint32 usedBuffers = 0;
-		for (uint32 i = 0; i < mNumMaterials; ++i)
+		int numMeshes;
+		ref_ptr = f10->getRefList(numMeshes);
+		for (int n = 0; n < numMeshes; ++n)
 		{
-			if (!mMaterialVertexBuffers[i].empty())
+			if (n > 0)
 			{
-				createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], skele);
-				mMaterialVertexBuffers[i].clear();
-				mMaterialIndexBuffers[i].clear();
-
-				//need to correct any bone assignment weights to point to the correct buffer index
-				for (uint32 j = 0; j < skele->getNumBones(); ++j)
-				{
-					auto& weights = skele->getWeights(j);
-					for (WLDSkeleton::Weight& wt : weights)
-					{
-						if (wt.buffer_index == i)
-							wt.buffer_index = usedBuffers;
-					}
-				}
-
-				++usedBuffers;
+				//make a copy of the skeleton
+				WLDSkeleton* copy = new WLDSkeleton(*skele);
+				mesh = new scene::SMesh;
+				copy->setReferenceMesh(mesh);
+				skele = copy;
 			}
+
+			Frag2D* f2d = (Frag2D*)getFragByRef(*ref_ptr++);
+
+			FragHeader* frag = getFragByRef(f2d->ref);
+			const char* modelFragName = getFragName(frag);
+			printf("%s 0x%0.2X\n", modelFragName, frag->type);
+			if (frag->type == 0x36)
+				processMesh((Frag36*)frag, skele);
+			else if (frag->type == 0x2C)
+				return; //handle this
+
+			//find any vertex + index buffers with data in them and use them to fill this mesh
+			uint32 usedBuffers = 0;
+			for (uint32 i = 0; i < mNumMaterials; ++i)
+			{
+				if (!mMaterialVertexBuffers[i].empty())
+				{
+					createMeshBuffer(mesh, mMaterialVertexBuffers[i], mMaterialIndexBuffers[i], &mMaterials[i], skele);
+					mMaterialVertexBuffers[i].clear();
+					mMaterialIndexBuffers[i].clear();
+
+					//need to correct any bone assignment weights to point to the correct buffer index
+					for (uint32 j = 0; j < skele->getNumBones(); ++j)
+					{
+						auto& weights = skele->getWeights(j);
+						for (WLDSkeleton::Weight& wt : weights)
+						{
+							if (wt.buffer_index == i)
+								wt.buffer_index = usedBuffers;
+						}
+					}
+
+					++usedBuffers;
+				}
+			}
+
+			//check if this is a head mesh
+			bool head = (strncmp(modelFragName + 3, "HE", 2) == 0);
+			gMobMgr.addModelPrototype(Translate::raceID(model_id), Translate::gender(model_id), skele, head);
 		}
-
-		break; //remove when we can handle head meshes
 	}
-
-	gMobMgr.addModelPrototype(Translate::raceID(model_id), Translate::gender(model_id), skele);
 }

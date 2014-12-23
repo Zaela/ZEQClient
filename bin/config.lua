@@ -4,7 +4,7 @@
 
 --[[ EQ Details ]]--
 --path to your EQ folder
-EQPath = [[C:\Everquest\]]
+EQPath = "C:/Everquest"
 
 --ip address and port of the login server you want to connect to
 LoginIP = "login.eqemulator.net"

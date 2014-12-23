@@ -1,5 +1,6 @@
 
 #include "util.h"
+#include "mob_manager.h"
 
 namespace Util
 {
@@ -45,5 +46,14 @@ namespace Util
 		temp.X = cos(rot.Z) * pos.X - sin(rot.Z) * pos.Y;
 		temp.Y = sin(rot.Z) * pos.X + cos(rot.Z) * pos.Y;
 		pos = temp;
+	}
+
+	float getDistSquared(MobPosition& a, MobPosition& b)
+	{
+		float x = a.x - b.x;
+		float y = a.y - b.y;
+		float z = a.z - b.z;
+
+		return x*x + y*y + z*z;
 	}
 }

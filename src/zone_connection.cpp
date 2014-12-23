@@ -103,10 +103,18 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		Spawn_Struct* spawn = (Spawn_Struct*)data;
 
 		uint32 count = len / sizeof(Spawn_Struct);
+		int ack = 0;
 		for (uint32 i = 0; i < count; ++i)
 		{
 			gMobMgr.spawnMob(spawn++);
+			//this might take some time, send the server some keepalive acks
+			if (++ack == 10)
+			{
+				mAckMgr->sendKeepAliveAck();
+				ack = 0;
+			}
 		}
+		mAckMgr->sendKeepAliveAck();
 		break;
 	}
 	case OP_NewSpawn:

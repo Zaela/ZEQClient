@@ -196,6 +196,11 @@ namespace WLD_Structs
 			data += sizeof(int);
 			return (int*)data;
 		}
+
+		bool hasRefList()
+		{
+			return (flag & (1 << 9)) != 0;
+		}
 	};
 
 	struct Frag05 : public FragHeader //material fragment

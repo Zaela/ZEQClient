@@ -5,6 +5,7 @@
 //static translation functions for id numbers, etc
 
 #include <string>
+#include <unordered_map>
 #include "types.h"
 #include "zeq_lua.h"
 

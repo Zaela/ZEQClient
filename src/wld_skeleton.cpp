@@ -3,6 +3,7 @@
 #include "mob.h"
 
 WLDSkeleton::WLDSkeleton(uint32 num_bones, scene::SMesh* reference_mesh) :
+	mIsCopy(false),
 	mNumBones(num_bones),
 	mNumFrames(0),
 	mHasPoint(0),
@@ -12,6 +13,26 @@ WLDSkeleton::WLDSkeleton(uint32 num_bones, scene::SMesh* reference_mesh) :
 
 	mWeightsByBone = new std::vector<Weight>[num_bones];
 	for (uint32 i = 0; i < num_bones; ++i)
+		new (&mWeightsByBone[i]) std::vector<Weight>;
+}
+
+WLDSkeleton::WLDSkeleton(const WLDSkeleton& toCopy) :
+	mIsCopy(true),
+	mNumBones(toCopy.mNumBones),
+	mNumFrames(toCopy.mNumFrames),
+	mHasPoint(toCopy.mHasPoint)
+{
+	//copied WLDSkeletons share base positions and animation frames,
+	//but not weights or reference meshes
+	mBasePosition.bones = toCopy.mBasePosition.bones;
+
+	for (uint32 i = 0; i < mNumFrames; ++i)
+	{
+		mFrames.push_back(toCopy.mFrames[i]);
+	}
+
+	mWeightsByBone = new std::vector<Weight>[mNumBones];
+	for (uint32 i = 0; i < mNumBones; ++i)
 		new (&mWeightsByBone[i]) std::vector<Weight>;
 }
 
@@ -84,19 +105,19 @@ void WLDSkeleton::setBasePosition(int bone_id, Frag12Entry& f12, int parent_id, 
 		{
 		case POINT_RIGHT:
 			pointFrame = &mPoints[POINT_RIGHT_POS];
-			printf("found POINT_RIGHT\n");
+			//printf("found POINT_RIGHT\n");
 			break;
 		case POINT_LEFT:
 			pointFrame = &mPoints[POINT_LEFT_POS];
-			printf("found POINT_LEFT\n");
+			//printf("found POINT_LEFT\n");
 			break;
 		case POINT_SHIELD:
 			pointFrame = &mPoints[POINT_SHIELD_POS];
-			printf("found POINT_SHIELD\n");
+			//printf("found POINT_SHIELD\n");
 			break;
 		case POINT_HEAD:
 			pointFrame = &mPoints[POINT_HEAD_POS];
-			printf("found POINT_HEAD\n");
+			//printf("found POINT_HEAD\n");
 			break;
 		}
 		mHasPoint |= point;

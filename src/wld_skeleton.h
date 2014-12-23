@@ -79,6 +79,7 @@ private:
 		float frame_delay;
 	};
 
+	bool mIsCopy;
 	uint32 mNumBones;
 	uint32 mNumFrames;
 	uint8 mHasPoint;
@@ -96,8 +97,10 @@ private:
 
 public:
 	WLDSkeleton(uint32 num_bones, scene::SMesh* reference_mesh);
+	WLDSkeleton(const WLDSkeleton& toCopy); //copy constructor
 
 	uint32 getNumBones() { return mNumBones; }
+	void setReferenceMesh(scene::SMesh* mesh) { mReferenceMesh = mesh; }
 	scene::SMesh* getReferenceMesh() { return mReferenceMesh; }
 
 	void addWeight(int bone, uint32 buffer, uint32 vert);

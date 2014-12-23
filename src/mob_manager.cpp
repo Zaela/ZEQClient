@@ -6,34 +6,45 @@
 extern Renderer gRenderer;
 extern Player gPlayer;
 
-void MobManager::addModelPrototype(int race_id, int gender, WLDSkeleton* skele)
+void MobManager::addModelPrototype(int race_id, int gender, WLDSkeleton* skele, bool head)
 {
 	MobPrototypeSetWLD& proto = mPrototypesWLD[race_id];
 
-	if (proto.set[gender].skeleton) //don't overwrite
-		return;
+	if (!head)
+	{
+		if (proto.set[gender].skeleton) //don't overwrite
+			return;
 
-	proto.set[gender].skeleton = skele;
+		proto.set[gender].skeleton = skele;
+		printf("added race %i gender %i\n", race_id, gender);
+	}
+	else
+	{
+		proto.set[gender].heads.push_back(skele);
+		printf("added head for race %i gender %i\n", race_id, gender);
+	}
 }
 
-Mob* MobManager::spawnMob(int race_id, int gender, int level)
+MobPrototypeWLD* MobManager::getModelPrototype(int race_id, int gender)
 {
-	//make sure we have the model, else default to human - add this later
 	if (mPrototypesWLD.count(race_id) == 0 || mPrototypesWLD[race_id].set[gender].skeleton == nullptr)
-		return nullptr;
+	{
+		return &mPrototypesWLD[DEFAULT_RACE].set[DEFAULT_GENDER];
+	}
 
-	WLDSkeleton* skele = mPrototypesWLD[race_id].set[gender].skeleton;
+	return &mPrototypesWLD[race_id].set[gender];
+}
 
-	MobPosition pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
+Mob* MobManager::spawnMob(int race_id, int gender, int level, float x, float y, float z)
+{
+	MobPrototypeWLD* proto = getModelPrototype(race_id, gender);
 
-	mMobPositionList.push_back(pos);
+	mMobPositionList.push_back(MobPosition(x, y, z));
 
 	MobEntry ent;
 	ent.entity_id = 0;
-	ent.ptr = new Mob(mMobList.size(), gRenderer.addSkeletonInstance(skele), &mMobPositionList.back());
+	ent.ptr = new Mob(mMobList.size(), proto->skeleton, &mMobPositionList.back(),
+		proto->heads.size() ? proto->heads[0] : nullptr);
 
 	mMobList.push_back(ent);
 
@@ -42,7 +53,31 @@ Mob* MobManager::spawnMob(int race_id, int gender, int level)
 
 Mob* MobManager::spawnMob(Spawn_Struct* spawn)
 {
-	return nullptr;
+	MobPrototypeWLD* proto = getModelPrototype(spawn->race, spawn->gender);
+
+	mMobPositionList.push_back(MobPosition((float)spawn->x, (float)spawn->z, (float)spawn->y));
+
+	MobEntry ent;
+	ent.entity_id = spawn->spawnId;
+	ent.ptr = new Mob(spawn->spawnId, proto->skeleton, &mMobPositionList.back());
+
+	mMobList.push_back(ent);
+
+	return ent.ptr;
+}
+
+void MobManager::animateNearbyMobs(float delta)
+{
+	MobPosition pos;
+	gPlayer.getCoords(pos);
+
+	const float dist = 1000.0f * 1000.0f;
+
+	for (uint32 i = 0; i < mMobPositionList.size(); ++i)
+	{
+		if (Util::getDistSquared(pos, mMobPositionList[i]) <= dist)
+			mMobList[i].ptr->animate(delta);
+	}
 }
 
 void MobManager::handleHPUpdate(HPUpdate_Struct* update)

@@ -14,6 +14,8 @@
 
 using namespace irr;
 
+struct MobPosition;
+
 class Player
 {
 private:
@@ -24,6 +26,7 @@ private:
 	bool mIsFalling;
 	float mFallStartingY;
 
+	Mob* mMob;
 	ZoneViewerData* mZoneViewer;
 
 private:
@@ -50,6 +53,8 @@ public:
 	void setCamera(Camera* cam);
 
 	int getEntityID() { return -1; } //put this in later
+
+	void getCoords(MobPosition& pos);
 
 	void handleSpawn(Spawn_Struct* spawn);
 	void handlePlayerProfile(PlayerProfile_Struct* pp);

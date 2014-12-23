@@ -16,6 +16,8 @@ Player::Player() :
 
 void Player::mainLoop()
 {
+	gRenderer.resetInternalTimer();
+
 	for (;;)
 	{
 		float delta = gRenderer.loopStep();
@@ -32,6 +34,8 @@ void Player::mainLoop()
 
 void Player::zoneViewerLoop()
 {
+	gRenderer.resetInternalTimer();
+
 	for (;;)
 	{
 		float delta = gRenderer.loopStep();
@@ -52,8 +56,8 @@ void Player::setCamera(Camera* cam)
 	//REPLACE THIS - crappy irrlicht collision thing for now
 	/*scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
 		gRenderer.getCollisionSelector(),
-		cam->getSceneNode(), core::vector3df(1.5f, 3.0f, 1.5f), core::vector3df(0.0f, 0.0f, 0.0f),
-		core::vector3df(0.0f, 3.0f, 0.0f), 0.0f);
+		cam->getSceneNode(), core::vector3df(0.5f, 0.5f, 0.5f), core::vector3df(0.0f, 0.0f, 0.0f),
+		core::vector3df(0.0f, 4.0f, 0.0f), 0.0f);
 	cam->getSceneNode()->addAnimator(acr);*/
 }
 
@@ -187,6 +191,30 @@ void Player::checkCollision(core::vector3df& from, core::vector3df& dest)
 	//just need to get a vector from a -> b by vector subtraction
 	//normalize it to unit length and multiply it to the desired length
 	//then shoot your ray and do the same stuff with the collision point, if any
+
+	/*core::vector3df temp = dest;
+	temp.Y = from.Y;
+
+	scene::ISceneCollisionManager* mgr = gRenderer.getCollisionManager();
+
+	core::line3df ray;
+	ray.start = from + core::vector3df(0, 5, 0);
+	ray.end = temp + core::vector3df(0, 5, 0);
+	core::vector3df collisionPoint;
+	core::triangle3df unused;
+
+	if (mgr->getSceneNodeAndCollisionPointFromRay(ray, collisionPoint, unused))
+	{
+		printf("collision: %g, %g, %g to %g, %g, %g\n", from.X, from.Y, from.Z, dest.X, dest.Y, dest.Z);
+		temp = collisionPoint - from;
+		temp.invert();
+		temp.normalize();
+		temp *= 10;
+		dest = from + temp;
+		printf("col point: %g, %g, %g\nmoving to: %g, %g, %g\n", collisionPoint.X, collisionPoint.Y, collisionPoint.Z,
+			dest.X, dest.Y, dest.Z);
+	}*/
+
 	/*scene::ISceneCollisionManager* mgr = gRenderer.getCollisionManager();
 
 	core::line3df ray;
@@ -211,9 +239,20 @@ void Player::applyFallingDamage()
 	//threshold and damage calculation, I have no idea at the moment
 }
 
+void Player::getCoords(MobPosition& pos)
+{
+	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
+	core::vector3df& p = cam->getAbsolutePosition();
+
+	pos.x = p.X;
+	pos.y = p.Y;
+	pos.z = p.Z;
+}
+
 void Player::handleSpawn(Spawn_Struct* spawn)
 {
-
+	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
+	cam->setPosition(core::vector3df((float)spawn->x, (float)spawn->z, (float)spawn->y));
 }
 
 void Player::handlePlayerProfile(PlayerProfile_Struct* pp)

@@ -74,10 +74,13 @@ int Socket::recvPacket()
 #ifdef _WIN32
 		err = WSAGetLastError();
 		if (err == WSAEWOULDBLOCK)
+#else
+		err = errno;
+		if (err == EWOULDBLOCK)
+#endif
 			return i;
 		else
 			throw ZEQException("Socket::recvPacket: error %i", err);
-#endif
 	}
 	return -1;
 }
@@ -92,6 +95,8 @@ int Socket::recvWithTimeout(uint32 milliseconds)
 			return len;
 #ifdef _WIN32
 		Sleep(20);
+#else
+		usleep(20 * 1000);
 #endif
 	}
 
@@ -110,7 +115,6 @@ void Socket::sendPacket(void* in_data, int len)
 		{
 			len -= sent;
 			data += sent;
-			//printf("sent %i\n", sent);
 		}
 		else if (sent == -1)
 		{
@@ -118,10 +122,13 @@ void Socket::sendPacket(void* in_data, int len)
 #ifdef _WIN32
 			err = WSAGetLastError();
 			if (err == WSAEWOULDBLOCK)
+#else
+			err = errno;
+			if (err == EWOULDBLOCK)
+#endif
 				continue;
 			else
 				throw ZEQException("Socket::sendPacket: error %i", err);
-#endif
 		}
 	}
 	while (len > 0);

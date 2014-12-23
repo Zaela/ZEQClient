@@ -37,6 +37,31 @@ namespace Lua
 		lua_pop(L, 1);
 	}
 
+	void fileToHashTable(const char* path, std::unordered_map<std::string, int, std::hash<std::string>>& table)
+	{
+		lua_newtable(L);
+		if (luaL_loadfile(L, path) == 0)
+		{
+			lua_pushvalue(L, -2);
+			lua_setfenv(L, -2);
+			if (lua_pcall(L, 0, 0, 0) == 0)
+			{
+				lua_pushnil(L);
+				while (lua_next(L, -2))
+				{
+					//key at -2, value at -1
+					table[lua_tostring(L, -2)] = lua_tointeger(L, -1);
+					lua_pop(L, 1);
+				}
+				lua_pop(L, 1);
+				return;
+			}
+		}
+		const char* err = lua_tostring(L, -1);
+		printf("Error running '%s': %s\n", path, err);
+		lua_pop(L, 2);
+	}
+
 	int getInt(const char* varname, const char* tbl)
 	{
 		lua_getfield(L, LUA_REGISTRYINDEX, tbl);

@@ -6,6 +6,7 @@
 
 #include <irrlicht.h>
 #include <FreeImage.h>
+#include "cegui.h"
 
 #include <string>
 #include <vector>
@@ -26,13 +27,16 @@ class Renderer
 {
 private:
 	static const uint32 SLEEP_TIME_DEFAULT = 20; //milliseconds
-	static const uint32 WLD_SKELETON_INSTANCES_DEFAULT = 1024; //power of 2 is best
 
 private:
 	IrrlichtDevice* mDevice;
 	video::IVideoDriver* mDriver;
 	scene::ISceneManager* mSceneMgr;
 	scene::ISceneCollisionManager* mCollisionMgr;
+	CEGUI::IrrlichtRenderer* mGUIMgr;
+	CEGUI::System* mGUISystem;
+	CEGUI::GUIContext* mGUIContext;
+
 	uint32 mSleepMilliseconds;
 	uint32 mPrevTime;
 
@@ -42,14 +46,8 @@ private:
 
 	std::vector<AnimatedTexture> mAnimatedTextures;
 
-	//better off keeping skeleton instances in MobManager since you'll have to to a distance check anyway
-	uint32 mNumSkeletons;
-	uint32 mCapacitySkeletons;
-	WLDSkeletonInstance* mSkeletons;
-
 private:
 	static IrrlichtDevice* createDevice(SIrrlichtCreationParameters& params, std::string selectedRenderer);
-	void reallocSkeletons();
 
 public:
 	Renderer();
@@ -69,11 +67,11 @@ public:
 	scene::ISceneManager* getSceneManager() { return mSceneMgr; }
 
 	float loopStep();
+	void resetInternalTimer();
 	void useZoneModel(ZoneModel* zoneModel);
 	void checkAnimatedTextures(uint32 delta);
 
 	scene::SMesh* copyMesh(scene::SMesh* mesh);
-	WLDSkeletonInstance* addSkeletonInstance(WLDSkeleton* skele);
 };
 
 

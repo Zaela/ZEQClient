@@ -4,6 +4,7 @@
 
 #include <lua.hpp>
 #include <string>
+#include <unordered_map>
 #include "types.h"
 
 #define CONFIG_TABLE "config"
@@ -27,6 +28,7 @@ namespace Lua
 	void initialize();
 	void close();
 	void fileToTable(const char* filePath, const char* table);
+	void fileToHashTable(const char* filePath, std::unordered_map<std::string, int, std::hash<std::string>>& table);
 
 	int getInt(const char* varname, const char* table);
 	int getInt(const char* varname, const char* table, int default);

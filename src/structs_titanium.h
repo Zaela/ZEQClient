@@ -3341,4 +3341,6 @@ struct LFGuild_GuildToggle_Struct
 /*616*/
 };
 
+#pragma pack()
+
 #endif

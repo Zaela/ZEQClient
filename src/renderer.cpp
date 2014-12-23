@@ -2,6 +2,7 @@
 #include "renderer.h"
 
 extern Input gInput;
+extern MobManager gMobMgr;
 
 using namespace irr;
 
@@ -13,11 +14,9 @@ Renderer::Renderer() :
 	mSleepMilliseconds(SLEEP_TIME_DEFAULT),
 	mPrevTime(0),
 	mCollisionNode(nullptr),
-	mActiveZoneModel(nullptr),
-	mNumSkeletons(0),
-	mCapacitySkeletons(WLD_SKELETON_INSTANCES_DEFAULT)
+	mActiveZoneModel(nullptr)
 {
-	mSkeletons = new WLDSkeletonInstance[WLD_SKELETON_INSTANCES_DEFAULT];
+
 }
 
 void Renderer::initialize()
@@ -41,13 +40,33 @@ void Renderer::initialize()
 		mDriver = mDevice->getVideoDriver();
 		mSceneMgr = mDevice->getSceneManager();
 		mCollisionMgr = mSceneMgr->getSceneCollisionManager();
+
+		mGUIMgr = &CEGUI::IrrlichtRenderer::bootstrapSystem(*mDevice);
+		mGUISystem = CEGUI::System::getSingletonPtr();
+		mGUIContext = &mGUISystem->getDefaultGUIContext();
+
+		gInput.setGUIContext(mGUIContext);
 	}
 }
 
 void Renderer::close()
 {
 	if (mDevice)
+	{
 		mDevice->drop();
+		mDevice = nullptr;
+		mDriver = nullptr;
+		mSceneMgr = nullptr;
+		mCollisionMgr = nullptr;
+	}
+
+	if (mGUIMgr)
+	{
+		CEGUI::IrrlichtRenderer::destroySystem();
+		mGUIMgr = nullptr;
+		mGUISystem = nullptr;
+		mGUIContext = nullptr;
+	}
 }
 
 IrrlichtDevice* Renderer::createDevice(SIrrlichtCreationParameters& params, std::string selectedRenderer)
@@ -176,6 +195,7 @@ float Renderer::loopStep()
 	{
 		mDriver->beginScene(true, true, video::SColor(255, 128, 128, 128));
 		mSceneMgr->drawAll();
+		mGUISystem->renderAllGUIContexts();
 		mDriver->endScene();
 
 		mDevice->sleep(mSleepMilliseconds);
@@ -196,17 +216,25 @@ float Renderer::loopStep()
 	float delta_f = (float)delta * 0.001f;
 
 	//wld skeleton animation
-	//add a distance checking mechanism later
-	for (uint32 i = 0; i < mNumSkeletons; ++i)
-		mSkeletons[i].animate(delta_f);
+	gMobMgr.animateNearbyMobs(delta_f);
+
+	//yes, we need to do this twice
+	mGUISystem->injectTimePulse(delta_f);
+	mGUIContext->injectTimePulse(delta_f);
 
 	return delta_f;
+}
+
+void Renderer::resetInternalTimer()
+{
+	mDevice->getTimer()->setTime(0);
 }
 
 void Renderer::useZoneModel(ZoneModel* zoneModel)
 {
 	mSceneMgr->clear();
-	//mSceneMgr->getParameters()->setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true); 
+	if (isOpenGL())
+		mSceneMgr->getParameters()->setAttribute(scene::ALLOW_ZWRITE_ON_TRANSPARENT, true); 
 
 	//animated textures
 	std::vector<AnimatedTexture> animTexturesTemp;
@@ -310,29 +338,4 @@ scene::SMesh* Renderer::copyMesh(scene::SMesh* mesh)
 	copy->recalculateBoundingBox();
 
 	return copy;
-}
-
-WLDSkeletonInstance* Renderer::addSkeletonInstance(WLDSkeleton* skele)
-{
-	scene::SMesh* mesh = copyMesh(skele->getReferenceMesh());
-	uint32 n = mNumSkeletons++;
-
-	if (n == mCapacitySkeletons)
-		reallocSkeletons();
-
-	new (&mSkeletons[n]) WLDSkeletonInstance(mesh, skele);
-
-	return &mSkeletons[n];
-}
-
-void Renderer::reallocSkeletons()
-{
-	uint32 cap = mCapacitySkeletons;
-	mCapacitySkeletons *= 2;
-
-	WLDSkeletonInstance* data = new WLDSkeletonInstance[mCapacitySkeletons];
-	memcpy(data, mSkeletons, sizeof(WLDSkeletonInstance) * cap);
-
-	delete[] mSkeletons;
-	mSkeletons = data;
 }

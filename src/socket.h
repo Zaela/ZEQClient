@@ -7,7 +7,18 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 #else
-//unix headers go here
+#include <errno.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <netdb.h>
+#include <signal.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netinet/tcp.h>
+#include <net/if.h>
 #endif
 
 #include "types.h"

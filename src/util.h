@@ -11,13 +11,18 @@
 
 using namespace irr;
 
+struct MobPosition;
+
 namespace Util
 {
 	//strcpy with proper bounding
 	void strcpy(char* dst, const char* src, uint32 boundLen);
 	void toLower(char* str, uint32 len);
+
 	float radiansToDegrees(float rad);
 	void rotateBy(core::vector3df& pos, core::vector3df& rot);
+
+	float getDistSquared(MobPosition& pos, MobPosition& compare);
 }
 
 #endif
