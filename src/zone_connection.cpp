@@ -1,8 +1,11 @@
 
 #include "zone_connection.h"
 #include "player.h"
+#include "renderer.h"
 
 extern MobManager gMobMgr;
+extern Renderer gRenderer;
+extern FileLoader gFileLoader;
 extern Player gPlayer;
 
 ZoneConnection::ZoneConnection(WorldConnection* world) :
@@ -84,6 +87,14 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		NewZone_Struct* nz = (NewZone_Struct*)data;
 		printf("Zone: %s - %s\n", nz->zone_short_name, nz->zone_long_name);
 
+		ZoneModel* zoneModel = ZoneModel::load(nz->zone_short_name);
+		if (zoneModel == nullptr)
+			throw ZEQException("bad zone shortname '%s'", nz->zone_short_name);
+		mAckMgr->sendKeepAliveAck();
+		gRenderer.useZoneModel(zoneModel);
+		mAckMgr->sendKeepAliveAck();
+		gFileLoader.handleZoneChr(nz->zone_short_name);
+
 		//send client spawn request
 		Packet packet(0, OP_ReqClientSpawn, mAckMgr);
 		packet.send(this, getCRCKey());
@@ -125,6 +136,14 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		gMobMgr.spawnMob(spawn);
 		break;
 	}
+	case OP_DeleteSpawn:
+	{
+		printf("OP_DeleteSpawn\n");
+		//happens when a mob despawns
+		DeleteSpawn_Struct* despawn = (DeleteSpawn_Struct*)data;
+		gMobMgr.despawnMob(despawn->spawn_id);
+		break;
+	}
 	case OP_SendAAStats:
 	{
 		printf("OP_SendAAStats\n");
@@ -142,7 +161,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 			//send client ready
 			Packet packet(0, OP_ClientReady, mAckMgr);
 			packet.send(this, getCRCKey());
-			break;
+			return true;
 		}
 		break;
 	}
@@ -172,6 +191,13 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	{
 		printf("OP_SpawnAppearance\n");
 		SpawnAppearance_Struct* ap = (SpawnAppearance_Struct*)data;
+		break;
+	}
+	case OP_MobUpdate:
+	{
+		printf("OP_MobUpdate\n");
+		MobPositionUpdate_Struct* mp = (MobPositionUpdate_Struct*)data;
+		gMobMgr.handlePositionUpdate(mp);
 		break;
 	}
 	//packets we don't care about for now

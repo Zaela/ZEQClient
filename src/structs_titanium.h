@@ -1152,7 +1152,7 @@ struct BecomeCorpse_Struct {
 **	another spawn's position update in zone (whether NPC or PC)
 **
 */
-struct PlayerPositionUpdateServer_Struct
+struct MobPositionUpdate_Struct
 {
 /*0000*/ uint16		spawn_id;
 /*0002*/ int32		delta_heading:10,  // change in heading

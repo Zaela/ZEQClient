@@ -53,6 +53,8 @@ void Player::setCamera(Camera* cam)
 	if (mCamera)
 		delete mCamera;
 	mCamera = cam;
+	scene::ISceneNode* node = cam->getSceneNode();
+	node->setPosition(core::vector3df(mPosition.x, mPosition.y, mPosition.z));
 	//REPLACE THIS - crappy irrlicht collision thing for now
 	/*scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
 		gRenderer.getCollisionSelector(),
@@ -251,11 +253,12 @@ void Player::getCoords(MobPosition& pos)
 
 void Player::handleSpawn(Spawn_Struct* spawn)
 {
-	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
-	cam->setPosition(core::vector3df((float)spawn->x, (float)spawn->z, (float)spawn->y));
+	setEntityID(spawn->spawnId);
+	printf("entityID: %u\n", spawn->spawnId);
 }
 
 void Player::handlePlayerProfile(PlayerProfile_Struct* pp)
 {
-
+	mPosition.set(pp->x, pp->z, pp->y);
+	printf("PLAYER spawning at %g, %g, %g\n", pp->x, pp->z, pp->y);
 }

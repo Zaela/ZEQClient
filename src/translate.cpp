@@ -11,9 +11,9 @@ namespace Translate
 	void initialize()
 	{
 		//3 letter race names to race ids
-		Lua::fileToTable(TRANSLATE_RACE_FILE, TRANSLATE_RACE_TABLE);
+		Lua::fileToTable(TRANSLATE_RACE_FILE, TRANSLATE_RACE_TABLE, false);
 		//3 letter identifiers for animations in WLD files
-		Lua::fileToTable(TRANSLATE_ANIM_FILE, TRANSLATE_ANIM_TABLE);
+		Lua::fileToTable(TRANSLATE_ANIM_FILE, TRANSLATE_ANIM_TABLE, false);
 	}
 
 	int raceID(std::string id)

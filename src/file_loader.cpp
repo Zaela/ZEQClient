@@ -148,3 +148,21 @@ ZON* FileLoader::getZON(std::string name)
 
 	return nullptr;
 }
+
+void FileLoader::handleGlobalLoad()
+{
+	//just global_chr for now
+	WLD* wld = getWLD("global_chr", nullptr, false);
+	wld->convertAllMobModels();
+	delete wld; //don't need to keep it loaded since all the assets are extracted for sure
+	unloadS3D("global_chr");
+}
+
+void FileLoader::handleZoneChr(std::string shortname)
+{
+	shortname += "_chr";
+	WLD* wld = getWLD(shortname, nullptr, false);
+	wld->convertAllMobModels();
+	delete wld;
+	unloadS3D(shortname);
+}

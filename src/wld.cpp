@@ -545,6 +545,11 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 	if (f14->size[1] < 1)
 		return;
 
+	const int race = Translate::raceID(model_id);
+	const int gender = Translate::gender(model_id);
+	if (gMobMgr.modelPrototypeLoaded(race, gender))
+		return;
+
 	//should handle this separately from zones in a lot of ways
 	//should not load all material textures off the bat in case we are only using 1 out of 10 models in a WLD, for one
 	
@@ -759,7 +764,9 @@ void WLD::convertMobModel(Frag14* f14, std::string model_id)
 
 			//check if this is a head mesh
 			bool head = (strncmp(modelFragName + 3, "HE", 2) == 0);
-			gMobMgr.addModelPrototype(Translate::raceID(model_id), Translate::gender(model_id), skele, head);
+			gMobMgr.addModelPrototype(race, gender, skele, head);
+			//need to look up any alternate heads by name...
+			//alternate texture sets, too
 		}
 	}
 }

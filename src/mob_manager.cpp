@@ -6,6 +6,11 @@
 extern Renderer gRenderer;
 extern Player gPlayer;
 
+bool MobManager::modelPrototypeLoaded(int race_id, int gender)
+{
+	return !(mPrototypesWLD.count(race_id) == 0 || mPrototypesWLD[race_id].set[gender].skeleton == nullptr);
+}
+
 void MobManager::addModelPrototype(int race_id, int gender, WLDSkeleton* skele, bool head)
 {
 	MobPrototypeSetWLD& proto = mPrototypesWLD[race_id];
@@ -66,6 +71,31 @@ Mob* MobManager::spawnMob(Spawn_Struct* spawn)
 	return ent.ptr;
 }
 
+void MobManager::despawnMob(int entity_id)
+{
+	for (uint32 i = 0; i < mMobList.size(); ++i)
+	{
+		if (mMobList[i].entity_id == entity_id)
+		{
+			delete mMobList[i].ptr;
+			//we don't need to worry about re-entrance, the client makes no assumptions about connections between mobs
+			if (i < (mMobList.size() - 1))
+			{
+				//swap'n'pop
+				mMobList[i] = mMobList.back();
+				//position list too
+				mMobPositionList[i] = mMobPositionList.back();
+				//inform mob of new positions
+				mMobList[i].ptr->setIndex(i);
+				mMobList[i].ptr->setPositionPtr(&mMobPositionList[i]);
+			}
+			mMobList.pop_back();
+			mMobPositionList.pop_back();
+			return;
+		}
+	}
+}
+
 void MobManager::animateNearbyMobs(float delta)
 {
 	MobPosition pos;
@@ -83,7 +113,11 @@ void MobManager::animateNearbyMobs(float delta)
 void MobManager::handleHPUpdate(HPUpdate_Struct* update)
 {
 	int entity = update->spawn_id;
-	//if (entity == gPlayer.getEntityID())
+	if (entity == gPlayer.getEntityID())
+	{
+		//handle
+		return;
+	}
 	
 	for (MobEntry& mob : mMobList)
 	{
@@ -98,7 +132,11 @@ void MobManager::handleHPUpdate(HPUpdate_Struct* update)
 void MobManager::handleHPUpdate(ExactHPUpdate_Struct* update)
 {
 	int entity = update->spawn_id;
-	//if (entity == gPlayer.getEntityID())
+	if (entity == gPlayer.getEntityID())
+	{
+		//handle
+		return;
+	}
 
 	for (MobEntry& mob : mMobList)
 	{
@@ -106,6 +144,25 @@ void MobManager::handleHPUpdate(ExactHPUpdate_Struct* update)
 		{
 			mob.ptr->setExactHPMax(update->max_hp);
 			mob.ptr->setExactHPCurrent(update->cur_hp);
+			return;
+		}
+	}
+}
+
+void MobManager::handlePositionUpdate(MobPositionUpdate_Struct* update)
+{
+	int entity = update->spawn_id;
+	if (entity == gPlayer.getEntityID())
+	{
+		//handle
+		return;
+	}
+
+	for (MobEntry& mob : mMobList)
+	{
+		if (mob.entity_id == entity)
+		{
+			mob.ptr->updatePosition(update);
 			return;
 		}
 	}

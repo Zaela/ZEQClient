@@ -11,6 +11,7 @@
 #include "renderer.h"
 #include "zone_connection.h"
 #include "zone_viewer.h"
+#include "structs_mob.h"
 
 using namespace irr;
 
@@ -27,6 +28,8 @@ private:
 	float mFallStartingY;
 
 	Mob* mMob;
+	int mEntityID;
+	MobPosition mPosition;
 	ZoneViewerData* mZoneViewer;
 
 private:
@@ -40,6 +43,8 @@ private:
 	void applyFallingDamage();
 	void checkCollision(core::vector3df& from, core::vector3df& dest);
 
+	void setEntityID(int id) { mEntityID = id; }
+
 public:
 	Player();
 
@@ -51,8 +56,7 @@ public:
 
 	void setZoneConnection(ZoneConnection* zc) { mZoneConnection = zc; }
 	void setCamera(Camera* cam);
-
-	int getEntityID() { return -1; } //put this in later
+	int getEntityID() { return mEntityID; }
 
 	void getCoords(MobPosition& pos);
 

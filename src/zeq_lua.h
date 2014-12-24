@@ -10,24 +10,24 @@
 #define CONFIG_TABLE "config"
 #define CONFIG_FILE "config.lua"
 
-#define CONFIG_VAR_EQ_PATH "EQPath"
-#define CONFIG_VAR_ACCOUNT "Account"
-#define CONFIG_VAR_CHARACTER "Character"
-#define CONFIG_VAR_SERVER "Server"
-#define CONFIG_VAR_LOGIN_IP "LoginIP"
-#define CONFIG_VAR_LOGIN_PORT "LoginPort"
-#define CONFIG_VAR_SCREEN_WIDTH "ScreenWidth"
-#define CONFIG_VAR_SCREEN_HEIGHT "ScreenHeight"
-#define CONFIG_VAR_VSYNC "Vsync"
-#define CONFIG_VAR_FULLSCREEN "Fullscreen"
-#define CONFIG_VAR_RENDERER "Renderer"
-#define CONFIG_VAR_SHOW_ZONE_WALLS "ShowZoneWalls"
+#define CONFIG_VAR_EQ_PATH "eqpath"
+#define CONFIG_VAR_ACCOUNT "account"
+#define CONFIG_VAR_CHARACTER "character"
+#define CONFIG_VAR_SERVER "server"
+#define CONFIG_VAR_LOGIN_IP "loginip"
+#define CONFIG_VAR_LOGIN_PORT "loginport"
+#define CONFIG_VAR_SCREEN_WIDTH "screenwidth"
+#define CONFIG_VAR_SCREEN_HEIGHT "screenheight"
+#define CONFIG_VAR_VSYNC "vsync"
+#define CONFIG_VAR_FULLSCREEN "fullscreen"
+#define CONFIG_VAR_RENDERER "renderer"
+#define CONFIG_VAR_SHOW_ZONE_WALLS "showzonewalls"
 
 namespace Lua
 {
 	void initialize();
 	void close();
-	void fileToTable(const char* filePath, const char* table);
+	void fileToTable(const char* filePath, const char* table, bool lowercase_keys = true);
 	void fileToHashTable(const char* filePath, std::unordered_map<std::string, int, std::hash<std::string>>& table);
 
 	int getInt(const char* varname, const char* table);

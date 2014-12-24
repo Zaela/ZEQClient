@@ -30,6 +30,9 @@ public:
 	WLD* getWLD(std::string name, const char* fromS3D = nullptr, bool cache = true); //no point in caching zone wlds
 	//emit file extension
 	ZON* getZON(std::string name);
+
+	void handleGlobalLoad();
+	void handleZoneChr(std::string shortname);
 };
 
 #endif

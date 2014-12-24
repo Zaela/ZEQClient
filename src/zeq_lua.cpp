@@ -3,6 +3,13 @@
 
 static lua_State* L;
 
+static void lua_newtable_tolowerkey(lua_State* L)
+{
+	lua_newtable(L);
+	luaL_getmetatable(L, "tolowerkey_meta");
+	lua_setmetatable(L, -2);
+}
+
 namespace Lua
 {
 	void initialize()
@@ -10,6 +17,22 @@ namespace Lua
 		L = luaL_newstate();
 		if (L)
 			luaL_openlibs(L);
+
+		//create tolowerkey metatable
+		luaL_newmetatable(L, "tolowerkey_meta");
+		luaL_dostring(L,
+			"local type = type\n"
+			"local rawset = rawset\n"
+			"local function set(t, k, v)\n"
+			"	if type(k) == 'string' then\n"
+			"		k = k:lower()\n"
+			"	end\n"
+			"	rawset(t, k, v)\n"
+			"end\n"
+			"return set\n"
+		);
+		lua_setfield(L, -2, "__newindex");
+		lua_pop(L, 1);
 	}
 
 	void close()
@@ -18,9 +41,12 @@ namespace Lua
 			lua_close(L);
 	}
 
-	void fileToTable(const char* path, const char* tbl_name)
+	void fileToTable(const char* path, const char* tbl_name, bool lowercase_keys)
 	{
-		lua_newtable(L);
+		if (lowercase_keys)
+			lua_newtable_tolowerkey(L);
+		else
+			lua_newtable(L);
 		lua_pushvalue(L, -1);
 		lua_setfield(L, LUA_REGISTRYINDEX, tbl_name);
 		if (luaL_loadfile(L, path) == 0)

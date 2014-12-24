@@ -34,11 +34,13 @@
 
 //mob-related packets
 #define OP_NewSpawn 0x1860
+#define OP_DeleteSpawn 0x55BC
 #define OP_SpawnAppearance 0x7C32
 #define OP_WearChange 0x7441
 #define OP_HPUpdate 0x3BCF
 #define OP_MobHealth 0x0695
 #define OP_ManaChange 0x4839
+#define OP_MobUpdate 0x14CB
 
 //general zone packets
 #define OP_Weather 0x254D

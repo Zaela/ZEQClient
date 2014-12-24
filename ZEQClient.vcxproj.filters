@@ -266,5 +266,8 @@
     <ClInclude Include="src\cegui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\structs_mob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

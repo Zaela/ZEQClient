@@ -21,8 +21,8 @@ QuickToZone = true
 
 --[[ Graphics Options ]]--
 Renderer = "DirectX" --valid options are "DirectX", "OpenGL", or "Software"
-ScreenWidth = 1024
-ScreenHeight = 664
+ScreenWidth = 800
+ScreenHeight = 600
 Vsync = true
 Fullscreen = false
 

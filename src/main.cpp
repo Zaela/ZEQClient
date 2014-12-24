@@ -89,16 +89,17 @@ int main(int argc, char** argv)
 
 			gRenderer.useZoneModel(zoneModel);
 
-			WLD* wld = gFileLoader.getWLD("global_chr");
+			//WLD* wld = gFileLoader.getWLD("global_chr");
 			//wld->convertMobModel("ELE");
-			wld->convertAllMobModels();
+			//wld->convertAllMobModels();
+			gFileLoader.handleGlobalLoad();
 
 			Mob* mob = gMobMgr.spawnMob(75, 2);
 			gMobMgr.spawnMob(9, 0, 1, 5, 5, 5);
 			gMobMgr.spawnMob(60, 2, 1, -5, 5, -5);
 			//mob->startAnimation("T06");
 
-			wld = gFileLoader.getWLD("dra_chr");
+			WLD* wld = gFileLoader.getWLD("dra_chr");
 			wld->convertMobModel("DRA");
 
 			gMobMgr.spawnMob(49, 2, 1, 20, 5, 20);
@@ -114,11 +115,22 @@ int main(int argc, char** argv)
 			login->setCredentials(args.acctName, args.password);
 			login->quickConnect(args.serverName);
 
+			gFileLoader.handleGlobalLoad();
+
 			world = new WorldConnection(login);
 			world->quickZoneInCharacter(args.charName);
+			delete login;
+			login = nullptr;
 
 			zone = new ZoneConnection(world);
+			gPlayer.setZoneConnection(zone);
 			zone->connect();
+			delete world;
+			world = nullptr;
+
+			gInput.setMode(Input::ZONE_VIEWER);
+			gPlayer.setCamera(gRenderer.createCamera());
+			gPlayer.mainLoop();
 		}
 	}
 	catch (ZEQException& e)

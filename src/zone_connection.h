@@ -10,6 +10,8 @@
 #include "world_connection.h"
 #include "structs_titanium.h"
 #include "mob_manager.h"
+#include "zone_model.h"
+#include "file_loader.h"
 
 class ZoneConnection : public Connection
 {

@@ -38,8 +38,8 @@ struct MobPrototypeSetWLD
 class MobManager
 {
 private:
-	static const int DEFAULT_RACE = 75;
-	static const int DEFAULT_GENDER = 2;
+	static const int DEFAULT_RACE = 1;
+	static const int DEFAULT_GENDER = 0;
 
 	std::vector<MobEntry> mMobList;
 	std::vector<MobPosition> mMobPositionList; //kept separate for faster computation on the whole set
@@ -50,14 +50,17 @@ private:
 	MobPrototypeWLD* getModelPrototype(int race_id, int gender);
 
 public:
+	bool modelPrototypeLoaded(int race_id, int gender);
 	void addModelPrototype(int race_id, int gender, WLDSkeleton* skele, bool head = false);
 	Mob* spawnMob(int race_id, int gender, int level = 1, float x = 0.0f, float y = 0.0f, float z = 0.0f);
 	Mob* spawnMob(Spawn_Struct* spawn);
+	void despawnMob(int entity_id);
 
 	void animateNearbyMobs(float delta);
 
 	void handleHPUpdate(HPUpdate_Struct* update);
 	void handleHPUpdate(ExactHPUpdate_Struct* update);
+	void handlePositionUpdate(MobPositionUpdate_Struct* update);
 };
 
 #endif
