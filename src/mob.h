@@ -17,6 +17,11 @@ private:
 	WLDSkeletonInstance* mSkeletonWLD;
 	WLDSkeletonInstance* mHeadSkeleWLD;
 
+	scene::ISceneNode* mHeadNode;
+	scene::ISceneNode* mRightHandNode;
+	scene::ISceneNode* mLeftHandNode;
+	scene::ISceneNode* mShieldNode;
+
 	int mEntityID;
 	char mName[64];
 

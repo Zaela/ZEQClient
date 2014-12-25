@@ -146,7 +146,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	}
 	case OP_NewSpawn:
 	{
-		printf("OP_NewSpawn - len %u\n", len);
+		printf("OP_NewSpawn\n");
 		//happens when a mob spawns!
 		Spawn_Struct* spawn = (Spawn_Struct*)data;
 		gMobMgr.spawnMob(spawn);
@@ -216,11 +216,11 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	{
 		printf("OP_SpawnAppearance\n");
 		SpawnAppearance_Struct* ap = (SpawnAppearance_Struct*)data;
+		//handle
 		break;
 	}
 	case OP_MobUpdate:
 	{
-		//printf("OP_MobUpdate\n");
 		MobPositionUpdate_Struct* mp = (MobPositionUpdate_Struct*)data;
 		gMobMgr.handlePositionUpdate(mp);
 		break;
@@ -268,7 +268,9 @@ void ZoneConnection::poll()
 		int len = recvPacket();
 		if (len <= 0)
 			return;
-		mPacketReceiver->handleProtocol(len);
+		
+		if (!mPacketReceiver->handleProtocol(len))
+			continue;
 
 		std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
 		while (!queue.empty())

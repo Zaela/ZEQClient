@@ -55,6 +55,7 @@ void Player::setCamera(Camera* cam)
 	mCamera = cam;
 	scene::ISceneNode* node = cam->getSceneNode();
 	node->setPosition(core::vector3df(mPosition.x, mPosition.y, mPosition.z));
+	node->setRotation(core::vector3df(0.0f, mHeading, 0.0f));
 	//REPLACE THIS - crappy irrlicht collision thing for now
 	/*scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
 		gRenderer.getCollisionSelector(),
@@ -268,5 +269,6 @@ void Player::handlePlayerProfile(PlayerProfile_Struct* pp)
 {
 	//need to swap x and y after correcting the up axis - no, I don't know why they are so inconsistent about coordinates
 	mPosition.set(pp->y, pp->z, pp->x);
-	printf("PLAYER spawning at %g, %g, %g\n", pp->y, pp->z, pp->x);
+	printf("PLAYER spawning at %g, %g, %g, heading %g\n", pp->y, pp->z, pp->x, pp->heading);
+	mHeading = pp->heading / 256.0f * 360.0f;
 }

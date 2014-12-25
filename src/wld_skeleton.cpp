@@ -374,11 +374,12 @@ uint32 WLDSkeleton::animate(std::string animName, scene::SMesh* mesh, uint32 cur
 }
 
 
-WLDSkeletonInstance::WLDSkeletonInstance(scene::SMesh* mesh, WLDSkeleton* skele) :
+WLDSkeletonInstance::WLDSkeletonInstance(scene::SMesh* mesh, WLDSkeleton* skele, Mob* owner) :
 	mMesh(mesh),
 	mCurTime(0),
 	mCurFrame(0),
-	mSkeleton(skele)
+	mSkeleton(skele),
+	mOwner(owner)
 {
 
 }

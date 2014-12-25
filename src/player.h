@@ -30,6 +30,7 @@ private:
 	Mob* mMob;
 	int mEntityID;
 	MobPosition mPosition;
+	float mHeading;
 	ZoneViewerData* mZoneViewer;
 
 private:

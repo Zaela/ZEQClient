@@ -252,5 +252,17 @@ void AckManager::sendMaxTimeoutLengthRequest()
 
 void AckManager::queueRawPacket(byte* packet, uint32 len)
 {
-	mReadPacketQueue.push(new ReadPacket(packet, len));
+	ReadPacket* rp;
+
+	if (len > 2 && packet[1] == 0xA5) //"not compressed" flag in between the two bytes of the opcode
+	{
+		packet[1] = packet[0];
+		rp = new ReadPacket(packet + 1, len - 1);
+	}
+	else
+	{
+		rp = new ReadPacket(packet, len);
+	}
+
+	mReadPacketQueue.push(rp);
 }

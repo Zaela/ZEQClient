@@ -106,6 +106,11 @@ public:
 	void addWeight(int bone, uint32 buffer, uint32 vert);
 	std::vector<Weight>& getWeights(uint32 bone) { return mWeightsByBone[bone]; }
 
+	bool hasRightHandPoint() { return (mHasPoint & POINT_RIGHT) != 0; }
+	bool hasLeftHandPoint() { return (mHasPoint & POINT_LEFT) != 0; }
+	bool hasHeadPoint() { return (mHasPoint & POINT_HEAD) != 0; }
+	bool hasShieldPoint() { return (mHasPoint & POINT_SHIELD) != 0; }
+
 	void setBasePosition(int bone, Frag12Entry& f12, int parent = -1, int point = -1);
 	void assumeBasePosition(scene::SMesh* mesh);
 	void addAnimation(std::string animName, uint32 num_frames, uint32 frame_delay);
@@ -125,11 +130,15 @@ public:
 	Mob* mOwner;
 
 public:
-	WLDSkeletonInstance() { }
-	WLDSkeletonInstance(scene::SMesh* mesh, WLDSkeleton* skele);
+	WLDSkeletonInstance(scene::SMesh* mesh, WLDSkeleton* skele, Mob* owner);
 	~WLDSkeletonInstance();
 
 	scene::SMesh* getMesh() { return mMesh; }
+
+	bool hasRightHandPoint() { return mSkeleton->hasRightHandPoint(); }
+	bool hasLeftHandPoint() { return mSkeleton->hasLeftHandPoint(); }
+	bool hasHeadPoint() { return mSkeleton->hasHeadPoint(); }
+	bool hasShieldPoint() { return mSkeleton->hasShieldPoint(); }
 
 	void assumeBasePosition();
 	void setAnimation(std::string animName);

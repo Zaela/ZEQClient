@@ -7,38 +7,54 @@ extern Renderer gRenderer;
 extern MobManager gMobMgr;
 
 Mob::Mob(uint32 index, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head) :
-	mIndex(index)
+	mIndex(index),
+	mHeadNode(nullptr),
+	mRightHandNode(nullptr),
+	mLeftHandNode(nullptr),
+	mShieldNode(nullptr)
 {
 	init(skele, pos, head);
 	setName("test");
 }
 
 Mob::Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head) :
-	mIndex(spawn->spawnId)
+	mIndex(spawn->spawnId),
+	mHeadNode(nullptr),
+	mRightHandNode(nullptr),
+	mLeftHandNode(nullptr),
+	mShieldNode(nullptr)
 {
 	init(skele, pos, head);
 	setName(spawn->name);
+
+	printf("heading: %g\n", Util::EQ19toFloat(spawn->heading));
+	mNode->setRotation(core::vector3df(0.0f, Util::EQ19toFloat(spawn->heading) / 256.0f * 360.0f, 0.0f));
 }
 
 void Mob::init(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head)
 {
-	mSkeletonWLD = new WLDSkeletonInstance(gRenderer.copyMesh(skele->getReferenceMesh()), skele);
+	mSkeletonWLD = new WLDSkeletonInstance(gRenderer.copyMesh(skele->getReferenceMesh()), skele, this);
 	mSkeletonWLD->assumeBasePosition();
 
 	scene::IAnimatedMesh* mesh = new scene::SAnimatedMesh(mSkeletonWLD->getMesh());
+	scene::ISceneManager* sceneMgr = gRenderer.getSceneManager();
 
-	mNode = gRenderer.getSceneManager()->addAnimatedMeshSceneNode(mesh, nullptr, -1,
-		core::vector3df(pos->x, pos->y, pos->z));
+	mNode = sceneMgr->addAnimatedMeshSceneNode(mesh, nullptr, -1, core::vector3df(pos->x, pos->y, pos->z));
 	mesh->drop();
+
+	if (skele->hasHeadPoint())
+	{
+		mHeadNode = sceneMgr->addEmptySceneNode(mNode); //make this a camera scene node later
+	}
 
 	if (head)
 	{
-		mHeadSkeleWLD = new WLDSkeletonInstance(gRenderer.copyMesh(head->getReferenceMesh()), head);
+		mHeadSkeleWLD = new WLDSkeletonInstance(gRenderer.copyMesh(head->getReferenceMesh()), head, this);
 		mHeadSkeleWLD->assumeBasePosition();
 
 		mesh = new scene::SAnimatedMesh(mHeadSkeleWLD->getMesh());
 
-		gRenderer.getSceneManager()->addAnimatedMeshSceneNode(mesh, mNode);
+		sceneMgr->addAnimatedMeshSceneNode(mesh, mNode);
 		mesh->drop();
 	}
 	else
@@ -76,6 +92,9 @@ void Mob::animate(float delta)
 		mSkeletonWLD->animate(delta);
 		if (mHeadSkeleWLD)
 			mHeadSkeleWLD->animate(delta);
+
+		//check point node position and rotation changes
+		//head doesn't rotate
 	}
 }
 
@@ -99,4 +118,5 @@ void Mob::updatePosition(MobPositionUpdate_Struct* update)
 	);
 	gMobMgr.getMobPosition(mIndex)->set(pos);
 	mNode->setPosition(pos);
+	mNode->setRotation(core::vector3df(0.0f, Util::EQ19toFloat(update->heading) / 256.0f * 360.0f - 180.0f, 0.0f));
 }
