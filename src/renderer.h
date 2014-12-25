@@ -55,6 +55,8 @@ public:
 	void initialize();
 	void close();
 
+	void sleep(uint32 milliseconds) { mDevice->sleep(milliseconds); }
+
 	bool isOpenGL() { return mDriver->getDriverType() == video::EDT_OPENGL; }
 
 	video::ITexture* createTexture(MemoryStream* file, std::string name, bool& isDDS);

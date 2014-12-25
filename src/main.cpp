@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 			delete world;
 			world = nullptr;
 
-			gInput.setMode(Input::ZONE_VIEWER);
+			gInput.setMode(Input::ZONE);
 			gPlayer.setCamera(gRenderer.createCamera());
 			gPlayer.mainLoop();
 		}

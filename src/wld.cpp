@@ -490,9 +490,9 @@ void WLD::convertZoneObjectPlacements(ZoneModel* zone)
 		obj.y = f15->pos.z; //irrlicht uses Y for the "up" axis
 		obj.z = f15->pos.y;
 
-		obj.rotX = f15->rot.z / 512.0f * 360.0f;
-		obj.rotY = -f15->rot.x / 512.0f * 360.0f; //don't even try to make sense of these
-		obj.rotZ = f15->rot.y / 512.0f * 360.0f;
+		obj.rotX = f15->rot.z / 512.0f * 360.0f; //wrong?
+		obj.rotY = -f15->rot.x / 512.0f * 360.0f; //right - don't even try to make sense of these
+		obj.rotZ = f15->rot.y / 512.0f * 360.0f; //wrong?
 
 		obj.scaleX = f15->scale.z;
 		obj.scaleY = f15->scale.y; //scale order is also weird - x is generally not given, assumed to be equal to the others

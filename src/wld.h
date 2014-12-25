@@ -13,6 +13,7 @@
 #include "util.h"
 #include "structs_wld.h"
 #include "structs_intermediate.h"
+#include "structs_mob.h"
 #include "memory_stream.h"
 #include "exception.h"
 #include "s3d.h"

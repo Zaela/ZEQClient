@@ -259,6 +259,7 @@ void Player::handleSpawn(Spawn_Struct* spawn)
 
 void Player::handlePlayerProfile(PlayerProfile_Struct* pp)
 {
-	mPosition.set(pp->x, pp->z, pp->y);
-	printf("PLAYER spawning at %g, %g, %g\n", pp->x, pp->z, pp->y);
+	//need to swap x and y after correcting the up axis - no, I don't know why they are so inconsistent about coordinates
+	mPosition.set(pp->y, pp->z, pp->x);
+	printf("PLAYER spawning at %g, %g, %g\n", pp->y, pp->z, pp->z);
 }

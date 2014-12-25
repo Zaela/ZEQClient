@@ -60,7 +60,7 @@ Mob* MobManager::spawnMob(Spawn_Struct* spawn)
 {
 	MobPrototypeWLD* proto = getModelPrototype(spawn->race, spawn->gender);
 
-	mMobPositionList.push_back(MobPosition((float)spawn->x, (float)spawn->z, (float)spawn->y));
+	mMobPositionList.push_back(MobPosition((float)spawn->y, (float)spawn->z, (float)spawn->x)); //yzx - don't ask
 
 	MobEntry ent;
 	ent.entity_id = spawn->spawnId;

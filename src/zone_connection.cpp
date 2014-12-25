@@ -18,9 +18,24 @@ ZoneConnection::ZoneConnection(WorldConnection* world) :
 
 void ZoneConnection::processInboundPackets()
 {
+	uint32 reack_count = 0;
+
 	for (;;)
 	{
-		int len = recvWithTimeout(3000);
+		//int len = recvWithTimeout(3000);
+		int len = recvPacket();
+		if (len <= 0)
+		{
+			if (++reack_count == 150) //after approximately 3 seconds without a packet
+			{
+				reack_count = 0;
+				mAckMgr->sendKeepAliveAck();
+			}
+			gRenderer.sleep(20);
+			continue;
+		}
+		reack_count = 0;
+
 		if (!mPacketReceiver->handleProtocol(len))
 			continue;
 		//else we have some packets to process here
@@ -185,6 +200,15 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	{
 		printf("OP_ManaChange\n");
 		ManaChange_Struct* mc = (ManaChange_Struct*)data;
+		//handle
+		break;
+	}
+	case OP_Stamina:
+	{
+		//actually hunger and thirst levels
+		printf("OP_Stamina\n");
+		Stamina_Struct* stam = (Stamina_Struct*)data;
+		//handle
 		break;
 	}
 	case OP_SpawnAppearance:

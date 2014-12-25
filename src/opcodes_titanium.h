@@ -32,6 +32,9 @@
 #define OP_ClientReady 0x5E20
 #define OP_ZoneSpawns 0x2E78
 
+//player packets
+#define OP_Stamina 0x7A83
+
 //mob-related packets
 #define OP_NewSpawn 0x1860
 #define OP_DeleteSpawn 0x55BC

@@ -89,7 +89,7 @@ void Mob::startAnimation(std::string id)
 void Mob::updatePosition(MobPositionUpdate_Struct* update)
 {
 	//ignoring deltas / interpolation for now...
-	core::vector3df pos((float)update->x_pos, (float)update->z_pos, (float)update->y_pos);
+	core::vector3df pos((float)update->y_pos, (float)update->z_pos, (float)update->x_pos);
 	mPosition->set(pos);
 	mNode->setPosition(pos);
 }

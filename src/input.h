@@ -44,12 +44,16 @@ public:
 
 	enum Mode
 	{
+		ZONE,
 		ZONE_VIEWER
 	};
 
 private:
 	bool handleKeyboardEvent(const SEvent::SKeyInput& ev);
 	bool handleMouseEvent(const SEvent::SMouseInput& ev);
+
+	bool zoneKeyboardEvent(const SEvent::SKeyInput& ev);
+	bool zoneMouseEvent(const SEvent::SMouseInput& ev);
 
 	bool zoneViewerKeyboardEvent(const SEvent::SKeyInput& ev);
 	bool zoneViewerMouseEvent(const SEvent::SMouseInput& ev);
