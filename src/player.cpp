@@ -241,6 +241,13 @@ void Player::applyFallingDamage()
 	//threshold and damage calculation, I have no idea at the moment
 }
 
+void Player::setPosition(float x, float y, float z)
+{
+	core::vector3df pos(x, y, z);
+	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
+	cam->setPosition(pos);
+}
+
 void Player::getCoords(MobPosition& pos)
 {
 	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
@@ -261,5 +268,5 @@ void Player::handlePlayerProfile(PlayerProfile_Struct* pp)
 {
 	//need to swap x and y after correcting the up axis - no, I don't know why they are so inconsistent about coordinates
 	mPosition.set(pp->y, pp->z, pp->x);
-	printf("PLAYER spawning at %g, %g, %g\n", pp->y, pp->z, pp->z);
+	printf("PLAYER spawning at %g, %g, %g\n", pp->y, pp->z, pp->x);
 }

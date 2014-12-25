@@ -127,6 +127,7 @@ public:
 public:
 	WLDSkeletonInstance() { }
 	WLDSkeletonInstance(scene::SMesh* mesh, WLDSkeleton* skele);
+	~WLDSkeletonInstance();
 
 	scene::SMesh* getMesh() { return mMesh; }
 

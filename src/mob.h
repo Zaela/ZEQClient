@@ -13,7 +13,6 @@ class Mob
 {
 private:
 	uint32 mIndex;
-	MobPosition* mPosition;
 	scene::IAnimatedMeshSceneNode* mNode;
 	WLDSkeletonInstance* mSkeletonWLD;
 	WLDSkeletonInstance* mHeadSkeleWLD;
@@ -27,7 +26,7 @@ private:
 
 public:
 	Mob(uint32 index, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head = nullptr);
-	Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos);
+	Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head);
 	~Mob();
 
 	void init(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head = nullptr);
@@ -37,7 +36,6 @@ public:
 
 	void setIndex(uint32 i) { mIndex = i; }
 	void setName(const char* name);
-	void setPositionPtr(MobPosition* ptr) { mPosition = ptr; }
 	void setExactHPCurrent(uint32 hp) { mExactCurHP = hp; }
 	void setExactHPMax(uint32 hp) { mExactMaxHP = hp; }
 	void setPercentHP(uint8 percent) { mPercentHP = percent; }

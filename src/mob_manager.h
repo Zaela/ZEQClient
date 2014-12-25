@@ -55,6 +55,7 @@ public:
 	Mob* spawnMob(int race_id, int gender, int level = 1, float x = 0.0f, float y = 0.0f, float z = 0.0f);
 	Mob* spawnMob(Spawn_Struct* spawn);
 	void despawnMob(int entity_id);
+	MobPosition* getMobPosition(uint32 index) { return &mMobPositionList[index]; }
 
 	void animateNearbyMobs(float delta);
 

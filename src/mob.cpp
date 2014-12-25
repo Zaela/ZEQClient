@@ -1,8 +1,10 @@
 
 #include "mob.h"
 #include "renderer.h"
+#include "mob_manager.h"
 
 extern Renderer gRenderer;
+extern MobManager gMobMgr;
 
 Mob::Mob(uint32 index, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head) :
 	mIndex(index)
@@ -11,16 +13,15 @@ Mob::Mob(uint32 index, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head) 
 	setName("test");
 }
 
-Mob::Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos) :
+Mob::Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head) :
 	mIndex(spawn->spawnId)
 {
-	init(skele, pos);
+	init(skele, pos, head);
 	setName(spawn->name);
 }
 
 void Mob::init(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head)
 {
-	mPosition = pos;
 	mSkeletonWLD = new WLDSkeletonInstance(gRenderer.copyMesh(skele->getReferenceMesh()), skele);
 	mSkeletonWLD->assumeBasePosition();
 
@@ -53,11 +54,13 @@ Mob::~Mob()
 		delete mSkeletonWLD;
 	if (mHeadSkeleWLD)
 		delete mHeadSkeleWLD;
-	mNode->drop();
+	mNode->removeAll();
 }
 
 void Mob::setName(const char* name)
 {
+	if (strlen(name) == 0)
+		return;
 	snprintf(mName, 64, "%s", name);
 	core::stringw wide_name(mName);
 	//should be placed above the HEAD_POINT node rather than the base node
@@ -89,7 +92,11 @@ void Mob::startAnimation(std::string id)
 void Mob::updatePosition(MobPositionUpdate_Struct* update)
 {
 	//ignoring deltas / interpolation for now...
-	core::vector3df pos((float)update->y_pos, (float)update->z_pos, (float)update->x_pos);
-	mPosition->set(pos);
+	core::vector3df pos(
+		Util::EQ19toFloat(update->y_pos),
+		Util::EQ19toFloat(update->z_pos),
+		Util::EQ19toFloat(update->x_pos)
+	);
+	gMobMgr.getMobPosition(mIndex)->set(pos);
 	mNode->setPosition(pos);
 }

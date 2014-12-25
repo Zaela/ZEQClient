@@ -61,6 +61,7 @@ public:
 	void checkFragmentComplete();
 	void checkAfterPacket();
 	void recordSentPacket(const Packet& packet, uint16 seq);
+	void queueRawPacket(byte* data, uint32 len);
 
 	void sendSessionRequest();
 	void sendSessionDisconnect();

@@ -30,6 +30,7 @@ void ZoneConnection::processInboundPackets()
 			{
 				reack_count = 0;
 				mAckMgr->sendKeepAliveAck();
+				printf("ack...\n");
 			}
 			gRenderer.sleep(20);
 			continue;
@@ -145,7 +146,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	}
 	case OP_NewSpawn:
 	{
-		printf("OP_NewSpawn\n");
+		printf("OP_NewSpawn - len %u\n", len);
 		//happens when a mob spawns!
 		Spawn_Struct* spawn = (Spawn_Struct*)data;
 		gMobMgr.spawnMob(spawn);
@@ -219,7 +220,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	}
 	case OP_MobUpdate:
 	{
-		printf("OP_MobUpdate\n");
+		//printf("OP_MobUpdate\n");
 		MobPositionUpdate_Struct* mp = (MobPositionUpdate_Struct*)data;
 		gMobMgr.handlePositionUpdate(mp);
 		break;
@@ -266,17 +267,17 @@ void ZoneConnection::poll()
 	{
 		int len = recvPacket();
 		if (len <= 0)
-			break;
+			return;
 		mPacketReceiver->handleProtocol(len);
-	}
 
-	std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
-	while (!queue.empty())
-	{
-		ReadPacket* packet = queue.front();
-		queue.pop();
-		uint16 opcode = *(uint16*)packet->data;
-		processPacket(opcode, packet->data + 2, packet->len - 2);
-		delete packet;
+		std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
+		while (!queue.empty())
+		{
+			ReadPacket* packet = queue.front();
+			queue.pop();
+			uint16 opcode = *(uint16*)packet->data;
+			processPacket(opcode, packet->data + 2, packet->len - 2);
+			delete packet;
+		}
 	}
 }

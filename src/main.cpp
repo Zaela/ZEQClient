@@ -102,7 +102,15 @@ int main(int argc, char** argv)
 			WLD* wld = gFileLoader.getWLD("dra_chr");
 			wld->convertMobModel("DRA");
 
-			gMobMgr.spawnMob(49, 2, 1, 20, 5, 20);
+			//gMobMgr.spawnMob(49, 2, 1, 20, 5, 20);
+			Spawn_Struct sp;
+			sp.race = 49;
+			sp.gender = 2;
+			sp.x = 20;
+			sp.y = 20;
+			sp.z = 5;
+			snprintf(sp.name, 64, "%s", "a_dragon");
+			gMobMgr.spawnMob(&sp);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());

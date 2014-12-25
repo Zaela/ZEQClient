@@ -60,13 +60,20 @@ Mob* MobManager::spawnMob(Spawn_Struct* spawn)
 {
 	MobPrototypeWLD* proto = getModelPrototype(spawn->race, spawn->gender);
 
-	mMobPositionList.push_back(MobPosition((float)spawn->y, (float)spawn->z, (float)spawn->x)); //yzx - don't ask
+	mMobPositionList.push_back(MobPosition(
+		Util::EQ19toFloat(spawn->y),
+		Util::EQ19toFloat(spawn->z),
+		Util::EQ19toFloat(spawn->x)
+	)); //yzx - don't ask
 
 	MobEntry ent;
 	ent.entity_id = spawn->spawnId;
-	ent.ptr = new Mob(spawn->spawnId, proto->skeleton, &mMobPositionList.back());
+	ent.ptr = new Mob(spawn, proto->skeleton, &mMobPositionList.back(),
+		proto->heads.size() ? proto->heads[0] : nullptr);
 
 	mMobList.push_back(ent);
+	printf("spawning race %i gender %i at %g, %g, %g - %s\n", spawn->race, spawn->gender, Util::EQ19toFloat(spawn->y),
+		Util::EQ19toFloat(spawn->z), Util::EQ19toFloat(spawn->x), spawn->name);
 
 	return ent.ptr;
 }
@@ -85,9 +92,8 @@ void MobManager::despawnMob(int entity_id)
 				mMobList[i] = mMobList.back();
 				//position list too
 				mMobPositionList[i] = mMobPositionList.back();
-				//inform mob of new positions
+				//inform mob of new indices
 				mMobList[i].ptr->setIndex(i);
-				mMobList[i].ptr->setPositionPtr(&mMobPositionList[i]);
 			}
 			mMobList.pop_back();
 			mMobPositionList.pop_back();

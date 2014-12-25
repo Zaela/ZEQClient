@@ -383,6 +383,11 @@ WLDSkeletonInstance::WLDSkeletonInstance(scene::SMesh* mesh, WLDSkeleton* skele)
 
 }
 
+WLDSkeletonInstance::~WLDSkeletonInstance()
+{
+	mMesh->drop();
+}
+
 void WLDSkeletonInstance::assumeBasePosition()
 {
 	mSkeleton->assumeBasePosition(mMesh);

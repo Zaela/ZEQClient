@@ -23,6 +23,8 @@ namespace Util
 	void rotateBy(core::vector3df& pos, core::vector3df& rot);
 
 	float getDistSquared(MobPosition& pos, MobPosition& compare);
+
+	float EQ19toFloat(int val);
 }
 
 #endif

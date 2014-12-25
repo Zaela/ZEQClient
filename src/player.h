@@ -58,6 +58,7 @@ public:
 	void setCamera(Camera* cam);
 	int getEntityID() { return mEntityID; }
 
+	void setPosition(float x, float y, float z);
 	void getCoords(MobPosition& pos);
 
 	void handleSpawn(Spawn_Struct* spawn);

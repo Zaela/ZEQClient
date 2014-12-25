@@ -17,6 +17,13 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 {
 	uint16 opcode = toHostShort(*(uint16*)data);
 
+	if (opcode > 0xFF)
+	{
+		//raw packet, no protocol
+		mAckMgr->queueRawPacket(data, len);
+		return;
+	}
+
 	switch (opcode)
 	{
 	case OP_SessionResponse:
@@ -49,7 +56,7 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	case OP_Combined:
 	{
 		//printf("OP_Combined\n");
-		if (!validateCompletePacket(data, len))
+		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 
 		uint32 pos = 2;
@@ -98,7 +105,11 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	case OP_SessionStatResponse:
 		break;
 	default:
-		printf("PacketReceiver received unknown protocol opcode 0x%0.4X\n", opcode);
+		printf("PacketReceiver received unknown protocol opcode 0x%0.4X len: %u, fromCombined: %i\n", opcode,
+			len, fromCombined ? 1 : 0);
+		for (uint32 i = 0; i < len; ++i)
+			printf("%0.2X ", data[i]);
+		printf("\n");
 		break;
 	}
 }

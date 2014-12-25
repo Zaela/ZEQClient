@@ -56,4 +56,9 @@ namespace Util
 
 		return x*x + y*y + z*z;
 	}
+
+	float EQ19toFloat(int val)
+	{
+		return (float(val) / float(1 << 3));
+	}
 }

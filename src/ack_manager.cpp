@@ -249,3 +249,8 @@ void AckManager::sendMaxTimeoutLengthRequest()
 
 	packet.send(mSocket, mCRCKey);
 }
+
+void AckManager::queueRawPacket(byte* packet, uint32 len)
+{
+	mReadPacketQueue.push(new ReadPacket(packet, len));
+}
