@@ -32,16 +32,20 @@ Socket::Socket(const char* ip, uint16 port) : mSocket(INVALID_SOCKET)
 		if (connect(sock, res->ai_addr, res->ai_addrlen) != 0)
 			continue;
 		//set non-blocking
-		unsigned long nonblock[1] = {1};
 #ifdef _WIN32
+		unsigned long nonblock[1] = {1};
 		if (ioctlsocket(sock, FIONBIO, nonblock) == 0)
-			break; //success
+#else
+		if (fcntl(sock, F_SETFL, O_NONBLOCK) == 0)
 #endif
+			break; //success
 		//if we're still here, we're connected but setting non-blocking failed, need to disconnect
 #ifdef _WIN32
 		closesocket(sock);
-		sock = INVALID_SOCKET; //in case this is the last round
+#else
+		close(sock);
 #endif
+		sock = INVALID_SOCKET; //in case this is the last round
 	}
 
 	freeaddrinfo(list);
@@ -54,9 +58,11 @@ Socket::Socket(const char* ip, uint16 port) : mSocket(INVALID_SOCKET)
 
 Socket::~Socket()
 {
-#ifdef _WIN32
 	if (mSocket != INVALID_SOCKET)
+#ifdef _WIN32
 		closesocket(mSocket);
+#else
+		close(mSocket);
 #endif
 }
 

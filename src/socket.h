@@ -19,6 +19,7 @@
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
 #include <net/if.h>
+#define INVALID_SOCKET -1
 #endif
 
 #include "types.h"
@@ -33,7 +34,11 @@ class Socket
 {
 private:
 	static const uint32 RECV_BUF_SIZE = 8192;
+#ifdef _WIN32
 	SOCKET mSocket;
+#else
+	int mSocket;
+#endif
 	byte mRecvBuf[RECV_BUF_SIZE];
 
 public:
