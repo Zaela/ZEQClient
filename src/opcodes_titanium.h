@@ -34,6 +34,7 @@
 
 //player packets
 #define OP_Stamina 0x7A83
+#define OP_Camp 0x78C1
 
 //mob-related packets
 #define OP_NewSpawn 0x1860

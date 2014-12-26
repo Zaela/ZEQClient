@@ -21,10 +21,12 @@ private:
 
 public:
 	ZoneConnection(WorldConnection* world);
+	~ZoneConnection();
 
 	void processInboundPackets();
 	bool processPacket(uint16 opcode, byte* data, uint32 len);
 	void connect();
+	void sendCamp();
 
 	//use this outside the connection procedure
 	void poll();

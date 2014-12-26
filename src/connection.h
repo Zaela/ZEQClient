@@ -52,6 +52,7 @@ public:
 
 	virtual ~Connection()
 	{
+		mAckMgr->sendSessionDisconnect();
 		delete mPacketReceiver;
 		delete mAckMgr;
 	}

@@ -27,7 +27,6 @@ Mob::Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton*
 	init(skele, pos, head);
 	setName(spawn->name);
 
-	printf("heading: %g\n", Util::EQ19toFloat(spawn->heading));
 	mNode->setRotation(core::vector3df(0.0f, Util::EQ19toFloat(spawn->heading) / 256.0f * 360.0f, 0.0f));
 }
 
