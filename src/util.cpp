@@ -48,17 +48,48 @@ namespace Util
 		pos = temp;
 	}
 
-	float getDistSquared(MobPosition& a, MobPosition& b)
+	float getHeadingTo(const MobPosition& from, const MobPosition& to)
 	{
-		float x = a.x - b.x;
-		float y = a.y - b.y;
-		float z = a.z - b.z;
+		core::vector3df v(to - from);
+		return v.getHorizontalAngle().Y;
+	}
+
+	float getDistSquared(const MobPosition& a, const MobPosition& b)
+	{
+		float x = a.X - b.X;
+		float y = a.Y - b.Y;
+		float z = a.Z - b.Z;
 
 		return x*x + y*y + z*z;
 	}
 
 	float EQ19toFloat(int val)
 	{
-		return (float(val) / float(1 << 3));
+		return float(val) / float(1 << 3);
+	}
+
+	int floatToEQ19(float val)
+	{
+		return int(val * float(1 << 3));
+	}
+
+	float EQ13toFloat(int val)
+	{
+		return float(val) / float(1 << 2);
+	}
+
+	int floatToEQ13(float val)
+	{
+		return int(val * float(1 << 2));
+	}
+
+	float EQ13PreciseToFloat(int val)
+	{
+		return float(val) / float(1 << 6);
+	}
+
+	int floatToEQ13Precise(float val)
+	{
+		return int(val * float(1 << 6));
 	}
 }

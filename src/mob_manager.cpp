@@ -15,6 +15,8 @@ void MobManager::addModelPrototype(int race_id, int gender, WLDSkeleton* skele, 
 {
 	MobPrototypeSetWLD& proto = mPrototypesWLD[race_id];
 
+	skele->setModelRaceGender(race_id, gender);
+
 	if (!head)
 	{
 		if (proto.set[gender].skeleton) //don't overwrite
@@ -104,8 +106,7 @@ void MobManager::despawnMob(int entity_id)
 
 void MobManager::animateNearbyMobs(float delta)
 {
-	MobPosition pos;
-	gPlayer.getCoords(pos);
+	const MobPosition& pos = gPlayer.getCoords();
 
 	const float dist = 1000.0f * 1000.0f;
 
@@ -116,60 +117,58 @@ void MobManager::animateNearbyMobs(float delta)
 	}
 }
 
-void MobManager::handleHPUpdate(HPUpdate_Struct* update)
+Mob* MobManager::getMobByEntityID(int entity, bool& isPlayer)
 {
-	int entity = update->spawn_id;
 	if (entity == gPlayer.getEntityID())
 	{
-		//handle
-		return;
+		isPlayer = true;
+		return nullptr;
 	}
-	
+	isPlayer = false;
+
 	for (MobEntry& mob : mMobList)
 	{
 		if (mob.entity_id == entity)
-		{
-			mob.ptr->setPercentHP(update->hp);
-			return;
-		}
+			return mob.ptr;
 	}
+
+	return nullptr;
+}
+
+void MobManager::handleHPUpdate(HPUpdate_Struct* update)
+{
+	bool isPlayer;
+	Mob* mob = getMobByEntityID(update->spawn_id, isPlayer);
+
+	if (mob)
+		mob->setPercentHP(update->hp);
+	else if (isPlayer)
+		return; //handle
 }
 
 void MobManager::handleHPUpdate(ExactHPUpdate_Struct* update)
 {
-	int entity = update->spawn_id;
-	if (entity == gPlayer.getEntityID())
+	bool isPlayer;
+	Mob* mob = getMobByEntityID(update->spawn_id, isPlayer);
+
+	if (mob)
+	{
+		mob->setExactHPMax(update->max_hp);
+		mob->setExactHPCurrent(update->cur_hp);
+	}
+	else if (isPlayer)
 	{
 		//handle
-		return;
-	}
-
-	for (MobEntry& mob : mMobList)
-	{
-		if (mob.entity_id == entity)
-		{
-			mob.ptr->setExactHPMax(update->max_hp);
-			mob.ptr->setExactHPCurrent(update->cur_hp);
-			return;
-		}
 	}
 }
 
 void MobManager::handlePositionUpdate(MobPositionUpdate_Struct* update)
 {
-	int entity = update->spawn_id;
-	if (entity == gPlayer.getEntityID())
-	{
-		//handle
-		return;
-	}
+	bool isPlayer;
+	Mob* mob = getMobByEntityID(update->spawn_id, isPlayer);
 
-	for (MobEntry& mob : mMobList)
-	{
-		if (mob.entity_id == entity)
-		{
-			mob.ptr->updatePosition(update);
-			return;
-		}
-	}
+	if (mob)
+		mob->updatePosition(update);
+	else if (isPlayer)
+		return; //handle
 }

@@ -89,6 +89,8 @@ private:
 	std::vector<FrameSkeleton> mFrames; //could be changed to one big flat array of frames
 	std::vector<Weight>* mWeightsByBone;
 	std::unordered_map<std::string, Animation, std::hash<std::string>> mAnimations;
+	int mModelRace;
+	int8 mModelGender;
 
 private:
 	static void getPosRot(Frag12Entry& f12, core::vector3df& pos, core::vector3df& rot);
@@ -116,6 +118,10 @@ public:
 	void addAnimation(std::string animName, uint32 num_frames, uint32 frame_delay);
 	void addAnimationFrames(std::string animName, Frag12* f12, int bone_id, int parent_id = -1);
 	uint32 animate(std::string animName, scene::SMesh* mesh, uint32 cur_frame, float& time, bool& ended);
+
+	void setModelRaceGender(int race, int gender) { mModelRace = race; mModelGender = gender; }
+	int getModelRace() const { return mModelRace; }
+	int8 getModelGender() const { return mModelGender; }
 };
 
 //the skeleton itself has no state, so it is fully reusable between instances of mobs

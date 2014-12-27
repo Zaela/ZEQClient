@@ -165,9 +165,8 @@ bool Input::zoneViewerKeyboardEvent(const SEvent::SKeyInput& ev)
 	case KEY_KEY_L:
 		if (!ev.PressedDown)
 		{
-			MobPosition pos;
-			gPlayer.getCoords(pos);
-			printf("Loc: %g, %g, %g\n", pos.x, pos.y, pos.z);
+			const MobPosition& pos = gPlayer.getCoords();
+			printf("Loc: %g, %g, %g\n", pos.X, pos.Y, pos.Z);
 		}
 		break;
 	case KEY_ESCAPE:

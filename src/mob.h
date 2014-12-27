@@ -8,6 +8,7 @@
 #include "wld_skeleton.h"
 #include "structs_mob.h"
 #include "structs_titanium.h"
+#include "translate.h"
 
 class Mob
 {
@@ -24,6 +25,7 @@ private:
 
 	int mEntityID;
 	char mName[64];
+	bool mInvertHeadingRace;
 
 	uint32 mExactCurHP;
 	uint32 mExactMaxHP;
@@ -35,6 +37,8 @@ public:
 	~Mob();
 
 	void init(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head = nullptr);
+
+	void setHeading(float heading);
 
 	void animate(float delta);
 	void startAnimation(std::string id);

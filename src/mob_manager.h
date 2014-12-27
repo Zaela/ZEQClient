@@ -49,6 +49,8 @@ private:
 private:
 	MobPrototypeWLD* getModelPrototype(int race_id, int gender);
 
+	Mob* getMobByEntityID(int entityid, bool& isPlayer);
+
 public:
 	bool modelPrototypeLoaded(int race_id, int gender);
 	void addModelPrototype(int race_id, int gender, WLDSkeleton* skele, bool head = false);

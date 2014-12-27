@@ -6,7 +6,7 @@ void FileLoader::setPathToEQ(std::string path)
 	mPathToEQ = path;
 	char c = mPathToEQ.back();
 #ifdef _WIN32
-	if (c != '\\')
+	if (c != '\\' && c != '/')
 		mPathToEQ += '\\';
 #else
 	if (c != '/')

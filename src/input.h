@@ -8,6 +8,7 @@
 #include "types.h"
 #include "exception.h"
 #include "zone_viewer.h"
+#include "structs_mob.h"
 
 using namespace irr;
 

@@ -15,8 +15,6 @@
 
 using namespace irr;
 
-struct MobPosition;
-
 class Player
 {
 private:
@@ -52,15 +50,15 @@ public:
 	void mainLoop();
 	void zoneViewerLoop();
 
-	ZoneViewerData* getZoneViewer() { return mZoneViewer; }
+	ZoneViewerData* getZoneViewer() const { return mZoneViewer; }
 	void setZoneViewer(ZoneViewerData* data) { mZoneViewer = data; }
 
 	void setZoneConnection(ZoneConnection* zc) { mZoneConnection = zc; }
 	void setCamera(Camera* cam);
-	int getEntityID() { return mEntityID; }
+	int getEntityID() const { return mEntityID; }
 
 	void setPosition(float x, float y, float z);
-	void getCoords(MobPosition& pos);
+	const MobPosition& getCoords() const;
 
 	void handleSpawn(Spawn_Struct* spawn);
 	void handlePlayerProfile(PlayerProfile_Struct* pp);

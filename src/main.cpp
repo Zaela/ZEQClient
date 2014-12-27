@@ -95,8 +95,9 @@ int main(int argc, char** argv)
 			gFileLoader.handleGlobalLoad();
 
 			Mob* mob = gMobMgr.spawnMob(75, 2);
-			gMobMgr.spawnMob(9, 0, 1, 5, 5, 5);
-			gMobMgr.spawnMob(60, 2, 1, -5, 5, -5);
+			gMobMgr.spawnMob(9, 0, 1, -5, 5, -5);
+			gMobMgr.spawnMob(60, 2, 1, 5, 5, 5);
+			gMobMgr.spawnMob(1, 0, 1, -5, 5, 5);
 			//mob->startAnimation("T06");
 
 			WLD* wld = gFileLoader.getWLD("dra_chr");
@@ -106,11 +107,20 @@ int main(int argc, char** argv)
 			Spawn_Struct sp;
 			sp.race = 49;
 			sp.gender = 2;
-			sp.x = 20;
-			sp.y = 20;
-			sp.z = 5;
+			sp.x = Util::floatToEQ19(20);
+			sp.y = Util::floatToEQ19(20);
+			sp.z = Util::floatToEQ19(5);
+			sp.heading = Util::floatToEQ19(180.0f / 360.0f * 256.0f);
 			snprintf(sp.name, 64, "%s", "a_dragon");
 			gMobMgr.spawnMob(&sp);
+
+			wld = gFileLoader.getWLD("gfaydark_chr");
+			wld->convertAllMobModels();
+
+			gMobMgr.spawnMob(38, 2, 1, 10, 5, 10);
+			gMobMgr.spawnMob(34, 2, 1, 10, 5, 5);
+			gMobMgr.spawnMob(109, 2, 1, 10, 5, 0);
+			gMobMgr.spawnMob(1, 1, 1, 10, 5, -5);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());

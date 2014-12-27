@@ -8,10 +8,9 @@
 #include <cmath>
 
 #include "types.h"
+#include "structs_mob.h"
 
 using namespace irr;
-
-struct MobPosition;
 
 namespace Util
 {
@@ -21,10 +20,16 @@ namespace Util
 
 	float radiansToDegrees(float rad);
 	void rotateBy(core::vector3df& pos, core::vector3df& rot);
+	float getHeadingTo(const MobPosition& from, const MobPosition& to);
 
-	float getDistSquared(MobPosition& pos, MobPosition& compare);
+	float getDistSquared(const MobPosition& pos, const MobPosition& compare);
 
 	float EQ19toFloat(int val);
+	int floatToEQ19(float val);
+	float EQ13toFloat(int val);
+	int floatToEQ13(float val);
+	float EQ13PreciseToFloat(int val);
+	int floatToEQ13Precise(float val);
 }
 
 #endif

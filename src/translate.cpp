@@ -39,4 +39,17 @@ namespace Translate
 	{
 		return Lua::getInt(id.c_str(), TRANSLATE_ANIM_TABLE);
 	}
+
+	bool invertHeadingRace(int race)
+	{
+		switch (race)
+		{
+		case 1:
+		case 60:
+		case 127:
+			return true;
+		default:
+			return false;
+		}
+	}
 }

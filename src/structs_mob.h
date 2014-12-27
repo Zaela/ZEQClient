@@ -6,9 +6,16 @@
 
 #include "types.h"
 
+typedef irr::core::vector3df MobPosition;
+
+/*
 struct MobPosition
 {
-	MobPosition() { }
+	MobPosition()
+	{
+		set(0, 0, 0);
+	}
+
 	MobPosition(float inX, float inY, float inZ)
 	{
 		set(inX, inY, inZ);
@@ -30,5 +37,6 @@ struct MobPosition
 
 	float x, y, z;
 };
+*/
 
 #endif

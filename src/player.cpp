@@ -54,7 +54,7 @@ void Player::setCamera(Camera* cam)
 		delete mCamera;
 	mCamera = cam;
 	scene::ISceneNode* node = cam->getSceneNode();
-	node->setPosition(core::vector3df(mPosition.x, mPosition.y, mPosition.z));
+	node->setPosition(mPosition);
 	node->setRotation(core::vector3df(0.0f, mHeading, 0.0f));
 	//REPLACE THIS - crappy irrlicht collision thing for now
 	/*scene::ISceneNodeAnimatorCollisionResponse* acr = gRenderer.getSceneManager()->createCollisionResponseAnimator(
@@ -249,14 +249,12 @@ void Player::setPosition(float x, float y, float z)
 	cam->setPosition(pos);
 }
 
-void Player::getCoords(MobPosition& pos)
+const MobPosition& Player::getCoords() const
 {
 	scene::ICameraSceneNode* cam = mCamera->getSceneNode();
 	core::vector3df& p = cam->getAbsolutePosition();
 
-	pos.x = p.X;
-	pos.y = p.Y;
-	pos.z = p.Z;
+	return p;
 }
 
 void Player::handleSpawn(Spawn_Struct* spawn)
