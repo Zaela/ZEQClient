@@ -49,7 +49,10 @@
 //general zone packets
 #define OP_Weather 0x254D
 #define OP_GroundSpawn 0x0F47
+
+//message packets
 #define OP_SpecialMesg 0x2372
+#define OP_FormattedMessage 0x5A48
 
 //AA packets
 #define OP_SendAAStats 0x5996

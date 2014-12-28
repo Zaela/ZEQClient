@@ -73,7 +73,7 @@ public:
 	void useZoneModel(ZoneModel* zoneModel);
 	void checkAnimatedTextures(uint32 delta);
 
-	scene::SMesh* copyMesh(scene::SMesh* mesh);
+	static scene::SMesh* copyMesh(scene::SMesh* mesh);
 };
 
 

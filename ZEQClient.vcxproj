@@ -78,6 +78,7 @@
     <ClCompile Include="src\animated_texture.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\compression.cpp" />
+    <ClCompile Include="src\eqstr.cpp" />
     <ClCompile Include="src\file_loader.cpp" />
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\irr\CBoneSceneNode.cpp" />
@@ -118,12 +119,14 @@
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\compression.h" />
     <ClInclude Include="src\connection.h" />
+    <ClInclude Include="src\eqstr.h" />
     <ClInclude Include="src\exception.h" />
     <ClInclude Include="src\file_loader.h" />
     <ClInclude Include="src\file_stream.h" />
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\login_connection.h" />
     <ClInclude Include="src\memory_stream.h" />
+    <ClInclude Include="src\micro_timer.h" />
     <ClInclude Include="src\mob.h" />
     <ClInclude Include="src\mob_manager.h" />
     <ClInclude Include="src\mod.h" />

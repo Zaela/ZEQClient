@@ -92,4 +92,33 @@ namespace Util
 	{
 		return int(val * float(1 << 6));
 	}
+
+	float unpackHeading(int eq19heading)
+	{
+		return EQ19toFloat(eq19heading) / 256.0f * 360.0f;
+	}
+
+	std::string getDisplayName(std::string name)
+	{
+		//are numeric symbols legal if not at the end?
+		char buf[64];
+		uint32 i;
+		for (i = 0; i < name.length(); ++i)
+		{
+			char c = name[i];
+			if (isdigit(c))
+			{
+				buf[i] = 0;
+				break;
+			}
+			
+			if (c == '_')
+				buf[i] = ' ';
+			else
+				buf[i] = c;
+		}
+
+		buf[63] = 0;
+		return std::string(buf, i);
+	}
 }

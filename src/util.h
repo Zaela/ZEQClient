@@ -6,6 +6,7 @@
 
 #include <cctype>
 #include <cmath>
+#include <string>
 
 #include "types.h"
 #include "structs_mob.h"
@@ -30,6 +31,10 @@ namespace Util
 	int floatToEQ13(float val);
 	float EQ13PreciseToFloat(int val);
 	int floatToEQ13Precise(float val);
+
+	float unpackHeading(int eq19heading);
+
+	std::string getDisplayName(std::string name);
 }
 
 #endif

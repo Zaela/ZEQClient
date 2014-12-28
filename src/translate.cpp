@@ -40,16 +40,25 @@ namespace Translate
 		return Lua::getInt(id.c_str(), TRANSLATE_ANIM_TABLE);
 	}
 
-	bool invertHeadingRace(int race)
+	uint32 invertHeadingRace(int race)
 	{
 		switch (race)
 		{
-		case 1:
-		case 60:
-		case 127:
-			return true;
+		case 1: //human
+		case 2: //barbarian
+		case 3: //erudite
+		case 4: //wood elf
+		case 5: //high elf
+		case 6: //dark elf
+		case 7: //half elf
+		case 60: //skeleton
+		case 70: //zombie
+		case 127: //invisible man
+			//human citizens, probably
+			//other citizens
+			return 1;
 		default:
-			return false;
+			return 0;
 		}
 	}
 }

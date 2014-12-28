@@ -22,6 +22,7 @@ private:
 
 public:
 	void setPathToEQ(std::string path);
+	std::string getPathToEQ() { return mPathToEQ; }
 
 	//omit file extension
 	S3D* getS3D(std::string name);

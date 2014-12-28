@@ -230,11 +230,32 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		gMobMgr.handlePositionUpdate(mp);
 		break;
 	}
+	case OP_FormattedMessage:
+	{
+		FormattedMessage_Struct* fm = (FormattedMessage_Struct*)data;
+		printf("OP_FormattedMessage: string %u, type %u\n", fm->string_id, fm->type);
+		//each format input is given in the message block, separated by null terminators
+		//a final null terminator marks the end of the block
+		std::string str;
+		EQStr::formatString(str, fm->string_id, fm->message);
+		printf("%s\n", str.c_str());
+		break;
+	}
+	case OP_SpecialMesg:
+	{
+		SpecialMesg_Struct* sm = (SpecialMesg_Struct*)data;
+		//the struct for this packet is a bit off
+		//the "sayer" field is a variable length null-terminated string, followed by 12 unknown bytes,
+		//followed by the message as another null-terminated string
+		const char* speaker = sm->sayer;
+		const char* msg = sm->sayer + strlen(speaker) + 13;
+		printf("OP_SpecialMesg: speaker %s says %s\n", speaker, msg);
+		break;
+	}
 	//packets we don't care about for now
 	case OP_WearChange:
 	case OP_SpawnDoor:
 	case OP_GroundSpawn:
-	case OP_SpecialMesg:
 	case OP_TributeUpdate:
 	case OP_TributeTimer:
 	case OP_TaskDescription:

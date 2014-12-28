@@ -16,7 +16,7 @@ namespace Translate
 	int raceID(std::string race3letter);
 	int gender(std::string race3letter);
 	int animationID(std::string anim3letter);
-	bool invertHeadingRace(int race);
+	uint32 invertHeadingRace(int race);
 }
 
 #endif

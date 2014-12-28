@@ -12,6 +12,7 @@
 #include "mob_manager.h"
 #include "zone_model.h"
 #include "file_loader.h"
+#include "eqstr.h"
 
 class ZoneConnection : public Connection
 {

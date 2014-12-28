@@ -16,6 +16,7 @@
 #include "mob_manager.h"
 #include "zeq_lua.h"
 #include "translate.h"
+#include "eqstr.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -110,17 +111,17 @@ int main(int argc, char** argv)
 			sp.x = Util::floatToEQ19(20);
 			sp.y = Util::floatToEQ19(20);
 			sp.z = Util::floatToEQ19(5);
-			sp.heading = Util::floatToEQ19(180.0f / 360.0f * 256.0f);
+			//sp.heading = Util::floatToEQ19(180.0f / 360.0f * 256.0f);
 			snprintf(sp.name, 64, "%s", "a_dragon");
 			gMobMgr.spawnMob(&sp);
 
 			wld = gFileLoader.getWLD("gfaydark_chr");
 			wld->convertAllMobModels();
 
-			gMobMgr.spawnMob(38, 2, 1, 10, 5, 10);
-			gMobMgr.spawnMob(34, 2, 1, 10, 5, 5);
-			gMobMgr.spawnMob(109, 2, 1, 10, 5, 0);
-			gMobMgr.spawnMob(1, 1, 1, 10, 5, -5);
+			gMobMgr.spawnMob(12, 0, 1, 10, 5, 10);
+			gMobMgr.spawnMob(8, 0, 1, 10, 5, 5);
+			gMobMgr.spawnMob(10, 0, 1, 10, 5, 0);
+			gMobMgr.spawnMob(11, 1, 1, 10, 5, -5);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());
@@ -129,6 +130,8 @@ int main(int argc, char** argv)
 		else
 		{
 			//do stuff
+			EQStr::initialize(gFileLoader.getPathToEQ());
+
 			login = new LoginConnection;
 			login->setCredentials(args.acctName, args.password);
 			login->quickConnect(args.serverName);

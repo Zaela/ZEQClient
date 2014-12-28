@@ -24,8 +24,12 @@ private:
 	scene::ISceneNode* mShieldNode;
 
 	int mEntityID;
-	char mName[64];
-	bool mInvertHeadingRace;
+	char mDisplayName[64];
+	char mRawName[64];
+
+	//boolean block
+	unsigned mInvertHeadingRace:1;
+	//end boolean block
 
 	uint32 mExactCurHP;
 	uint32 mExactMaxHP;
