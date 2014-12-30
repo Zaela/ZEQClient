@@ -147,9 +147,9 @@ void Mob::updatePosition(MobPositionUpdate_Struct* update)
 		//the server doesn't tell us the heading the mob should have while moving - need to calculate based on difference
 		float heading = Util::getHeadingTo(*cur, pos);
 
-		printf("moving diff: %g, %g, %g - delta: %g, %g, %g\n", cur->X - pos.X, cur->Y - pos.Y, cur->Z - pos.Z,
+		/*printf("moving diff: %g, %g, %g - delta: %g, %g, %g\n", cur->X - pos.X, cur->Y - pos.Y, cur->Z - pos.Z,
 			Util::EQ13PreciseToFloat(update->delta_x), Util::EQ13PreciseToFloat(update->delta_y),
-			Util::EQ13PreciseToFloat(update->delta_z));
+			Util::EQ13PreciseToFloat(update->delta_z));*/
 
 		*cur = pos;
 		mNode->setPosition(pos);

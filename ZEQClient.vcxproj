@@ -61,8 +61,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>"include\irrlicht\";"include\freeimage\";"include\zlib\";"include\cryptopp562\";"include\lua\";"include\cegui\";</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>"include\irrlicht\";"include\freeimage\";"include\zlib\";"include\cryptopp562\";"include\lua\";"include\";</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -70,7 +70,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>"lib\";</AdditionalLibraryDirectories>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib.lib;lua5.1.lib;CEGUIBase-0.lib;CEGUICommonDialogs-0.lib;CEGUICoreWindowRendererSet.lib;CEGUIExpatParser.lib;CEGUIFreeImageImageCodec.lib;CEGUIIrrlichtRenderer-0.lib;CEGUILuaScriptModule-0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib.lib;lua5.1.lib;RocketCore.lib;RocketControls.lib;RocketCoreLua.lib;RocketControlsLua.lib;RocketDebugger.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -96,6 +96,7 @@
     <ClCompile Include="src\packet_receiver.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\renderer.cpp" />
+    <ClCompile Include="src\rocket.cpp" />
     <ClCompile Include="src\s3d.cpp" />
     <ClCompile Include="src\socket.cpp" />
     <ClCompile Include="src\structs_eqg.cpp" />
@@ -115,7 +116,6 @@
     <ClInclude Include="src\animated_texture.h" />
     <ClInclude Include="src\buffer.h" />
     <ClInclude Include="src\camera.h" />
-    <ClInclude Include="src\cegui.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\compression.h" />
     <ClInclude Include="src\connection.h" />
@@ -143,6 +143,7 @@
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\random.h" />
     <ClInclude Include="src\renderer.h" />
+    <ClInclude Include="src\rocket.h" />
     <ClInclude Include="src\s3d.h" />
     <ClInclude Include="src\socket.h" />
     <ClInclude Include="src\structs_eqg.h" />

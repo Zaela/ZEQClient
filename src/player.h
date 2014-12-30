@@ -12,6 +12,7 @@
 #include "zone_connection.h"
 #include "zone_viewer.h"
 #include "structs_mob.h"
+#include "rocket.h"
 
 using namespace irr;
 
@@ -52,6 +53,7 @@ public:
 
 	ZoneViewerData* getZoneViewer() const { return mZoneViewer; }
 	void setZoneViewer(ZoneViewerData* data) { mZoneViewer = data; }
+	void updateViewerDisplay();
 
 	void setZoneConnection(ZoneConnection* zc) { mZoneConnection = zc; }
 	void setCamera(Camera* cam);

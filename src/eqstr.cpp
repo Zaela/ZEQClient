@@ -101,7 +101,7 @@ namespace EQStr
 			++len;
 		}
 
-		out.reserve(len);
+		out.reserve(len + 1);
 		//write format string
 		for (uint32 i = 0; i < fmt.length(); ++i)
 		{

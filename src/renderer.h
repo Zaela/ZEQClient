@@ -6,7 +6,7 @@
 
 #include <irrlicht.h>
 #include <FreeImage.h>
-#include "cegui.h"
+#include "rocket.h"
 
 #include <string>
 #include <vector>
@@ -33,9 +33,10 @@ private:
 	video::IVideoDriver* mDriver;
 	scene::ISceneManager* mSceneMgr;
 	scene::ISceneCollisionManager* mCollisionMgr;
-	CEGUI::IrrlichtRenderer* mGUIMgr;
-	CEGUI::System* mGUISystem;
-	CEGUI::GUIContext* mGUIContext;
+
+	RocketRenderer* mGUIRenderer;
+	Rocket::Core::Context* mGUIContext;
+	Rocket::Core::ElementDocument* mGUIDocument;
 
 	uint32 mSleepMilliseconds;
 	uint32 mPrevTime;
@@ -53,13 +54,16 @@ public:
 	Renderer();
 	
 	void initialize();
+	void initializeGUI();
 	void close();
 
 	void sleep(uint32 milliseconds) { mDevice->sleep(milliseconds); }
 
 	bool isOpenGL() { return mDriver->getDriverType() == video::EDT_OPENGL; }
+	bool isDirectX() { return mDriver->getDriverType() == video::EDT_DIRECT3D9; }
 
 	video::ITexture* createTexture(MemoryStream* file, std::string name, bool& isDDS);
+	video::ITexture* createTexture(std::string name, void* pixels, uint32 width, uint32 height, bool own_pixels = true);
 	void destroyTexture(video::ITexture* tex);
 	Camera* createCamera(bool bind = true);
 	scene::ISceneCollisionManager* getCollisionManager() { return mCollisionMgr; }
@@ -67,6 +71,11 @@ public:
 	scene::ITriangleSelector* getCollisionSelector() { return mCollisionSelector; }
 
 	scene::ISceneManager* getSceneManager() { return mSceneMgr; }
+	video::IVideoDriver* getVideoDriver() { return mDriver; }
+	Rocket::Core::Context* getGUIContext() { return mGUIContext; }
+	Rocket::Core::ElementDocument* getGUIDocument() { return mGUIDocument; }
+
+	void loadGUIDocument(Rocket::Core::String path);
 
 	float loopStep();
 	void resetInternalTimer();

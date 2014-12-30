@@ -95,6 +95,7 @@ private:
 private:
 	static void getPosRot(Frag12Entry& f12, core::vector3df& pos, core::vector3df& rot);
 	static void inheritPosRot(core::vector3df& pos, core::vector3df& rot, Frame& parent);
+	static void inheritPos(core::vector3df& pos, core::vector3df& rot, Frame& parent);
 	static void moveVertex(const video::S3DVertex& refVert, video::S3DVertex& vert, Frame& by);
 
 public:

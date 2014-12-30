@@ -5,6 +5,7 @@
 #include <lua.hpp>
 #include <string>
 #include <unordered_map>
+#include "rocket.h"
 #include "types.h"
 
 #define CONFIG_TABLE "config"
@@ -27,6 +28,7 @@ namespace Lua
 {
 	void initialize();
 	void close();
+	lua_State* getState();
 	void fileToTable(const char* filePath, const char* table, bool lowercase_keys = true);
 	void fileToHashTable(const char* filePath, std::unordered_map<std::string, int, std::hash<std::string>>& table);
 
@@ -45,6 +47,10 @@ namespace Lua
 	std::string getConfigString(const char* varname, const char* default);
 	bool getConfigBool(const char* varname);
 	bool getConfigBool(const char* varname, bool default);
+
+	void setGlobal(void* ptr, const char* name);
+
+	void loadFontsGUI();
 }
 
 #endif

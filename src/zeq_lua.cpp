@@ -3,6 +3,13 @@
 
 static lua_State* L;
 
+static void lua_newtable_globalenv(lua_State* L)
+{
+	lua_newtable(L);
+	luaL_getmetatable(L, "globalenv_meta");
+	lua_setmetatable(L, -2);
+}
+
 static void lua_newtable_tolowerkey(lua_State* L)
 {
 	lua_newtable(L);
@@ -18,6 +25,12 @@ namespace Lua
 		if (L)
 			luaL_openlibs(L);
 
+		//create globalenv metatable
+		luaL_newmetatable(L, "globalenv_meta");
+		lua_getglobal(L, "_G");
+		lua_setfield(L, -2, "__index");
+		lua_pop(L, 1);
+
 		//create tolowerkey metatable
 		luaL_newmetatable(L, "tolowerkey_meta");
 		luaL_dostring(L,
@@ -32,7 +45,20 @@ namespace Lua
 			"return set\n"
 		);
 		lua_setfield(L, -2, "__newindex");
+		//give it globalenv as its metatable
+		luaL_getmetatable(L, "globalenv_meta");
+		lua_setmetatable(L, -2);
 		lua_pop(L, 1);
+
+		//set some consants
+#ifdef _WIN32
+		luaL_dostring(L, "Windows = true");
+#else
+		luaL_dostring(L, "Unix = true");
+#endif
+
+		//load config file
+		fileToTable(CONFIG_FILE, CONFIG_TABLE);
 	}
 
 	void close()
@@ -41,12 +67,18 @@ namespace Lua
 			lua_close(L);
 	}
 
+	lua_State* getState()
+	{
+		return L;
+	}
+
 	void fileToTable(const char* path, const char* tbl_name, bool lowercase_keys)
 	{
 		if (lowercase_keys)
 			lua_newtable_tolowerkey(L);
 		else
-			lua_newtable(L);
+			lua_newtable_globalenv(L);
+
 		lua_pushvalue(L, -1);
 		lua_setfield(L, LUA_REGISTRYINDEX, tbl_name);
 		if (luaL_loadfile(L, path) == 0)
@@ -58,14 +90,15 @@ namespace Lua
 				return;
 			}
 		}
+
 		const char* err = lua_tostring(L, -1);
 		printf("Error running '%s': %s\n", path, err);
-		lua_pop(L, 1);
+		lua_settop(L, 0);
 	}
 
 	void fileToHashTable(const char* path, std::unordered_map<std::string, int, std::hash<std::string>>& table)
 	{
-		lua_newtable(L);
+		lua_newtable_globalenv(L);
 		if (luaL_loadfile(L, path) == 0)
 		{
 			lua_pushvalue(L, -2);
@@ -85,7 +118,7 @@ namespace Lua
 		}
 		const char* err = lua_tostring(L, -1);
 		printf("Error running '%s': %s\n", path, err);
-		lua_pop(L, 2);
+		lua_settop(L, 0);
 	}
 
 	int getInt(const char* varname, const char* tbl)
@@ -115,7 +148,7 @@ namespace Lua
 		lua_getfield(L, LUA_REGISTRYINDEX, tbl);
 		lua_getfield(L, -1, varname);
 		std::string ret;
-		if (lua_tostring(L, -1))
+		if (lua_isstring(L, -1))
 			ret = lua_tostring(L, -1);
 		lua_pop(L, 2);
 		return ret;
@@ -184,5 +217,41 @@ namespace Lua
 	bool getConfigBool(const char* varname, bool default)
 	{
 		return getBool(varname, CONFIG_TABLE, default);
+	}
+
+	void setGlobal(void* ptr, const char* name)
+	{
+		lua_pushlightuserdata(L, ptr);
+		lua_setglobal(L, name);
+	}
+
+	void loadFontsGUI()
+	{
+		if (luaL_loadfile(L, "fonts/load.lua") == 0)
+		{
+			if (lua_pcall(L, 0, 1, 0) == 0)
+			{
+				if (lua_istable(L, -1))
+				{
+					int n = lua_objlen(L, -1);
+					for (int i = 1; i <= n; ++i)
+					{
+						lua_pushinteger(L, i);
+						lua_gettable(L, -2);
+
+						Rocket::Core::FontDatabase::LoadFontFace(lua_tostring(L, -1));
+
+						lua_pop(L, 1);
+					}
+
+					lua_settop(L, 0);
+					return;
+				}
+			}
+		}
+
+		const char* err = lua_tostring(L, -1);
+		printf("Error running 'fonts/load.lua': %s\n", err);
+		lua_settop(L, 0);
 	}
 }

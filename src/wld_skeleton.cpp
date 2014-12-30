@@ -34,6 +34,8 @@ WLDSkeleton::WLDSkeleton(const WLDSkeleton& toCopy) :
 	mWeightsByBone = new std::vector<Weight>[mNumBones];
 	for (uint32 i = 0; i < mNumBones; ++i)
 		new (&mWeightsByBone[i]) std::vector<Weight>;
+
+	mAnimations = toCopy.mAnimations;
 }
 
 void WLDSkeleton::getPosRot(Frag12Entry& f12, core::vector3df& pos, core::vector3df& rot)
@@ -64,6 +66,14 @@ void WLDSkeleton::inheritPosRot(core::vector3df& pos, core::vector3df& rot, Fram
 	pos += parent.pos;
 	//add parent's rotations
 	rot += parent.rot;
+}
+
+void WLDSkeleton::inheritPos(core::vector3df& pos, core::vector3df& rot, Frame& parent)
+{
+	//shifts are rotated according to parent's rotation
+	Util::rotateBy(pos, parent.rot);
+	//add parent's shifts
+	pos += parent.pos;
 }
 
 void WLDSkeleton::moveVertex(const video::S3DVertex& refVert, video::S3DVertex& vert, Frame& by)

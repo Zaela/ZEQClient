@@ -17,6 +17,7 @@
 #include "zeq_lua.h"
 #include "translate.h"
 #include "eqstr.h"
+#include "rocket.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -70,11 +71,10 @@ int main(int argc, char** argv)
 		EQG_Structs::initialize();
 		Translate::initialize();
 
-		Lua::fileToTable(CONFIG_FILE, CONFIG_TABLE);
-
 		Args args;
 		readArgs(argc, argv, args);
 
+		gRenderer.initializeGUI();
 		gRenderer.initialize();
 		gFileLoader.setPathToEQ(args.pathToEQ);
 
@@ -82,6 +82,7 @@ int main(int argc, char** argv)
 		{
 			std::string shortname = args.zoneShortname;
 
+			gRenderer.loadGUIDocument("gui/viewer.rml");
 			gPlayer.setZoneViewer(new ZoneViewerData);
 
 			ZoneModel* zoneModel = ZoneModel::load(shortname);
@@ -90,38 +91,19 @@ int main(int argc, char** argv)
 
 			gRenderer.useZoneModel(zoneModel);
 
-			//WLD* wld = gFileLoader.getWLD("global_chr");
-			//wld->convertMobModel("ELE");
-			//wld->convertAllMobModels();
-			gFileLoader.handleGlobalLoad();
+			WLD* wld;
+			wld = gFileLoader.getWLD("global_chr");
+			wld->convertMobModel("ELE");
 
-			Mob* mob = gMobMgr.spawnMob(75, 2);
-			gMobMgr.spawnMob(9, 0, 1, -5, 5, -5);
-			gMobMgr.spawnMob(60, 2, 1, 5, 5, 5);
-			gMobMgr.spawnMob(1, 0, 1, -5, 5, 5);
+			//gFileLoader.handleGlobalLoad();
+
+			Mob* mob = gMobMgr.spawnMob(75, 2, 1, 5, 5, 5);
 			//mob->startAnimation("T06");
 
-			WLD* wld = gFileLoader.getWLD("dra_chr");
-			wld->convertMobModel("DRA");
+			//wld = gFileLoader.getWLD("dra_chr");
+			//wld->convertMobModel("DRA");
 
 			//gMobMgr.spawnMob(49, 2, 1, 20, 5, 20);
-			Spawn_Struct sp;
-			sp.race = 49;
-			sp.gender = 2;
-			sp.x = Util::floatToEQ19(20);
-			sp.y = Util::floatToEQ19(20);
-			sp.z = Util::floatToEQ19(5);
-			//sp.heading = Util::floatToEQ19(180.0f / 360.0f * 256.0f);
-			snprintf(sp.name, 64, "%s", "a_dragon");
-			gMobMgr.spawnMob(&sp);
-
-			wld = gFileLoader.getWLD("gfaydark_chr");
-			wld->convertAllMobModels();
-
-			gMobMgr.spawnMob(12, 0, 1, 10, 5, 10);
-			gMobMgr.spawnMob(8, 0, 1, 10, 5, 5);
-			gMobMgr.spawnMob(10, 0, 1, 10, 5, 0);
-			gMobMgr.spawnMob(11, 1, 1, 10, 5, -5);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());

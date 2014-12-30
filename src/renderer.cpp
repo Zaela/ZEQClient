@@ -11,6 +11,7 @@ Renderer::Renderer() :
 	mDriver(nullptr),
 	mSceneMgr(nullptr),
 	mCollisionMgr(nullptr),
+	mGUIDocument(nullptr),
 	mSleepMilliseconds(SLEEP_TIME_DEFAULT),
 	mPrevTime(0),
 	mCollisionNode(nullptr),
@@ -41,12 +42,29 @@ void Renderer::initialize()
 		mSceneMgr = mDevice->getSceneManager();
 		mCollisionMgr = mSceneMgr->getSceneCollisionManager();
 
-		mGUIMgr = &CEGUI::IrrlichtRenderer::bootstrapSystem(*mDevice);
-		mGUISystem = CEGUI::System::getSingletonPtr();
-		mGUIContext = &mGUISystem->getDefaultGUIContext();
+		//rocket
+		mGUIRenderer->setIsDirectX(isDirectX());
+		mGUIContext = Rocket::Core::CreateContext("main",
+			Rocket::Core::Vector2i(
+				Lua::getConfigInt(CONFIG_VAR_SCREEN_WIDTH, 640),
+				Lua::getConfigInt(CONFIG_VAR_SCREEN_HEIGHT, 480)
+			));
 
 		gInput.setGUIContext(mGUIContext);
 	}
+}
+
+void Renderer::initializeGUI()
+{
+	mGUIRenderer = new RocketRenderer;
+	Rocket::Core::SetRenderInterface(mGUIRenderer);
+	Rocket::Core::SetSystemInterface(new RocketSystem);
+	Rocket::Core::Initialise();
+	Rocket::Controls::Initialise();
+	Rocket::Core::Lua::Interpreter::Initialise(Lua::getState());
+	Rocket::Controls::Lua::RegisterTypes(Lua::getState());
+
+	Lua::loadFontsGUI();
 }
 
 void Renderer::close()
@@ -58,14 +76,6 @@ void Renderer::close()
 		mDriver = nullptr;
 		mSceneMgr = nullptr;
 		mCollisionMgr = nullptr;
-	}
-
-	if (mGUIMgr)
-	{
-		CEGUI::IrrlichtRenderer::destroySystem();
-		mGUIMgr = nullptr;
-		mGUISystem = nullptr;
-		mGUIContext = nullptr;
 	}
 }
 
@@ -128,7 +138,7 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 		FIBITMAP* bitmap = FreeImage_LoadFromMemory(fmt, fi_mem);
 		video::IImage* img = mDriver->createImageFromData(video::ECF_A8R8G8B8,
 			core::dimension2d<uint32>(FreeImage_GetWidth(bitmap), FreeImage_GetHeight(bitmap)),
-			FreeImage_GetBits(bitmap), false, false);
+			FreeImage_GetBits(bitmap), false, true);
 		FreeImage_Unload(bitmap);
 
 		tex = mDriver->addTexture(name.c_str(), img);
@@ -177,6 +187,14 @@ video::ITexture* Renderer::createTexture(MemoryStream* file, std::string name, b
 	return tex;
 }
 
+video::ITexture* Renderer::createTexture(std::string name, void* pixels, uint32 width, uint32 height, bool own_pixels)
+{
+	video::IImage* img = mDriver->createImageFromData(video::ECF_A8R8G8B8,
+		core::dimension2du(width, height), pixels, own_pixels, true);
+	video::ITexture* tex = mDriver->addTexture(name.c_str(), img);
+	return tex;
+}
+
 void Renderer::destroyTexture(video::ITexture* tex)
 {
 	mDriver->removeTexture(tex);
@@ -195,7 +213,10 @@ float Renderer::loopStep()
 	{
 		mDriver->beginScene(true, true, video::SColor(255, 128, 128, 128));
 		mSceneMgr->drawAll();
-		mGUISystem->renderAllGUIContexts();
+
+		mGUIContext->Update();
+		mGUIContext->Render();
+
 		mDriver->endScene();
 
 		mDevice->sleep(mSleepMilliseconds);
@@ -217,10 +238,6 @@ float Renderer::loopStep()
 
 	//wld skeleton animation
 	gMobMgr.animateNearbyMobs(delta_f);
-
-	//yes, we need to do this twice
-	mGUISystem->injectTimePulse(delta_f);
-	mGUIContext->injectTimePulse(delta_f);
 
 	return delta_f;
 }
@@ -338,4 +355,18 @@ scene::SMesh* Renderer::copyMesh(scene::SMesh* mesh)
 	copy->recalculateBoundingBox();
 
 	return copy;
+}
+
+void Renderer::loadGUIDocument(Rocket::Core::String path)
+{
+	if (mGUIDocument)
+		mGUIContext->UnloadDocument(mGUIDocument);
+
+	mGUIDocument = mGUIContext->LoadDocument(path);
+	if (mGUIDocument)
+	{
+		mGUIDocument->SetId(path);
+		mGUIDocument->Show();
+		mGUIDocument->RemoveReference();
+	}
 }

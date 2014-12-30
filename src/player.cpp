@@ -41,10 +41,16 @@ void Player::zoneViewerLoop()
 		float delta = gRenderer.loopStep();
 
 		if (gInput.isMoving())
+		{
 			applyMovement(delta);
+			updateViewerDisplay();
+		}
 
 		if (mZoneViewer->applyGravity && mIsFalling)
+		{
 			applyGravity(delta);
+			updateViewerDisplay();
+		}
 	}
 }
 
@@ -129,6 +135,7 @@ void Player::applyMovement(float delta)
 
 	//write translation
 	cam->setPosition(dest);
+	mPosition = dest;
 
 	//write right target
 	target += dest;
@@ -269,4 +276,23 @@ void Player::handlePlayerProfile(PlayerProfile_Struct* pp)
 	mPosition.set(pp->y, pp->z, pp->x);
 	printf("PLAYER spawning at %g, %g, %g, heading %g\n", pp->y, pp->z, pp->x, pp->heading);
 	mHeading = pp->heading / 256.0f * 360.0f;
+}
+
+void Player::updateViewerDisplay()
+{
+	char buf[256];
+	Rocket::Core::ElementDocument* doc = gRenderer.getGUIDocument();
+	Rocket::Core::Element* elem;
+
+	elem = doc->GetElementById("locX");
+	snprintf(buf, 256, "%.2f", mPosition.X);
+	elem->SetInnerRML(buf);
+
+	elem = doc->GetElementById("locY");
+	snprintf(buf, 256, "%.2f", mPosition.Y);
+	elem->SetInnerRML(buf);
+
+	elem = doc->GetElementById("locZ");
+	snprintf(buf, 256, "%.2f", mPosition.Z);
+	elem->SetInnerRML(buf);
 }

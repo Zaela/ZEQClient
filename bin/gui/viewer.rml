@@ -1,0 +1,17 @@
+<rml>
+<head>
+	<link type="text/rcss" href="css/default.rcss"/>
+	<style>
+		div#viewerStats {
+			display: block;
+			width: 250px;
+			padding-left: 5px;
+		}
+	</style>
+</head>
+<body>
+	<div id="viewerStats">
+		Loc: <span id="locX">0.00</span>, <span id="locZ">0.00</span>, <span id="locY">0.00</span>
+	</div>
+</body>
+</rml>

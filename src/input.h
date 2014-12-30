@@ -3,7 +3,7 @@
 #define _ZEQ_INPUT_H
 
 #include <irrlicht.h>
-#include "cegui.h"
+#include "rocket.h"
 
 #include "types.h"
 #include "exception.h"
@@ -24,7 +24,7 @@ private:
 	float mRelativeMouseX;
 	float mRelativeMouseY;
 
-	CEGUI::GUIContext* mGUIContext;
+	Rocket::Core::Context* mGUIContext;
 
 	int mMode;
 
@@ -75,7 +75,7 @@ public:
 	bool isMoving() { return mMoveDirection || mTurnDirection || mRelativeMouseX != 0.0f || mRelativeMouseY != 0.0f; }
 	void resetMoved() { mRelativeMouseX = 0; mRelativeMouseY = 0; }
 
-	void setGUIContext(CEGUI::GUIContext* cxt) { mGUIContext = cxt; }
+	void setGUIContext(Rocket::Core::Context* cxt) { mGUIContext = cxt; }
 
 	virtual bool OnEvent(const SEvent& ev) override;
 };
