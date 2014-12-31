@@ -299,7 +299,7 @@ void AckManager::startFragSequence(byte* data, uint16 seq)
 
 	//find the expected end seq
 	uint32 size = toHostLong(*(uint32*)(data + 4));
-	//max packet size is 512 - 4 = 508 	+ //max packet size is 512 - 6 = 508
+	//max packet size is 512 - 6 = 508
 	//this packet has 4 extra bytes of overhead, so 504
 	mFragEnd = seq + ((size - 504) / 508) + 2;
 }
