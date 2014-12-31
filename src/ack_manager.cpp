@@ -300,5 +300,5 @@ void AckManager::startFragSequence(byte* data, uint16 seq)
 	//find the expected end seq
 	uint32 size = toHostLong(*(uint32*)(data + 4));
 	//max packet size is 512 - 6 = 508
-	mFragEnd = seq + (size / 506) + 1;
+	mFragEnd = seq + (size / 504) + 1;
 }
