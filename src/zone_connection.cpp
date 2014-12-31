@@ -24,37 +24,45 @@ ZoneConnection::~ZoneConnection()
 void ZoneConnection::processInboundPackets()
 {
 	//uint32 reack_count = 0;
-
 	for (;;)
 	{
-		int len = recvWithTimeout(3000);
-		/*int len = recvPacket();
-		if (len <= 0)
+		try
 		{
-			if (++reack_count == 150) //after approximately 3 seconds without a packet
+			int len = recvWithTimeout(3000);
+			/*int len = recvPacket();
+			if (len <= 0)
 			{
-				reack_count = 0;
-				mAckMgr->sendKeepAliveAck();
-				printf("ack...\n");
+				if (++reack_count == 150) //after approximately 3 seconds without a packet
+				{
+					reack_count = 0;
+					mAckMgr->sendKeepAliveAck();
+					printf("ack...\n");
+				}
+				gRenderer.sleep(20);
+				continue;
 			}
-			gRenderer.sleep(20);
-			continue;
-		}
-		reack_count = 0;*/
+			reack_count = 0;*/
 
-		if (!mPacketReceiver->handleProtocol(len))
-			continue;
-		//else we have some packets to process here
-		std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
-		while (!queue.empty())
+			if (!mPacketReceiver->handleProtocol(len))
+				continue;
+			//else we have some packets to process here
+			std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
+			while (!queue.empty())
+			{
+				ReadPacket* packet = queue.front();
+				queue.pop();
+				uint16 opcode = *(uint16*)packet->data;
+				bool ret = processPacket(opcode, packet->data + 2, packet->len - 2);
+				delete packet;
+				if (ret)
+					return;
+			}
+		}
+		catch (TimeoutException)
 		{
-			ReadPacket* packet = queue.front();
-			queue.pop();
-			uint16 opcode = *(uint16*)packet->data;
-			bool ret = processPacket(opcode, packet->data + 2, packet->len - 2);
-			delete packet;
-			if (ret)
-				return;
+			if (!mAckMgr->resendUnackedPackets())
+				mAckMgr->sendKeepAliveAck();
+				//throw TimeoutException();
 		}
 	}
 }

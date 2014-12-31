@@ -48,9 +48,8 @@ namespace Lua
 	bool getConfigBool(const char* varname);
 	bool getConfigBool(const char* varname, bool default);
 
-	void setGlobal(void* ptr, const char* name);
-
 	void loadFontsGUI();
+	Rocket::Core::Context* initGUI(int width, int height);
 }
 
 #endif

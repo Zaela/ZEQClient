@@ -97,11 +97,19 @@ bool Input::zoneMouseEvent(const SEvent::SMouseInput& ev)
 {
 	switch (ev.Event)
 	{
+	case EMIE_LMOUSE_PRESSED_DOWN:
+		mGUIContext->ProcessMouseButtonDown(MOUSE_LEFT, getKeyModifier(ev));
+		break;
+	case EMIE_LMOUSE_LEFT_UP:
+		mGUIContext->ProcessMouseButtonUp(MOUSE_LEFT, getKeyModifier(ev));
+		break;
 	case EMIE_RMOUSE_PRESSED_DOWN:
 		mRightMouseDown = true;
+		mGUIContext->ProcessMouseButtonUp(MOUSE_RIGHT, getKeyModifier(ev));
 		break;
 	case EMIE_RMOUSE_LEFT_UP:
 		mRightMouseDown = false;
+		mGUIContext->ProcessMouseButtonUp(MOUSE_RIGHT, getKeyModifier(ev));
 		break;
 	case EMIE_MOUSE_MOVED:
 		if (mRightMouseDown)
@@ -111,7 +119,10 @@ bool Input::zoneMouseEvent(const SEvent::SMouseInput& ev)
 		}
 		mMouseX = ev.X;
 		mMouseY = ev.Y;
-		mGUIContext->ProcessMouseMove(ev.X, ev.Y, 0);
+		mGUIContext->ProcessMouseMove(ev.X, ev.Y, getKeyModifier(ev));
+		break;
+	case EMIE_MOUSE_WHEEL:
+		mGUIContext->ProcessMouseWheel((int)ev.Wheel, getKeyModifier(ev));
 		break;
 	default:
 		break;
@@ -182,11 +193,19 @@ bool Input::zoneViewerMouseEvent(const SEvent::SMouseInput& ev)
 {
 	switch (ev.Event)
 	{
+	case EMIE_LMOUSE_PRESSED_DOWN:
+		mGUIContext->ProcessMouseButtonDown(MOUSE_LEFT, getKeyModifier(ev));
+		break;
+	case EMIE_LMOUSE_LEFT_UP:
+		mGUIContext->ProcessMouseButtonUp(MOUSE_LEFT, getKeyModifier(ev));
+		break;
 	case EMIE_RMOUSE_PRESSED_DOWN:
 		mRightMouseDown = true;
+		mGUIContext->ProcessMouseButtonUp(MOUSE_RIGHT, getKeyModifier(ev));
 		break;
 	case EMIE_RMOUSE_LEFT_UP:
 		mRightMouseDown = false;
+		mGUIContext->ProcessMouseButtonUp(MOUSE_RIGHT, getKeyModifier(ev));
 		break;
 	case EMIE_MOUSE_MOVED:
 		if (mRightMouseDown)
@@ -196,11 +215,26 @@ bool Input::zoneViewerMouseEvent(const SEvent::SMouseInput& ev)
 		}
 		mMouseX = ev.X;
 		mMouseY = ev.Y;
-		mGUIContext->ProcessMouseMove(ev.X, ev.Y, 0);
+		mGUIContext->ProcessMouseMove(ev.X, ev.Y, getKeyModifier(ev));
+		break;
+	case EMIE_MOUSE_WHEEL:
+		mGUIContext->ProcessMouseWheel((int)ev.Wheel, getKeyModifier(ev));
 		break;
 	default:
 		break;
 	}
 
 	return false;
+}
+
+int Input::getKeyModifier(const SEvent::SMouseInput& ev)
+{
+	int ret = 0;
+
+	if (ev.Shift)
+		ret |= KM_SHIFT;
+	if (ev.Control)
+		ret |= KM_CTRL;
+
+	return ret;
 }

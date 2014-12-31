@@ -22,6 +22,7 @@ private:
 	//these overflow by design
 	uint16 mNextSeq;
 	uint16 mExpectedSeq;
+	uint16 mLastReceivedAck;
 
 	//fragment-related
 	bool mBuildingFrag;
@@ -62,6 +63,8 @@ public:
 	void checkAfterPacket();
 	void recordSentPacket(const Packet& packet, uint16 seq);
 	void queueRawPacket(byte* data, uint32 len);
+	bool resendUnackedPackets();
+	void startFragSequence(byte* data, uint16 seq);
 
 	void sendSessionRequest();
 	void sendSessionDisconnect();

@@ -176,17 +176,17 @@ void Player::applyGravity(float delta)
 			}
 			yDiff = pos.Y - fallTo;
 			pos.Y = fallTo;
-			cam->setPosition(pos);
-			cam->setTarget(cam->getTarget() - core::vector3df(0, yDiff, 0));
 		}
 		else
 		{
 			//we need to correct upwards
 			pos.Y -= yDiff;
-			cam->setPosition(pos);
-			cam->setTarget(cam->getTarget() - core::vector3df(0, yDiff, 0));
 			mIsFalling = false;
 		}
+
+		mPosition = pos;
+		cam->setPosition(pos);
+		cam->setTarget(cam->getTarget() - core::vector3df(0, yDiff, 0));
 	}
 	else
 	{

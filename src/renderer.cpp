@@ -44,11 +44,15 @@ void Renderer::initialize()
 
 		//rocket
 		mGUIRenderer->setIsDirectX(isDirectX());
-		mGUIContext = Rocket::Core::CreateContext("main",
+		mGUIContext = Lua::initGUI(
+			Lua::getConfigInt(CONFIG_VAR_SCREEN_WIDTH, 640),
+			Lua::getConfigInt(CONFIG_VAR_SCREEN_HEIGHT, 480)
+		);
+		/*mGUIContext = Rocket::Core::CreateContext("main",
 			Rocket::Core::Vector2i(
 				Lua::getConfigInt(CONFIG_VAR_SCREEN_WIDTH, 640),
 				Lua::getConfigInt(CONFIG_VAR_SCREEN_HEIGHT, 480)
-			));
+			));*/
 
 		gInput.setGUIContext(mGUIContext);
 	}

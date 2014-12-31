@@ -17,6 +17,17 @@ static void lua_newtable_tolowerkey(lua_State* L)
 	lua_setmetatable(L, -2);
 }
 
+static bool dofile(lua_State* L, const char* path, int num_rets)
+{
+	if (luaL_loadfile(L, path) == 0 && lua_pcall(L, 0, num_rets, 0) == 0)
+		return true;
+
+	const char* err = lua_tostring(L, -1);
+	printf("Error running '%s': %s\n", path, err);
+	lua_pop(L, 1);
+	return false;
+}
+
 namespace Lua
 {
 	void initialize()
@@ -219,12 +230,6 @@ namespace Lua
 		return getBool(varname, CONFIG_TABLE, default);
 	}
 
-	void setGlobal(void* ptr, const char* name)
-	{
-		lua_pushlightuserdata(L, ptr);
-		lua_setglobal(L, name);
-	}
-
 	void loadFontsGUI()
 	{
 		if (luaL_loadfile(L, "fonts/load.lua") == 0)
@@ -253,5 +258,20 @@ namespace Lua
 		const char* err = lua_tostring(L, -1);
 		printf("Error running 'fonts/load.lua': %s\n", err);
 		lua_settop(L, 0);
+	}
+
+	Rocket::Core::Context* initGUI(int width, int height)
+	{
+		lua_pushinteger(L, width);
+		lua_setglobal(L, "screenWidth");
+		lua_pushinteger(L, height);
+		lua_setglobal(L, "screenHeight");
+
+		if (!dofile(L, "gui/init.lua", 1))
+			return nullptr;
+
+		Rocket::Core::Context** cxt = (Rocket::Core::Context**)lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		return *cxt;
 	}
 }

@@ -3,7 +3,12 @@
 
 extern Random gRNG;
 
-AckManager::AckManager(Socket* socket) : mSocket(socket), mNextSeq(65535), mExpectedSeq(0), mBuildingFrag(false)
+AckManager::AckManager(Socket* socket) : 
+	mSocket(socket),
+	mNextSeq(65535),
+	mExpectedSeq(0),
+	mLastReceivedAck(65535),
+	mBuildingFrag(false)
 {
 	memset(mFuturePackets, 0, sizeof(ReadPacket*) * SEQUENCE_MAX);
 	memset(mSentPackets, 0, sizeof(Packet*) * SEQUENCE_MAX);
@@ -22,6 +27,8 @@ AckManager::PacketSequence AckManager::compareSequence(uint16 got, uint16 expect
 
 void AckManager::receiveAck(uint16 seq)
 {
+	mLastReceivedAck = seq;
+
 	for (uint16 count = 0; count < WINDOW_SIZE; ++count)
 	{
 		if (mSentPackets[seq])
@@ -85,15 +92,8 @@ void AckManager::checkInboundFragment(byte* packet, uint32 len)
 	case SEQUENCE_PRESENT:
 	{
 		//this is the starting packet of a fragment sequence
-		mBuildingFrag = true;
-		mFragStart = seq;
-		mFragMilestone = seq;
+		startFragSequence(packet, seq);
 		mFuturePackets[seq] = new ReadPacket(packet, len);
-
-		//find the expected end seq
-		uint32 size = toHostLong(*(uint32*)(packet + 4));
-		//max packet size is 512 - 4 = 508
-		mFragEnd = seq + (size / 508) + 1;
 
 		//printf("FRAG END: %u -> %u\n", seq, mFragEnd);
 
@@ -190,6 +190,7 @@ void AckManager::checkAfterPacket()
 		uint16 opcode = toHostShort(*(uint16*)nextPacket->data);
 		if (opcode == OP_Fragment)
 		{
+			startFragSequence(nextPacket->data, i);
 			checkFragmentComplete();
 		}
 		else
@@ -265,4 +266,39 @@ void AckManager::queueRawPacket(byte* packet, uint32 len)
 	}
 
 	mReadPacketQueue.push(rp);
+}
+
+bool AckManager::resendUnackedPackets()
+{
+	int count = 0;
+	uint16 i = mLastReceivedAck + 1;
+	for (;;)
+	{
+		if (mSentPackets[i])
+		{
+			mSentPackets[i]->send(mSocket, mCRCKey);
+			++count;
+		}
+		else
+		{
+			break;
+		}
+		++i;
+	}
+
+	printf("Resending unacked: %i\n", count);
+
+	return count > 0;
+}
+
+void AckManager::startFragSequence(byte* data, uint16 seq)
+{
+	mBuildingFrag = true;
+	mFragStart = seq;
+	mFragMilestone = seq;
+
+	//find the expected end seq
+	uint32 size = toHostLong(*(uint32*)(data + 4));
+	//max packet size is 512 - 4 = 508
+	mFragEnd = seq + (size / 508) + 1;
 }

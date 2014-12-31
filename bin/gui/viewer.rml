@@ -10,8 +10,10 @@
 	</style>
 </head>
 <body>
-	<div id="viewerStats">
-		Loc: <span id="locX">0.00</span>, <span id="locZ">0.00</span>, <span id="locY">0.00</span>
-	</div>
+	<handle move_target="#document">
+		<div id="viewerStats">
+			Loc: <span id="locX">0.00</span>, <span id="locZ">0.00</span>, <span id="locY">0.00</span>
+		</div>
+	</handle>
 </body>
 </rml>
