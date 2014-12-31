@@ -83,7 +83,7 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	case OP_Fragment:
 	{
 		//printf("OP_Fragment\n");
-		if (!fromCombined && !Compression::decompressPacket(data, len))
+		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 
 		mAckMgr->checkInboundFragment(data, len);
@@ -120,6 +120,7 @@ bool PacketReceiver::validateCompletePacket(byte*& packet, uint32& len)
 	if (!NetworkCRC::validatePacket(packet, len, mCRCKey))
 		return false;
 	//attempt to decompress
+	len -= 2; //crc
 	if (!Compression::decompressPacket(packet, len))
 		return false;
 	return true;

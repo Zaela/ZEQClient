@@ -95,8 +95,6 @@ void AckManager::checkInboundFragment(byte* packet, uint32 len)
 		startFragSequence(packet, seq);
 		mFuturePackets[seq] = new ReadPacket(packet, len);
 
-		//printf("FRAG END: %u -> %u\n", seq, mFragEnd);
-
 		checkFragmentComplete();
 	}
 	case SEQUENCE_FUTURE:
@@ -163,10 +161,7 @@ void AckManager::checkFragmentComplete()
 	}
 
 	//add to queue
-	if (NetworkCRC::validatePacket(out->data, len, mCRCKey))
-	{
-		mReadPacketQueue.push(out);
-	}
+	mReadPacketQueue.push(out);
 
 	//clean up
 	mExpectedSeq = i;
@@ -299,7 +294,6 @@ void AckManager::startFragSequence(byte* data, uint16 seq)
 
 	//find the expected end seq
 	uint32 size = toHostLong(*(uint32*)(data + 4));
-	//max packet size is 512 - 4 = 508
-	//this packet has 4 extra bytes of overhead, so 504
-	mFragEnd = seq + ((size - 504) / 508) + 2;
+	//max packet size is 512 - 6 = 506
+	mFragEnd = seq + (size / 506) + 1;
 }
