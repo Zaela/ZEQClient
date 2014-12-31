@@ -322,4 +322,5 @@ void ZoneConnection::sendCamp()
 {
 	Packet packet(0, OP_Camp, mAckMgr);
 	packet.send(this, getCRCKey());
+	g_EqState = World;
 }

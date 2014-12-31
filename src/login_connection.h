@@ -19,6 +19,7 @@
 #include "opcodes_login.h"
 #include "exception.h"
 #include "zeq_lua.h"
+#include "eq_state.h"
 
 #define LOGIN_IP_DEFAULT "login.eqemulator.net"
 #define LOGIN_PORT_DEFAULT 5998
@@ -28,6 +29,7 @@ class LoginConnection : public Connection
 private:
 	std::string mName;
 	std::string mPassword;
+	std::string mServerName;
 
 	std::vector<ServerListing> mServerList;
 	std::unordered_map<std::string, ServerListing> mServersByName;
@@ -52,10 +54,12 @@ public:
 	bool success() { return mSuccess; }
 
 	void setCredentials(std::string name, std::string password);
-	void processInboundPackets();
+	void process();
+	bool connectToSelectedServer();
 	bool processPacket(uint16 opcode, byte* data, uint32 len);
+	bool processPacketQueue();
 	void toServerSelect();
-	void quickConnect(std::string serverName);
+	void setServerName(std::string serverName);
 };
 
 #pragma pack(1)

@@ -2,7 +2,7 @@
 #ifndef _ZEQ_COMPRESSION_H
 #define _ZEQ_COMPRESSION_H
 
-#include <zlib.h>
+#include "..\..\include\zlib\zlib.h"
 
 #include "types.h"
 #include "packet.h"

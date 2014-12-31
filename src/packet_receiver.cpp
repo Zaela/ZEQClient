@@ -4,7 +4,7 @@
 PacketReceiver::PacketReceiver(Socket* socket, AckManager* ackMgr, bool isLogin)
 	: mSocket(socket), mAckMgr(ackMgr), mIsLogin(isLogin)
 {
-
+	mIsDisconnected = false;
 }
 
 bool PacketReceiver::handleProtocol(uint32 len)
@@ -100,7 +100,8 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 		break;
 	}
 	case OP_SessionDisconnect:
-		throw DisconnectException();
+		SetDisconnected(true);
+		break;
 	//packets we don't care about
 	case OP_SessionStatResponse:
 		break;

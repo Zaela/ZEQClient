@@ -58,6 +58,7 @@ struct ReadPacket
 
 	byte* data;
 	uint32 len;
+	uint32 max_seq;
 };
 
 #endif

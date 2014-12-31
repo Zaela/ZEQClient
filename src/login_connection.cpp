@@ -19,26 +19,52 @@ void LoginConnection::setCredentials(std::string name, std::string password)
 	mPassword = password;
 }
 
-void LoginConnection::processInboundPackets()
+void LoginConnection::setServerName(std::string serverName)
 {
-	for (;;)
+	mServerName = serverName;
+}
+
+void LoginConnection::process()
+{
+	mAckMgr->sendSessionRequest();
+	while(g_EqState == Login)
 	{
-		int len = recvWithTimeout(5000);
-		if (!mPacketReceiver->handleProtocol(len))
-			continue;
-		//else we have some packets to process here
-		std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
-		while (!queue.empty())
+		bool Disconnected = processPacketQueue();
+		if(Disconnected)
 		{
-			ReadPacket* packet = queue.front();
-			queue.pop();
-			uint16 opcode = *(uint16*)packet->data;
-			bool ret = processPacket(opcode, packet->data + 2, packet->len - 2);
-			delete packet;
-			if (ret)
-				return;
+			g_EqState = None;
+			return;
 		}
 	}
+}
+
+bool LoginConnection::processPacketQueue()
+{
+
+	if(mPacketReceiver->GetDisconnected())
+		return true;
+
+	int len = recvWithTimeout(5000);
+	if (!mPacketReceiver->handleProtocol(len))
+	{
+		return false;
+	}
+
+	//else we have some packets to process here
+	std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
+	while (!queue.empty())
+	{
+		ReadPacket* packet = queue.front();
+		queue.pop();
+		uint16 opcode = *(uint16*)packet->data;
+		bool ret = processPacket(opcode, packet->data + 2, packet->len - 2);
+		if(!ret)
+		{
+			printf("Invalid packet in login state.\n");
+		}
+		delete packet;
+	}
+	return false;
 }
 
 bool LoginConnection::processPacket(uint16 opcode, byte* data, uint32 len)
@@ -66,9 +92,11 @@ bool LoginConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 	case OP_LoginAccepted:
 	{
 		printf("OP_LoginAccepted\n");
-		if (len < 80) //replace this with a more appropriate exception type
-			throw BadCredentialsException();
-			//throw ZEQException("LoginConnection::processPacket: bad username/password");
+		if (len < 80)
+		{
+			printf("Login Failed. Invalid Username/Password\n");
+			return false;
+		}
 
 		data += 10;
 		len -= 10;
@@ -129,7 +157,7 @@ bool LoginConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 			printf("Players: %u, name: %s\n", sl.playerCount, sl.longname.c_str());
 		}
 
-		return true;
+		return connectToSelectedServer();
 	}
 	case OP_PlayEverquestResponse:
 	{
@@ -138,6 +166,7 @@ bool LoginConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		mSuccess = (pr->allowed > 0);
 		if (mSuccess)
 			mAckMgr->sendSessionDisconnect();
+		g_EqState = EqState::World;
 		return true;
 	}
 	default:
@@ -151,20 +180,32 @@ bool LoginConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 void LoginConnection::toServerSelect()
 {
 	mAckMgr->sendSessionRequest();
-	processInboundPackets();
+	process();
 }
 
-void LoginConnection::quickConnect(std::string serverName)
+bool LoginConnection::connectToSelectedServer()
 {
-	toServerSelect();
+	if(mServerName.empty())
+	{
+		printf("No servername is configured in our settings for connection!\n");
+		g_EqState = None;
+		return false;
+	}
 
 	if (mServersByName.empty())
-		throw ZEQException("LoginConnection::quickConnect: bad server list");
+	{
+		printf("No servers are in our ServerList packet!\n");
+		g_EqState = None;
+		return false;
+	}
+	if (mServersByName.count(mServerName) == 0)
+	{
+		printf("Could not find our configured server in the server list!\n");
+		g_EqState = None;
+		return false;
+	}
 
-	if (mServersByName.count(serverName) == 0)
-		throw ZEQException("LoginConnection::quickConnect: could not find server");
-
-	setServer(new ServerListing(mServersByName[serverName]));
+	setServer(new ServerListing(mServersByName[mServerName]));
 
 	//inform the login server of our selection
 	Packet packet(14, OP_PlayEverquestRequest, mAckMgr, OP_Packet, false, false);
@@ -173,8 +214,7 @@ void LoginConnection::quickConnect(std::string serverName)
 	pr->serverRuntimeID = getServer()->runtimeID;
 
 	packet.send(this, mAckMgr->getCRCKey());
-
-	processInboundPackets();
+	return true;
 }
 
 std::string LoginConnection::encrypt(std::string plaintext)
