@@ -105,8 +105,7 @@ int Socket::recvWithTimeout(uint32 milliseconds)
 		usleep(20 * 1000);
 #endif
 	}
-
-	throw TimeoutException();
+	return 0;
 }
 
 void Socket::sendPacket(void* in_data, int len)

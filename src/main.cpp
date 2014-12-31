@@ -3,6 +3,7 @@
 #include <lua.hpp>
 
 #include "socket.h"
+#include "eq_state.h"
 #include "random.h"
 #include "input.h"
 #include "renderer.h"
@@ -28,6 +29,7 @@ Renderer gRenderer;
 FileLoader gFileLoader;
 Player gPlayer;
 MobManager gMobMgr;
+EqState g_EqState;
 
 void showError(const char* fmt, ...)
 {
@@ -112,28 +114,76 @@ int main(int argc, char** argv)
 		else
 		{
 			//do stuff
-			EQStr::initialize(gFileLoader.getPathToEQ());
+			g_EqState = Login;
+			while(g_EqState != None)
+			{
+				EQStr::initialize(gFileLoader.getPathToEQ());
+				
+				if(g_EqState == Login)
+				{
+					if(login)
+					{
+						delete login;
+						login = nullptr;
+					}
+					//clean up previous world instance since we're starting over
+					if(world)
+					{
+						delete world;
+						world= nullptr;
+					}
+					//clean up previous zone instance since we're starting over
+					if(zone)
+					{
+						delete zone;
+						zone= nullptr;
+					}
 
-			login = new LoginConnection;
-			login->setCredentials(args.acctName, args.password);
-			login->quickConnect(args.serverName);
+					login = new LoginConnection;
+					login->setCredentials(args.acctName, args.password);
+					login->setServerName(args.serverName);
+					login->process();
+				}
+				else if(g_EqState == World) 
+				{
+					if(login)
+					{
+						gFileLoader.handleGlobalLoad();
 
-			gFileLoader.handleGlobalLoad();
-
-			world = new WorldConnection(login);
-			world->quickZoneInCharacter(args.charName);
-			delete login;
-			login = nullptr;
-
-			zone = new ZoneConnection(world);
-			gPlayer.setZoneConnection(zone);
-			zone->connect();
-			delete world;
-			world = nullptr;
-
-			gInput.setMode(Input::ZONE);
-			gPlayer.setCamera(gRenderer.createCamera());
-			gPlayer.mainLoop();
+						if(!world)
+						{
+							world = new WorldConnection(login);
+						}
+						world->quickZoneInCharacter(args.charName);
+						world->process();
+					}
+					else
+					{
+						g_EqState = Login;
+					}
+				}
+				else if(g_EqState == Zone)
+				{
+					if(zone)
+					{
+						delete zone;
+						zone = nullptr;
+					}
+					if(world)
+					{
+						zone = new ZoneConnection(world);
+						gPlayer.setZoneConnection(zone);
+						zone->connect();
+						gInput.setMode(Input::ZONE);
+						gPlayer.setCamera(gRenderer.createCamera());
+						gPlayer.mainLoop();
+					}
+					else
+					{
+						g_EqState = Login;
+					}
+				}
+			}
 		}
 	}
 	catch (ZEQException& e)

@@ -19,6 +19,7 @@ private:
 	AckManager* mAckMgr;
 	uint32 mCRCKey;
 	bool mIsLogin;
+	bool mIsDisconnected;
 
 private:
 	bool validateCompletePacket(byte*& packet, uint32& len);
@@ -28,6 +29,10 @@ public:
 	PacketReceiver(Socket* socket, AckManager* ackMgr, bool isLogin = false);
 
 	bool handleProtocol(uint32 len);
+	bool IsLogin() { return mIsLogin; }
+	void SetDisconnected(bool state) { mIsDisconnected = state; }
+	bool GetDisconnected() { return mIsDisconnected; }
+
 };
 
 #endif

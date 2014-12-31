@@ -23,13 +23,12 @@ ZoneConnection::~ZoneConnection()
 
 void ZoneConnection::processInboundPackets()
 {
-	//uint32 reack_count = 0;
+	uint32 reack_count = 0;
 	for (;;)
 	{
 		try
 		{
 			int len = recvWithTimeout(3000);
-			/*int len = recvPacket();
 			if (len <= 0)
 			{
 				if (++reack_count == 150) //after approximately 3 seconds without a packet
@@ -41,7 +40,7 @@ void ZoneConnection::processInboundPackets()
 				gRenderer.sleep(20);
 				continue;
 			}
-			reack_count = 0;*/
+			reack_count = 0;
 
 			if (!mPacketReceiver->handleProtocol(len))
 				continue;
@@ -322,4 +321,5 @@ void ZoneConnection::sendCamp()
 {
 	Packet packet(0, OP_Camp, mAckMgr);
 	packet.send(this, getCRCKey());
+	g_EqState = World;
 }
