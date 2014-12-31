@@ -8,26 +8,54 @@ WorldConnection::WorldConnection(LoginConnection* login) :
 	inheritSession(login);
 }
 
-void WorldConnection::processInboundPackets()
+void WorldConnection::process()
 {
-	for (;;)
+	connect();
+	while(g_EqState == World)
 	{
-		int len = recvWithTimeout(3000);
-		if (!mPacketReceiver->handleProtocol(len))
-			continue;
-		//else we have some packets to process here
-		std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
-		while (!queue.empty())
+		bool Disconnected = processPacketQueue();
+		if(Disconnected)
 		{
-			ReadPacket* packet = queue.front();
-			queue.pop();
-			uint16 opcode = *(uint16*)packet->data;
-			bool ret = processPacket(opcode, packet->data + 2, packet->len - 2);
-			delete packet;
-			if (ret)
-				return;
+			g_EqState = Login;
+			return;
 		}
 	}
+}
+
+
+bool WorldConnection::processPacketQueue()
+{
+	if(mPacketReceiver->GetDisconnected())
+		return true;
+
+	int len = recvWithTimeout(5000);
+
+	if(len == 0)
+	{
+		mPacketReceiver->SetDisconnected(true);
+		return true;
+	}
+
+	if (!mPacketReceiver->handleProtocol(len))
+	{
+		return false;
+	}
+
+	//else we have some packets to process here
+	std::queue<ReadPacket*>& queue = mAckMgr->getPacketQueue();
+	while (!queue.empty())
+	{
+		ReadPacket* packet = queue.front();
+		queue.pop();
+		uint16 opcode = *(uint16*)packet->data;
+		bool ret = processPacket(opcode, packet->data + 2, packet->len - 2);
+		if(!ret)
+		{
+			printf("Invalid packet in world state.\n");
+		}
+		delete packet;
+	}
+	return false;
 }
 
 bool WorldConnection::processPacket(uint16 opcode, byte* data, uint32 len)
@@ -72,6 +100,13 @@ bool WorldConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 				printf("%s\n", mCharacters.name[i]);
 		}
 
+		bool returnVal = zoneInCharacter();
+		if(!returnVal)
+		{
+			printf("Character is not available:\n");
+			g_EqState = Login;
+			return returnVal;
+		}
 		return true;
 	}
 	case OP_ExpansionInfo:
@@ -107,7 +142,8 @@ bool WorldConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		memcpy(&mZoneServer, data, sizeof(ZoneServerInfo_Struct));
 
 		printf("Received ZoneServerInfo: %s : %u\n", mZoneServer.ip, mZoneServer.port);
-		return true;
+		g_EqState = Zone;
+		break;
 	}
 	//packets we don't care about
 	case OP_ApproveWorld: //nothing meaningful
@@ -116,10 +152,10 @@ bool WorldConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		break;
 	default:
 		printf("WorldConnection received unknown opcode 0x%0.4X\n", opcode);
-		break;
+		return false;
 	}
 
-	return false;
+	return true;
 }
 
 void WorldConnection::connect()
@@ -135,8 +171,6 @@ void WorldConnection::connect()
 	memcpy(&li->login_info[strlen(li->login_info) + 1], getSessionKey().c_str(), getSessionKey().length());
 
 	packet.send(this, getCRCKey());
-
-	processInboundPackets();
 }
 
 bool WorldConnection::hasCharacter(std::string name)
@@ -149,15 +183,15 @@ bool WorldConnection::hasCharacter(std::string name)
 	return false;
 }
 
-void WorldConnection::zoneInCharacter(std::string name, bool tutorial, bool gohome)
+bool WorldConnection::zoneInCharacter(bool tutorial, bool gohome)
 {
-	if (!hasCharacter(name))
-		throw NotFoundException();
+	if (!hasCharacter(mCharacterName))
+		return false;
 
 	Packet packet(sizeof(EnterWorld_Struct), OP_EnterWorld, mAckMgr);
 	EnterWorld_Struct* ew = (EnterWorld_Struct*)packet.getDataBuffer();
 
-	Util::strcpy(ew->name, name.c_str(), 64);
+	Util::strcpy(ew->name, mCharacterName.c_str(), 64);
 
 	if (tutorial)
 		ew->tutorial = 1;
@@ -165,14 +199,10 @@ void WorldConnection::zoneInCharacter(std::string name, bool tutorial, bool goho
 		ew->return_home = 1;
 
 	packet.send(this, getCRCKey());
-
-	mCharacterName = name;
-
-	processInboundPackets();
+	return true;
 }
 
 void WorldConnection::quickZoneInCharacter(std::string name)
 {
-	connect();
-	zoneInCharacter(name);
+	this->setCharacterName(name);
 }

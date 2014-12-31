@@ -104,6 +104,7 @@ void Mob::setHeading(float heading)
 		else
 			heading -= 270.0f;
 	}
+	if(mNode)
 	mNode->setRotation(core::vector3df(0.0f, heading, 0.0f));
 }
 
@@ -158,7 +159,10 @@ void Mob::updatePosition(MobPositionUpdate_Struct* update)
 	else
 	{
 		//we're teleporting
+		if(mNode)
+		{
 		mNode->setPosition(pos);
+		}
 		setHeading(Util::unpackHeading(update->heading));
 	}
 }

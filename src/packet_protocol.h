@@ -27,6 +27,7 @@ struct SessionResponse
 
 struct SessionStat
 {
+	uint16 opcode;
 	uint16 requestID;
 	uint32 last_local_delta;
 	uint32 average_delta;
