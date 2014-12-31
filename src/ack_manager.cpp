@@ -8,7 +8,8 @@ AckManager::AckManager(Socket* socket) :
 	mNextSeq(65535),
 	mExpectedSeq(0),
 	mLastReceivedAck(65535),
-	mBuildingFrag(false)
+	mBuildingFrag(false),
+	mFragEndReceived(false)
 {
 	memset(mFuturePackets, 0, sizeof(ReadPacket*) * SEQUENCE_MAX);
 	memset(mSentPackets, 0, sizeof(Packet*) * SEQUENCE_MAX);
@@ -95,15 +96,21 @@ void AckManager::checkInboundFragment(byte* packet, uint32 len)
 		startFragSequence(packet, seq);
 		mFuturePackets[seq] = new ReadPacket(packet, len);
 
-		checkFragmentComplete();
+		if (mFragEndReceived)
+			checkFragmentComplete();
 	}
 	case SEQUENCE_FUTURE:
 	{
 		//future packet: remember it for later
 		mFuturePackets[seq] = new ReadPacket(packet, len);
+
+		if (!mFragEndReceived && seq == (mFragEnd - 1))
+			mFragEndReceived = true;
+
 		if (mBuildingFrag)
 		{
-			checkFragmentComplete();
+			if (mFragEndReceived)
+				checkFragmentComplete();
 			//if we didn't finish a packet...
 			if (mBuildingFrag && (seq - mFragMilestone) >= 10)
 			{
@@ -166,6 +173,7 @@ void AckManager::checkFragmentComplete()
 	//clean up
 	mExpectedSeq = i;
 	mBuildingFrag = false;
+	mFragEndReceived = false;
 	sendAck(i - 1);
 
 	checkAfterPacket();
@@ -186,7 +194,9 @@ void AckManager::checkAfterPacket()
 		if (opcode == OP_Fragment)
 		{
 			startFragSequence(nextPacket->data, i);
-			checkFragmentComplete();
+			if (mFragEndReceived)
+				checkFragmentComplete();
+			return;
 		}
 		else
 		{
@@ -235,15 +245,15 @@ void AckManager::sendSessionDisconnect()
 
 void AckManager::sendMaxTimeoutLengthRequest()
 {
-	Packet packet(sizeof(SessionStat), OP_NONE, nullptr, OP_SessionStatRequest, true, false);
-	SessionStat* ss = (SessionStat*)packet.getDataBuffer();
+	SessionStat ss;
 
+	ss.opcode = toNetworkShort(OP_SessionStatRequest);
 	//having a high value here maxes out the timeout window to 5 seconds, so we don't have to spam acks quite so much
-	ss->last_local_delta = toNetworkLong(5000000);
+	ss.last_local_delta = toNetworkLong(5000000);
 	//while this one decreases the amount of time the server waits between sending us strings of queued packets
-	ss->average_delta = toNetworkLong(25);
+	ss.average_delta = toNetworkLong(25);
 
-	packet.send(mSocket, mCRCKey);
+	mSocket->sendPacket(&ss, sizeof(SessionStat));
 }
 
 void AckManager::queueRawPacket(byte* packet, uint32 len)
@@ -296,4 +306,10 @@ void AckManager::startFragSequence(byte* data, uint16 seq)
 	uint32 size = toHostLong(*(uint32*)(data + 4));
 	//max packet size is 512 - 6 = 506
 	mFragEnd = seq + (size / 506) + 1;
+	//if it's an exact multiple we just overshot it by 1
+	if (size % 506 == 0)
+		--mFragEnd;
+	//check if we've already received the last frag
+	if (mFuturePackets[mFragEnd - 1])
+		mFragEndReceived = true;
 }

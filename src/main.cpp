@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 		{
 			std::string shortname = args.zoneShortname;
 
-			gRenderer.loadGUIDocument("gui/viewer.rml");
+			gRenderer.loadGUI(Renderer::GUI_VIEWER);
 			gPlayer.setZoneViewer(new ZoneViewerData);
 
 			ZoneModel* zoneModel = ZoneModel::load(shortname);
@@ -92,20 +92,6 @@ int main(int argc, char** argv)
 				throw ZEQException("bad zone shortname '%s'", shortname.c_str());
 
 			gRenderer.useZoneModel(zoneModel);
-
-			WLD* wld;
-			wld = gFileLoader.getWLD("global_chr");
-			wld->convertMobModel("ELE");
-
-			//gFileLoader.handleGlobalLoad();
-
-			Mob* mob = gMobMgr.spawnMob(75, 2, 1, 5, 5, 5);
-			//mob->startAnimation("T06");
-
-			//wld = gFileLoader.getWLD("dra_chr");
-			//wld->convertMobModel("DRA");
-
-			//gMobMgr.spawnMob(49, 2, 1, 20, 5, 20);
 
 			gInput.setMode(Input::ZONE_VIEWER);
 			gPlayer.setCamera(gRenderer.createCamera());

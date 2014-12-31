@@ -75,14 +75,24 @@ public:
 	Rocket::Core::Context* getGUIContext() { return mGUIContext; }
 	Rocket::Core::ElementDocument* getGUIDocument() { return mGUIDocument; }
 
-	void loadGUIDocument(Rocket::Core::String path);
-
 	float loopStep();
 	void resetInternalTimer();
 	void useZoneModel(ZoneModel* zoneModel);
 	void checkAnimatedTextures(uint32 delta);
 
 	static scene::SMesh* copyMesh(scene::SMesh* mesh);
+
+	enum GUIType
+	{
+		GUI_SPLASH,
+		GUI_CREDENTIALS,
+		GUI_SERVER_LIST,
+		GUI_CHAR_SELECT,
+		GUI_ZONE,
+		GUI_VIEWER
+	};
+
+	void loadGUI(GUIType guiType);
 };
 
 

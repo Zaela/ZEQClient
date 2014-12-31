@@ -51,10 +51,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>"include\irrlicht\";"include\freeimage\";"include\zlib\";"include\cryptopp562\";"include\lua\";"include\";</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib.lib;lua5.1.lib;RocketCore.lib;RocketControls.lib;RocketCoreLua.lib;RocketControlsLua.lib;RocketDebugger.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;Irrlicht_d.lib;FreeImage.lib;zdll.lib;ws2_32.lib;cryptlib_d.lib;lua5.1.lib;RocketCore.lib;RocketControls.lib;RocketCoreLua.lib;RocketControlsLua.lib;RocketDebugger.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>"lib\";</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -83,9 +87,6 @@
     <ClCompile Include="src\eqstr.cpp" />
     <ClCompile Include="src\file_loader.cpp" />
     <ClCompile Include="src\input.cpp" />
-    <ClCompile Include="src\irr\CBoneSceneNode.cpp" />
-    <ClCompile Include="src\irr\CSkinnedMesh.cpp" />
-    <ClCompile Include="src\irr\os.cpp" />
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mob.cpp" />

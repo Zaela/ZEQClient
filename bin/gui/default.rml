@@ -1,8 +1,30 @@
 <rml>
 <head>
 	<link type="text/rcss" href="css/default.rcss"/>
+	<style>
+		div#chatbox {
+			display: block;
+			width: 400px;
+			height: 200px;
+			padding: 5px 10px;
+			overflow: hidden;
+		}
+		div#chattext {
+			background-color: rgba(0, 0, 0, 0);
+			height: 100%;
+		}
+	</style>
 </head>
 <body>
+	<!--<handle move_target="#document">
+	<div id="chatbox">
+		<div id="chattext">
+			Stuff, things, and words<br/>
+			Blahblahblahblahblahblahblahblahblahblahblah blahblahblah blah blah<br/>
+			B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>
+		</div>
+	</div>
+	</handle>-->
 
 </body>
 </rml>

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\Irr">
-      <UniqueIdentifier>{378d1ada-939f-4104-bdc1-4903f4f29f38}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -77,15 +74,6 @@
     </ClCompile>
     <ClCompile Include="src\animated_texture.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\irr\CBoneSceneNode.cpp">
-      <Filter>Source Files\Irr</Filter>
-    </ClCompile>
-    <ClCompile Include="src\irr\CSkinnedMesh.cpp">
-      <Filter>Source Files\Irr</Filter>
-    </ClCompile>
-    <ClCompile Include="src\irr\os.cpp">
-      <Filter>Source Files\Irr</Filter>
     </ClCompile>
     <ClCompile Include="src\model.cpp">
       <Filter>Source Files</Filter>
@@ -279,9 +267,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rocket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\eq_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

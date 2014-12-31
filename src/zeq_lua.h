@@ -50,6 +50,7 @@ namespace Lua
 
 	void loadFontsGUI();
 	Rocket::Core::Context* initGUI(int width, int height);
+	Rocket::Core::ElementDocument* initGUIDocument(const char* path);
 }
 
 #endif

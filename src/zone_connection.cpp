@@ -122,6 +122,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		gRenderer.useZoneModel(zoneModel);
 		mAckMgr->sendKeepAliveAck();
 		gFileLoader.handleZoneChr(nz->zone_short_name);
+		gRenderer.loadGUI(Renderer::GUI_ZONE);
 
 		//send client spawn request
 		Packet packet(0, OP_ReqClientSpawn, mAckMgr);

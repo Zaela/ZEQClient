@@ -1,12 +1,9 @@
-﻿Build started 2014-12-06 3:47:17 AM.
-     1>Project "C:\Users\Samuel\Downloads\cryptopp562\cryptlib.vcxproj" on node 2 (Build target(s)).
-     1>CustomBuild:
-         Performing Custom Build Tools
-                 1 file(s) copied.
-       ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oi /Oy- /D _DEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D _VC80_UPGRADE=0x0710 /Gm- /EHsc /MTd /GS /arch:SSE /fp:precise /Zc:wchar_t /Zc:forScope /Yc"pch.h" /Fp"Win32\cryptlib\Debug\cryptlib.pch" /Fo"Win32\cryptlib\Debug\\" /Fd"Win32\Output\Debug\vc80.pdb" /Gd /TP /analyze- /errorReport:prompt pch.cpp
+﻿Build started 2014-12-31 7:21:14 AM.
+     1>Project "C:\Users\Samuel\Desktop\ZEQClient\include\cryptopp562\cryptlib.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oi /Oy- /D _DEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D _VC80_UPGRADE=0x0710 /Gm- /EHsc /MTd /GS /arch:SSE /fp:precise /Zc:wchar_t /Zc:forScope /Yc"pch.h" /Fp"Win32\cryptlib\Debug\cryptlib.pch" /Fo"Win32\cryptlib\Debug\\" /Fd"Win32\Output\Debug\cryptlib_d.pdb" /Gd /TP /analyze- /errorReport:prompt pch.cpp
          pch.cpp
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oi /Oy- /D _DEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D _VC80_UPGRADE=0x0710 /Gm- /EHsc /MTd /GS /arch:SSE /fp:precise /Zc:wchar_t /Zc:forScope /Yu"pch.h" /Fp"Win32\cryptlib\Debug\cryptlib.pch" /Fo"Win32\cryptlib\Debug\\" /Fd"Win32\Output\Debug\vc80.pdb" /Gd /TP /analyze- /errorReport:prompt 3way.cpp adler32.cpp algebra.cpp algparam.cpp arc4.cpp asn.cpp authenc.cpp base32.cpp base64.cpp basecode.cpp bfinit.cpp blowfish.cpp blumshub.cpp camellia.cpp cast.cpp casts.cpp cbcmac.cpp ccm.cpp channels.cpp cmac.cpp cpu.cpp crc.cpp cryptlib.cpp default.cpp des.cpp dessp.cpp dh.cpp dh2.cpp dsa.cpp eax.cpp ec2n.cpp ecp.cpp elgamal.cpp emsa2.cpp esign.cpp files.cpp filters.cpp fips140.cpp fipstest.cpp gcm.cpp gf256.cpp gf2n.cpp gf2_32.cpp gfpcrypt.cpp gost.cpp gzip.cpp hex.cpp hmac.cpp hrtimer.cpp ida.cpp idea.cpp integer.cpp luc.cpp mars.cpp marss.cpp md2.cpp md4.cpp md5.cpp misc.cpp modes.cpp mqueue.cpp mqv.cpp nbtheory.cpp network.cpp oaep.cpp osrng.cpp panama.cpp pkcspad.cpp polynomi.cpp pssr.cpp pubkey.cpp queue.cpp rabin.cpp randpool.cpp rc2.cpp rc5.cpp rc6.cpp rdtables.cpp rijndael.cpp ripemd.cpp rng.cpp rsa.cpp rw.cpp safer.cpp salsa.cpp seal.cpp seed.cpp serpent.cpp sha.cpp sha3.cpp shacal2.cpp shark.cpp sharkbox.cpp simple.cpp skipjack.cpp socketft.cpp sosemanuk.cpp square.cpp squaretb.cpp strciphr.cpp tea.cpp tftables.cpp tiger.cpp tigertab.cpp trdlocal.cpp ttmac.cpp twofish.cpp vmac.cpp wait.cpp wake.cpp whrlpool.cpp winpipes.cpp xtr.cpp xtrcrypt.cpp zdeflate.cpp zinflate.cpp zlib.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oi /Oy- /D _DEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D _VC80_UPGRADE=0x0710 /Gm- /EHsc /MTd /GS /arch:SSE /fp:precise /Zc:wchar_t /Zc:forScope /Yu"pch.h" /Fp"Win32\cryptlib\Debug\cryptlib.pch" /Fo"Win32\cryptlib\Debug\\" /Fd"Win32\Output\Debug\cryptlib_d.pdb" /Gd /TP /analyze- /errorReport:prompt 3way.cpp adler32.cpp algebra.cpp algparam.cpp arc4.cpp asn.cpp authenc.cpp base32.cpp base64.cpp basecode.cpp bfinit.cpp blowfish.cpp blumshub.cpp camellia.cpp cast.cpp casts.cpp cbcmac.cpp ccm.cpp channels.cpp cmac.cpp cpu.cpp crc.cpp cryptlib.cpp default.cpp des.cpp dessp.cpp dh.cpp dh2.cpp dsa.cpp eax.cpp ec2n.cpp ecp.cpp elgamal.cpp emsa2.cpp esign.cpp files.cpp filters.cpp fips140.cpp fipstest.cpp gcm.cpp gf256.cpp gf2_32.cpp gf2n.cpp gfpcrypt.cpp gost.cpp gzip.cpp hex.cpp hmac.cpp hrtimer.cpp ida.cpp idea.cpp integer.cpp luc.cpp mars.cpp marss.cpp md2.cpp md4.cpp md5.cpp misc.cpp modes.cpp mqueue.cpp mqv.cpp nbtheory.cpp network.cpp oaep.cpp osrng.cpp panama.cpp pkcspad.cpp polynomi.cpp pssr.cpp pubkey.cpp queue.cpp rabin.cpp randpool.cpp rc2.cpp rc5.cpp rc6.cpp rdtables.cpp rijndael.cpp ripemd.cpp rng.cpp rsa.cpp rw.cpp safer.cpp salsa.cpp seal.cpp seed.cpp serpent.cpp sha.cpp sha3.cpp shacal2.cpp shark.cpp sharkbox.cpp simple.cpp skipjack.cpp socketft.cpp sosemanuk.cpp square.cpp squaretb.cpp strciphr.cpp tea.cpp tftables.cpp tiger.cpp tigertab.cpp trdlocal.cpp ttmac.cpp twofish.cpp vmac.cpp wait.cpp wake.cpp whrlpool.cpp winpipes.cpp xtr.cpp xtrcrypt.cpp zdeflate.cpp zinflate.cpp zlib.cpp
          3way.cpp
          adler32.cpp
          algebra.cpp
@@ -48,8 +45,223 @@
          filters.cpp
          fips140.cpp
          fipstest.cpp
-     1>Done Building Project "C:\Users\Samuel\Downloads\cryptopp562\cryptlib.vcxproj" (Build target(s)) -- FAILED.
+         gcm.cpp
+         Generating Code...
+         Compiling...
+         gf256.cpp
+         gf2_32.cpp
+         gf2n.cpp
+         gfpcrypt.cpp
+         gost.cpp
+         gzip.cpp
+         hex.cpp
+         hmac.cpp
+         hrtimer.cpp
+         ida.cpp
+         idea.cpp
+         integer.cpp
+         luc.cpp
+         mars.cpp
+         marss.cpp
+         md2.cpp
+         md4.cpp
+         md5.cpp
+         misc.cpp
+         modes.cpp
+         Generating Code...
+         Compiling...
+         mqueue.cpp
+         mqv.cpp
+         nbtheory.cpp
+         network.cpp
+         oaep.cpp
+         osrng.cpp
+         panama.cpp
+         pkcspad.cpp
+         polynomi.cpp
+         pssr.cpp
+         pubkey.cpp
+         queue.cpp
+         rabin.cpp
+         randpool.cpp
+         rc2.cpp
+         rc5.cpp
+         rc6.cpp
+         rdtables.cpp
+         rijndael.cpp
+         ripemd.cpp
+         Generating Code...
+         Compiling...
+         rng.cpp
+         rsa.cpp
+         rw.cpp
+         safer.cpp
+         salsa.cpp
+         seal.cpp
+         seed.cpp
+         serpent.cpp
+         sha.cpp
+         sha3.cpp
+         shacal2.cpp
+         shark.cpp
+         sharkbox.cpp
+         simple.cpp
+         skipjack.cpp
+         socketft.cpp
+         sosemanuk.cpp
+         square.cpp
+         squaretb.cpp
+         strciphr.cpp
+         Generating Code...
+         Compiling...
+         tea.cpp
+         tftables.cpp
+         tiger.cpp
+         tigertab.cpp
+         trdlocal.cpp
+         ttmac.cpp
+         twofish.cpp
+         vmac.cpp
+         wait.cpp
+         wake.cpp
+         whrlpool.cpp
+         winpipes.cpp
+         xtr.cpp
+         xtrcrypt.cpp
+         zdeflate.cpp
+         zinflate.cpp
+         zlib.cpp
+         Generating Code...
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oi /Oy- /D _DEBUG /D _WINDOWS /D USE_PRECOMPILED_HEADERS /D WIN32 /D _VC80_UPGRADE=0x0710 /Gm- /EHsc /MTd /GS /arch:SSE /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Win32\cryptlib\Debug\\" /Fd"Win32\Output\Debug\cryptlib_d.pdb" /Gd /TP /analyze- /errorReport:prompt dll.cpp iterhash.cpp
+         dll.cpp
+         iterhash.cpp
+         Generating Code...
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1299,5): warning MSB8012: TargetPath(C:\Users\Samuel\Desktop\ZEQClient\include\cryptopp562\Win32\Output\Debug\cryptlib.lib) does not match the Library's OutputFile property value (C:\Users\Samuel\Desktop\ZEQClient\include\cryptopp562\Win32\Output\Debug\cryptlib_d.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V110\Microsoft.CppBuild.targets(1301,5): warning MSB8012: TargetName(cryptlib) does not match the Library's OutputFile property value (cryptlib_d). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"Win32\Output\Debug\cryptlib_d.lib" /NOLOGO Win32\cryptlib\Debug\3way.obj
+         Win32\cryptlib\Debug\adler32.obj
+         Win32\cryptlib\Debug\algebra.obj
+         Win32\cryptlib\Debug\algparam.obj
+         Win32\cryptlib\Debug\arc4.obj
+         Win32\cryptlib\Debug\asn.obj
+         Win32\cryptlib\Debug\authenc.obj
+         Win32\cryptlib\Debug\base32.obj
+         Win32\cryptlib\Debug\base64.obj
+         Win32\cryptlib\Debug\basecode.obj
+         Win32\cryptlib\Debug\bfinit.obj
+         Win32\cryptlib\Debug\blowfish.obj
+         Win32\cryptlib\Debug\blumshub.obj
+         Win32\cryptlib\Debug\camellia.obj
+         Win32\cryptlib\Debug\cast.obj
+         Win32\cryptlib\Debug\casts.obj
+         Win32\cryptlib\Debug\cbcmac.obj
+         Win32\cryptlib\Debug\ccm.obj
+         Win32\cryptlib\Debug\channels.obj
+         Win32\cryptlib\Debug\cmac.obj
+         Win32\cryptlib\Debug\cpu.obj
+         Win32\cryptlib\Debug\crc.obj
+         Win32\cryptlib\Debug\cryptlib.obj
+         Win32\cryptlib\Debug\default.obj
+         Win32\cryptlib\Debug\des.obj
+         Win32\cryptlib\Debug\dessp.obj
+         Win32\cryptlib\Debug\dh.obj
+         Win32\cryptlib\Debug\dh2.obj
+         Win32\cryptlib\Debug\dll.obj
+         Win32\cryptlib\Debug\dsa.obj
+         Win32\cryptlib\Debug\eax.obj
+         Win32\cryptlib\Debug\ec2n.obj
+         Win32\cryptlib\Debug\ecp.obj
+         Win32\cryptlib\Debug\elgamal.obj
+         Win32\cryptlib\Debug\emsa2.obj
+         Win32\cryptlib\Debug\esign.obj
+         Win32\cryptlib\Debug\files.obj
+         Win32\cryptlib\Debug\filters.obj
+         Win32\cryptlib\Debug\fips140.obj
+         Win32\cryptlib\Debug\fipstest.obj
+         Win32\cryptlib\Debug\gcm.obj
+         Win32\cryptlib\Debug\gf256.obj
+         Win32\cryptlib\Debug\gf2_32.obj
+         Win32\cryptlib\Debug\gf2n.obj
+         Win32\cryptlib\Debug\gfpcrypt.obj
+         Win32\cryptlib\Debug\gost.obj
+         Win32\cryptlib\Debug\gzip.obj
+         Win32\cryptlib\Debug\hex.obj
+         Win32\cryptlib\Debug\hmac.obj
+         Win32\cryptlib\Debug\hrtimer.obj
+         Win32\cryptlib\Debug\ida.obj
+         Win32\cryptlib\Debug\idea.obj
+         Win32\cryptlib\Debug\integer.obj
+         Win32\cryptlib\Debug\iterhash.obj
+         Win32\cryptlib\Debug\luc.obj
+         Win32\cryptlib\Debug\mars.obj
+         Win32\cryptlib\Debug\marss.obj
+         Win32\cryptlib\Debug\md2.obj
+         Win32\cryptlib\Debug\md4.obj
+         Win32\cryptlib\Debug\md5.obj
+         Win32\cryptlib\Debug\misc.obj
+         Win32\cryptlib\Debug\modes.obj
+         Win32\cryptlib\Debug\mqueue.obj
+         Win32\cryptlib\Debug\mqv.obj
+         Win32\cryptlib\Debug\nbtheory.obj
+         Win32\cryptlib\Debug\network.obj
+         Win32\cryptlib\Debug\oaep.obj
+         Win32\cryptlib\Debug\osrng.obj
+         Win32\cryptlib\Debug\panama.obj
+         Win32\cryptlib\Debug\pch.obj
+         Win32\cryptlib\Debug\pkcspad.obj
+         Win32\cryptlib\Debug\polynomi.obj
+         Win32\cryptlib\Debug\pssr.obj
+         Win32\cryptlib\Debug\pubkey.obj
+         Win32\cryptlib\Debug\queue.obj
+         Win32\cryptlib\Debug\rabin.obj
+         Win32\cryptlib\Debug\randpool.obj
+         Win32\cryptlib\Debug\rc2.obj
+         Win32\cryptlib\Debug\rc5.obj
+         Win32\cryptlib\Debug\rc6.obj
+         Win32\cryptlib\Debug\rdtables.obj
+         Win32\cryptlib\Debug\rijndael.obj
+         Win32\cryptlib\Debug\ripemd.obj
+         Win32\cryptlib\Debug\rng.obj
+         Win32\cryptlib\Debug\rsa.obj
+         Win32\cryptlib\Debug\rw.obj
+         Win32\cryptlib\Debug\safer.obj
+         Win32\cryptlib\Debug\salsa.obj
+         Win32\cryptlib\Debug\seal.obj
+         Win32\cryptlib\Debug\seed.obj
+         Win32\cryptlib\Debug\serpent.obj
+         Win32\cryptlib\Debug\sha.obj
+         Win32\cryptlib\Debug\sha3.obj
+         Win32\cryptlib\Debug\shacal2.obj
+         Win32\cryptlib\Debug\shark.obj
+         Win32\cryptlib\Debug\sharkbox.obj
+         Win32\cryptlib\Debug\simple.obj
+         Win32\cryptlib\Debug\skipjack.obj
+         Win32\cryptlib\Debug\socketft.obj
+         Win32\cryptlib\Debug\sosemanuk.obj
+         Win32\cryptlib\Debug\square.obj
+         Win32\cryptlib\Debug\squaretb.obj
+         Win32\cryptlib\Debug\strciphr.obj
+         Win32\cryptlib\Debug\tea.obj
+         Win32\cryptlib\Debug\tftables.obj
+         Win32\cryptlib\Debug\tiger.obj
+         Win32\cryptlib\Debug\tigertab.obj
+         Win32\cryptlib\Debug\trdlocal.obj
+         Win32\cryptlib\Debug\ttmac.obj
+         Win32\cryptlib\Debug\twofish.obj
+         Win32\cryptlib\Debug\vmac.obj
+         Win32\cryptlib\Debug\wait.obj
+         Win32\cryptlib\Debug\wake.obj
+         Win32\cryptlib\Debug\whrlpool.obj
+         Win32\cryptlib\Debug\winpipes.obj
+         Win32\cryptlib\Debug\xtr.obj
+         Win32\cryptlib\Debug\xtrcrypt.obj
+         Win32\cryptlib\Debug\zdeflate.obj
+         Win32\cryptlib\Debug\zinflate.obj
+         Win32\cryptlib\Debug\zlib.obj
+         cryptlib.vcxproj -> C:\Users\Samuel\Desktop\ZEQClient\include\cryptopp562\Win32\Output\Debug\cryptlib.lib
+     1>Done Building Project "C:\Users\Samuel\Desktop\ZEQClient\include\cryptopp562\cryptlib.vcxproj" (Build target(s)).
 
-Build FAILED.
+Build succeeded.
 
-Time Elapsed 00:00:12.26
+Time Elapsed 00:00:41.15

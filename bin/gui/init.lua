@@ -1,4 +1,6 @@
 
+package.path = package.path .. ";./gui/?.lua;./gui/lua/?.lua"
+
 r = {}
 
 local dim = Vector2i.new(screenWidth, screenHeight)

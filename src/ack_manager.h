@@ -26,6 +26,7 @@ private:
 
 	//fragment-related
 	bool mBuildingFrag;
+	bool mFragEndReceived;
 	uint16 mFragStart;
 	uint16 mFragEnd;
 	uint16 mFragMilestone;

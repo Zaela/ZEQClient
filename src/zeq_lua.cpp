@@ -274,4 +274,14 @@ namespace Lua
 		lua_pop(L, 1);
 		return *cxt;
 	}
+
+	Rocket::Core::ElementDocument* initGUIDocument(const char* path)
+	{
+		if (!dofile(L, path, 1))
+			return nullptr;
+
+		Rocket::Core::ElementDocument** doc = (Rocket::Core::ElementDocument**)lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		return *doc;
+	}
 }

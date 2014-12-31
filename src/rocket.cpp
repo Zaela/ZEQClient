@@ -110,12 +110,12 @@ void RocketRenderer::ReleaseTexture(Rocket::Core::TextureHandle texture)
 
 void RocketRenderer::EnableScissorRegion(bool enable)
 {
-
+	gRenderer.getVideoDriver()->enableScissor(enable);
 }
 
 void RocketRenderer::SetScissorRegion(int x, int y, int width, int height)
 {
-
+	gRenderer.getVideoDriver()->setScissorRect(x, y, width, height);
 }
 
 float RocketRenderer::GetHorizontalTexelOffset()

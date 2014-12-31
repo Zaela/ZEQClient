@@ -356,16 +356,18 @@ scene::SMesh* Renderer::copyMesh(scene::SMesh* mesh)
 	return copy;
 }
 
-void Renderer::loadGUIDocument(Rocket::Core::String path)
+void Renderer::loadGUI(GUIType guiType)
 {
 	if (mGUIDocument)
 		mGUIContext->UnloadDocument(mGUIDocument);
 
-	mGUIDocument = mGUIContext->LoadDocument(path);
-	if (mGUIDocument)
+	switch (guiType)
 	{
-		mGUIDocument->SetId(path);
-		mGUIDocument->Show();
-		mGUIDocument->RemoveReference();
+	case GUI_ZONE:
+		mGUIDocument = Lua::initGUIDocument("gui/lua/initZone.lua");
+		break;
+	case GUI_VIEWER:
+		mGUIDocument = Lua::initGUIDocument("gui/lua/initViewer.lua");
+		break;
 	}
 }
