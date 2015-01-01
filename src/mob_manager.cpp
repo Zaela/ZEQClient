@@ -60,7 +60,10 @@ Mob* MobManager::spawnMob(int race_id, int gender, int level, float x, float y, 
 
 Mob* MobManager::spawnMob(Spawn_Struct* spawn)
 {
-	MobPrototypeWLD* proto = getModelPrototype(spawn->race, spawn->gender);
+	MobPrototypeWLD* proto = nullptr;
+	
+	if (modelPrototypeLoaded(spawn->race, spawn->gender))
+		proto = getModelPrototype(spawn->race, spawn->gender);
 
 	mMobPositionList.push_back(MobPosition(
 		Util::EQ19toFloat(spawn->y),
@@ -70,8 +73,15 @@ Mob* MobManager::spawnMob(Spawn_Struct* spawn)
 
 	MobEntry ent;
 	ent.entity_id = spawn->spawnId;
-	ent.ptr = new Mob(spawn, proto->skeleton, &mMobPositionList.back(),
-		proto->heads.size() ? proto->heads[0] : nullptr);
+	if (proto)
+	{
+		ent.ptr = new Mob(spawn, proto->skeleton, &mMobPositionList.back(),
+			proto->heads.size() ? proto->heads[0] : nullptr);
+	}
+	else
+	{
+		ent.ptr = new Mob(spawn);
+	}
 
 	mMobList.push_back(ent);
 	printf("spawning race %i gender %i at %g, %g, %g - %s\n", spawn->race, spawn->gender, Util::EQ19toFloat(spawn->y),
@@ -171,4 +181,17 @@ void MobManager::handlePositionUpdate(MobPositionUpdate_Struct* update)
 		mob->updatePosition(update);
 	else if (isPlayer)
 		return; //handle
+}
+
+void MobManager::correctPrematureSpawns()
+{
+	for (uint32 i = 0; i < mMobList.size(); ++i)
+	{
+		Mob* mob = mMobList[i].ptr;
+		if (mob->hasSkeleton())
+			continue;
+
+		MobPrototypeWLD* proto = getModelPrototype(mob->getRace(), mob->getGender());
+		mob->initSkeleton(proto->skeleton, &mMobPositionList[i], proto->heads.size() ? proto->heads[0] : nullptr);
+	}
 }

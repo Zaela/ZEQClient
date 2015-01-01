@@ -122,7 +122,12 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		gRenderer.useZoneModel(zoneModel);
 		mAckMgr->sendKeepAliveAck();
 		gFileLoader.handleZoneChr(nz->zone_short_name);
-		gRenderer.loadGUI(Renderer::GUI_ZONE);
+		mAckMgr->sendKeepAliveAck();
+		gMobMgr.correctPrematureSpawns();
+
+		std::string msg = "Entering ";
+		msg += nz->zone_long_name;
+		GUI::addChat(0, msg.c_str());
 
 		//send client spawn request
 		Packet packet(0, OP_ReqClientSpawn, mAckMgr);
@@ -247,6 +252,9 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		std::string str;
 		EQStr::formatString(str, fm->string_id, fm->message);
 		printf("%s\n", str.c_str());
+
+		GUI::addChat(fm->type, str.c_str());
+
 		break;
 	}
 	case OP_SpecialMesg:
@@ -258,6 +266,9 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		const char* speaker = sm->sayer;
 		const char* msg = sm->sayer + strlen(speaker) + 13;
 		printf("OP_SpecialMesg: speaker %s says %s\n", speaker, msg);
+
+		GUI::addChat(sm->msg_type, msg);
+
 		break;
 	}
 	//packets we don't care about for now

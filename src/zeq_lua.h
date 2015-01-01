@@ -48,9 +48,14 @@ namespace Lua
 	bool getConfigBool(const char* varname);
 	bool getConfigBool(const char* varname, bool default);
 
-	void loadFontsGUI();
+	void loadFontsGUI(); //do this on the lua side instead
 	Rocket::Core::Context* initGUI(int width, int height);
 	Rocket::Core::ElementDocument* initGUIDocument(const char* path);
+}
+
+namespace GUI
+{
+	void addChat(int channel, const char* message);
 }
 
 #endif

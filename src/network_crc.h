@@ -9,7 +9,7 @@ namespace NetworkCRC
 {
 	uint16 calc(void* data, int len, uint32 key);
 	uint16 calcOutbound(void* data, int len, uint32 key);
-	bool validatePacket(void* packet, int len, uint32 key);
+	bool validatePacket(void* packet, uint32& len, uint32 key);
 }
 
 #endif

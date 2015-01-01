@@ -285,3 +285,18 @@ namespace Lua
 		return *doc;
 	}
 }
+
+namespace GUI
+{
+	void addChat(int channel, const char* message)
+	{
+		lua_getglobal(L, "addChat");
+		lua_pushinteger(L, channel);
+		lua_pushstring(L, message);
+		if (lua_pcall(L, 2, 0, 0) != 0)
+		{
+			printf("Error: %s\n", lua_tostring(L, -1));
+			lua_pop(L, 1);
+		}
+	}
+}

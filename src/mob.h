@@ -27,6 +27,9 @@ private:
 	char mDisplayName[64];
 	char mRawName[64];
 
+	int mRace;
+	int mGender;
+
 	//boolean block
 	unsigned mInvertHeadingRace:1;
 	//end boolean block
@@ -35,17 +38,25 @@ private:
 	uint32 mExactMaxHP;
 	uint8 mPercentHP;
 
+private:
+	void readSpawnStruct(Spawn_Struct* spawn);
+
 public:
 	Mob(uint32 index, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head = nullptr);
 	Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head);
+	Mob(Spawn_Struct* spawn);
 	~Mob();
 
-	void init(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head = nullptr);
+	void initSkeleton(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head = nullptr);
 
 	void setHeading(float heading);
 
+	int getRace() { return mRace; }
+	int getGender() { return mGender; }
+
 	void animate(float delta);
 	void startAnimation(std::string id);
+	bool hasSkeleton() { return mSkeletonWLD != nullptr; }
 
 	void setIndex(uint32 i) { mIndex = i; }
 	void setName(const char* name);

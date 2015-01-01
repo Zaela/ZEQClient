@@ -13,7 +13,7 @@ Mob::Mob(uint32 index, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head) 
 	mLeftHandNode(nullptr),
 	mShieldNode(nullptr)
 {
-	init(skele, pos, head);
+	initSkeleton(skele, pos, head);
 	setName("test");
 }
 
@@ -24,13 +24,33 @@ Mob::Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton*
 	mLeftHandNode(nullptr),
 	mShieldNode(nullptr)
 {
-	init(skele, pos, head);
-	setName(spawn->name);
+	initSkeleton(skele, pos, head);
+	readSpawnStruct(spawn);
 
 	setHeading(Util::unpackHeading(spawn->heading));
 }
 
-void Mob::init(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head)
+Mob::Mob(Spawn_Struct* spawn) :
+	mIndex(spawn->spawnId),
+	mNode(nullptr),
+	mSkeletonWLD(nullptr),
+	mHeadSkeleWLD(nullptr),
+	mHeadNode(nullptr),
+	mRightHandNode(nullptr),
+	mLeftHandNode(nullptr),
+	mShieldNode(nullptr)
+{
+	readSpawnStruct(spawn);
+}
+
+void Mob::readSpawnStruct(Spawn_Struct* spawn)
+{
+	setName(spawn->name);
+	mRace = spawn->race;
+	mGender = spawn->gender;
+}
+
+void Mob::initSkeleton(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head)
 {
 	mSkeletonWLD = new WLDSkeletonInstance(gRenderer.copyMesh(skele->getReferenceMesh()), skele, this);
 	mSkeletonWLD->assumeBasePosition();

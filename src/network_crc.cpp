@@ -65,7 +65,7 @@ namespace NetworkCRC
 		return toNetworkShort(calc(data, len, key));
 	}
 
-	bool validatePacket(void* packet, int len, uint32 key)
+	bool validatePacket(void* packet, uint32& len, uint32 key)
 	{
 		if (key == 0)
 			return true;

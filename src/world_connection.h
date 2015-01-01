@@ -11,6 +11,7 @@
 #include "exception.h"
 #include "login_connection.h"
 #include "structs_titanium.h"
+#include "renderer.h"
 
 class WorldConnection : public Connection
 {

@@ -121,7 +121,6 @@ bool PacketReceiver::validateCompletePacket(byte*& packet, uint32& len)
 	if (!NetworkCRC::validatePacket(packet, len, mCRCKey))
 		return false;
 	//attempt to decompress
-	len -= 2; //crc
 	if (!Compression::decompressPacket(packet, len))
 		return false;
 	return true;

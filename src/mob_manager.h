@@ -59,6 +59,8 @@ public:
 	void despawnMob(int entity_id);
 	MobPosition* getMobPosition(uint32 index) { return &mMobPositionList[index]; }
 
+	void correctPrematureSpawns();
+
 	void animateNearbyMobs(float delta);
 
 	void handleHPUpdate(HPUpdate_Struct* update);

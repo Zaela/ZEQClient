@@ -7,24 +7,22 @@
 			width: 400px;
 			height: 200px;
 			padding: 5px 10px;
-			overflow: hidden;
+			padding-right: 0;
 		}
 		div#chattext {
+			display: block;
 			background-color: rgba(0, 0, 0, 0);
 			height: 100%;
+			overflow-y: scroll;
+			overflow-x: hidden;
 		}
 	</style>
 </head>
 <body>
-	<!--<handle move_target="#document">
-	<div id="chatbox">
-		<div id="chattext">
-			Stuff, things, and words<br/>
-			Blahblahblahblahblahblahblahblahblahblahblah blahblahblah blah blah<br/>
-			B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>B<br/>
+	<handle move_target="#document">
+		<div id="chatbox">
+			<div id="chattext"></div>
 		</div>
-	</div>
-	</handle>-->
-
+	</handle>
 </body>
 </rml>
