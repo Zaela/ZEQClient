@@ -55,7 +55,6 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Combined:
 	{
-		//printf("OP_Combined\n");
 		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 
@@ -66,6 +65,10 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 			uint8 size = data[pos];
 			++pos;
 
+			uint32 avail = len - pos;
+			if (size > avail)
+				size = avail;
+
 			readPacket(data + pos, size, true);
 			pos += size;
 		}
@@ -73,7 +76,6 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Packet:
 	{
-		//printf("OP_Packet\n");
 		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 
@@ -82,7 +84,6 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Fragment:
 	{
-		//printf("OP_Fragment\n");
 		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 
@@ -91,7 +92,6 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Ack:
 	{
-		//printf("OP_Ack\n");
 		if (!fromCombined && !validateCompletePacket(data, len))
 			break;
 

@@ -127,6 +127,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 
 		std::string msg = "Entering ";
 		msg += nz->zone_long_name;
+		msg += ".";
 		GUI::addChat(0, msg.c_str());
 
 		//send client spawn request

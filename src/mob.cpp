@@ -24,8 +24,8 @@ Mob::Mob(Spawn_Struct* spawn, WLDSkeleton* skele, MobPosition* pos, WLDSkeleton*
 	mLeftHandNode(nullptr),
 	mShieldNode(nullptr)
 {
-	initSkeleton(skele, pos, head);
 	readSpawnStruct(spawn);
+	initSkeleton(skele, pos, head);
 
 	setHeading(Util::unpackHeading(spawn->heading));
 }
@@ -83,6 +83,11 @@ void Mob::initSkeleton(WLDSkeleton* skele, MobPosition* pos, WLDSkeleton* head)
 		mHeadSkeleWLD = nullptr;
 	}
 
+	//should be placed above the HEAD_POINT node rather than the base node
+	//default font is pretty terrible
+	core::stringw wide_name(mDisplayName);
+	gRenderer.getSceneManager()->addBillboardTextSceneNode(nullptr, wide_name.c_str(), mNode,
+		core::dimension2df(5.0f, 2.0f), core::vector3df(0, 5.0f, 0));
 }
 
 Mob::~Mob()
@@ -100,12 +105,7 @@ void Mob::setName(const char* name)
 		return;
 	snprintf(mRawName, 64, "%s", name);
 	std::string displayName = Util::getDisplayName(name);
-	snprintf(mDisplayName, 64, "%s", displayName.c_str()); //not sure if there's any use in recording this
-	core::stringw wide_name(displayName.c_str());
-	//should be placed above the HEAD_POINT node rather than the base node
-	//default font is pretty terrible
-	gRenderer.getSceneManager()->addBillboardTextSceneNode(nullptr, wide_name.c_str(), mNode,
-		core::dimension2df(5.0f, 2.0f), core::vector3df(0, 5.0f, 0));
+	snprintf(mDisplayName, 64, "%s", displayName.c_str());
 }
 
 void Mob::setHeading(float heading)
