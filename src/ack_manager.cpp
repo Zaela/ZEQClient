@@ -291,8 +291,6 @@ bool AckManager::resendUnackedPackets()
 		++i;
 	}
 
-	printf("Resending unacked: %i\n", count);
-
 	return count > 0;
 }
 
