@@ -65,10 +65,6 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 			uint8 size = data[pos];
 			++pos;
 
-			uint32 avail = len - pos;
-			if (size > avail)
-				size = avail;
-
 			readPacket(data + pos, size, true);
 			pos += size;
 		}
@@ -121,7 +117,7 @@ bool PacketReceiver::validateCompletePacket(byte*& packet, uint32& len)
 	if (!NetworkCRC::validatePacket(packet, len, mCRCKey))
 		return false;
 	//attempt to decompress
-	if (!Compression::decompressPacket(packet, len))
+	if (!mIsLogin && !Compression::decompressPacket(packet, len))
 		return false;
 	return true;
 }

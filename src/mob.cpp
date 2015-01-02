@@ -96,7 +96,8 @@ Mob::~Mob()
 		delete mSkeletonWLD;
 	if (mHeadSkeleWLD)
 		delete mHeadSkeleWLD;
-	mNode->removeAll();
+	if (mNode)
+		mNode->removeAll();
 }
 
 void Mob::setName(const char* name)
@@ -124,8 +125,9 @@ void Mob::setHeading(float heading)
 		else
 			heading -= 270.0f;
 	}
+
 	if(mNode)
-	mNode->setRotation(core::vector3df(0.0f, heading, 0.0f));
+		mNode->setRotation(core::vector3df(0.0f, heading, 0.0f));
 }
 
 void Mob::animate(float delta)
@@ -173,16 +175,15 @@ void Mob::updatePosition(MobPositionUpdate_Struct* update)
 			Util::EQ13PreciseToFloat(update->delta_z));*/
 
 		*cur = pos;
-		mNode->setPosition(pos);
+		if (mNode)
+			mNode->setPosition(pos);
 		setHeading(heading);
 	}
 	else
 	{
 		//we're teleporting
 		if(mNode)
-		{
-		mNode->setPosition(pos);
-		}
+			mNode->setPosition(pos);
 		setHeading(Util::unpackHeading(update->heading));
 	}
 }
