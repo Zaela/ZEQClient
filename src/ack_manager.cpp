@@ -55,16 +55,16 @@ void AckManager::sendKeepAliveAck()
 	sendAck(mExpectedSeq - 1);
 }
 
-void AckManager::checkInboundPacket(byte* packet, uint32 len)
+void AckManager::checkInboundPacket(byte* packet, uint32 len, uint32 off)
 {
-	uint16 seq = toHostShort(*(uint16*)(packet + 2));
+	uint16 seq = toHostShort(*(uint16*)(packet + off));
 
 	switch (compareSequence(seq, mExpectedSeq))
 	{
 	case SEQUENCE_PRESENT:
 	{
 		//this is our next expected packet, queue it
-		mReadPacketQueue.push(new ReadPacket(packet + 4, len - 4)); //may want to handle the +4 -4 at the end for all packets equally to avoid intermediate allocations
+		mReadPacketQueue.push(new ReadPacket(packet + 2 + off, len - 2 - off)); //may want to handle the +4 -4 at the end for all packets equally to avoid intermediate allocations
 		++mExpectedSeq;
 		//check if we have any packets ahead of this one ready to be processed
 		checkAfterPacket();

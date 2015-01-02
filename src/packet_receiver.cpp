@@ -16,7 +16,7 @@ bool PacketReceiver::handleProtocol(uint32 len)
 void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 {
 	uint16 opcode = toHostShort(*(uint16*)data);
-
+	uint32 offset = 2;
 	if (opcode > 0xFF)
 	{
 		//raw packet, no protocol
@@ -55,10 +55,11 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Combined:
 	{
-		if (!fromCombined && !validateCompletePacket(data, len))
-			break;
 
-		uint32 pos = 2;
+		offset = validateCompletePacket(data, len, fromCombined);
+		if (!fromCombined && offset == 0xFF)
+			break;
+		uint32 pos = offset;
 		while (pos < len)
 		{
 			//8 bit packet length
@@ -76,15 +77,18 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Packet:
 	{
-		if (!fromCombined && !validateCompletePacket(data, len))
+
+		offset = validateCompletePacket(data, len, fromCombined);
+		if (!fromCombined && offset == 0xFF)
 			break;
 
-		mAckMgr->checkInboundPacket(data, len);
+		mAckMgr->checkInboundPacket(data, len, offset);
 		break;
 	}
 	case OP_Fragment:
 	{
-		if (!fromCombined && !validateCompletePacket(data, len))
+		offset = validateCompletePacket(data, len, fromCombined);
+		if (!fromCombined && offset == 0xFF)
 			break;
 
 		mAckMgr->checkInboundFragment(data, len);
@@ -92,10 +96,13 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 	case OP_Ack:
 	{
-		if (!fromCombined && !validateCompletePacket(data, len))
+		offset = validateCompletePacket(data, len, fromCombined);
+		if (!fromCombined && offset == 0xFF)
+			break;
+		if(offset == 0xFF)
 			break;
 
-		uint16 seq = toHostShort(*(uint16*)(data + 2));
+		uint16 seq = toHostShort(*(uint16*)(data + offset));
 		mAckMgr->receiveAck(seq);
 		break;
 	}
@@ -115,13 +122,26 @@ void PacketReceiver::readPacket(byte* data, uint32 len, bool fromCombined)
 	}
 }
 
-bool PacketReceiver::validateCompletePacket(byte*& packet, uint32& len)
+//signed int is offset for packet - 0xFF = INVALID
+signed int PacketReceiver::validateCompletePacket(byte*& packet, uint32& len, bool fromCombined)
 {
 	//check CRC before decompressing
-	if (!NetworkCRC::validatePacket(packet, len, mCRCKey))
-		return false;
+	if(!fromCombined)
+	{
+		if (!NetworkCRC::validatePacket(packet, len, mCRCKey))
+			return 0xFF;
+	}
 	//attempt to decompress
-	if (!Compression::decompressPacket(packet, len))
-		return false;
-	return true;
+	//if not unencrypted flag
+	if(packet[2] == 0x5a) //compressed
+	{
+		if (!Compression::decompressPacket(packet, len))
+			return 2;
+	}
+	else if(packet[2] == 0xa5) //Not compressed, single byte flag
+	{
+		return 3;
+	}
+
+	return 2;
 }

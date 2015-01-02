@@ -58,7 +58,7 @@ public:
 	void receiveAck(uint16 seq);
 	void sendAck(uint16 seq);
 	void sendKeepAliveAck();
-	void checkInboundPacket(byte* packet, uint32 len);
+	void checkInboundPacket(byte* packet, uint32 len, uint32 off = 2);
 	void checkInboundFragment(byte* packet, uint32 len);
 	void checkFragmentComplete();
 	void checkAfterPacket();
