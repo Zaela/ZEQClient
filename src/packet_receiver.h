@@ -22,7 +22,7 @@ private:
 	bool mIsDisconnected;
 
 private:
-	bool validateCompletePacket(byte*& packet, uint32& len);
+	signed int validateCompletePacket(byte*& packet, uint32& len, bool fromCombined = false);
 	void readPacket(byte* data, uint32 len, bool fromCombined = false);
 
 public:
