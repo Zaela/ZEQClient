@@ -1,7 +1,9 @@
 
 #include "world_connection.h"
+#include "gui.h"
 
 extern Renderer gRenderer;
+extern GUI gGUI;
 
 WorldConnection::WorldConnection(LoginConnection* login) :
 	Connection(login->getServer()->ip.c_str(), 9000),
@@ -123,7 +125,8 @@ bool WorldConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 
 		mMOTD = std::string((char*)data, len);
 		printf("Received MOTD: %s\n", mMOTD.c_str());
-		GUI::addChat(0, mMOTD.c_str());
+		gGUI.displayChat(12, mMOTD.c_str());
+		//GUI::addChat(0, mMOTD.c_str());
 		break;
 	}
 	case OP_SetChatServer:

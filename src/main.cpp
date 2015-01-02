@@ -19,6 +19,7 @@
 #include "translate.h"
 #include "eqstr.h"
 #include "rocket.h"
+#include "gui.h"
 
 #include "s3d.h"
 #include "wld.h"
@@ -29,6 +30,7 @@ Renderer gRenderer;
 FileLoader gFileLoader;
 Player gPlayer;
 MobManager gMobMgr;
+GUI gGUI;
 EqState g_EqState;
 
 void showError(const char* fmt, ...)

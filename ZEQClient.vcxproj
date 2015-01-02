@@ -86,6 +86,7 @@
     <ClCompile Include="src\compression.cpp" />
     <ClCompile Include="src\eqstr.cpp" />
     <ClCompile Include="src\file_loader.cpp" />
+    <ClCompile Include="src\gui.cpp" />
     <ClCompile Include="src\input.cpp" />
     <ClCompile Include="src\login_connection.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="src\exception.h" />
     <ClInclude Include="src\file_loader.h" />
     <ClInclude Include="src\file_stream.h" />
+    <ClInclude Include="src\gui.h" />
     <ClInclude Include="src\input.h" />
     <ClInclude Include="src\login_connection.h" />
     <ClInclude Include="src\memory_stream.h" />

@@ -2,11 +2,13 @@
 #include "zone_connection.h"
 #include "player.h"
 #include "renderer.h"
+#include "gui.h"
 
 extern MobManager gMobMgr;
 extern Renderer gRenderer;
 extern FileLoader gFileLoader;
 extern Player gPlayer;
+extern GUI gGUI;
 
 ZoneConnection::ZoneConnection(WorldConnection* world) :
 	Connection(world->getZoneServer()->ip, world->getZoneServer()->port),
@@ -109,10 +111,10 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		mAckMgr->sendKeepAliveAck();
 		gMobMgr.correctPrematureSpawns();
 
-		std::string msg = "Entering ";
+		Rocket::Core::String msg = "Entering ";
 		msg += nz->zone_long_name;
 		msg += ".";
-		GUI::addChat(0, msg.c_str());
+		gGUI.displayChat(0, msg);
 
 		//send client spawn request
 		Packet packet(0, OP_ReqClientSpawn, mAckMgr);
@@ -238,7 +240,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		EQStr::formatString(str, fm->string_id, fm->message);
 		printf("%s\n", str.c_str());
 
-		GUI::addChat(fm->type, str.c_str());
+		gGUI.displayChat(fm->type, str.c_str());
 
 		break;
 	}
@@ -252,7 +254,7 @@ bool ZoneConnection::processPacket(uint16 opcode, byte* data, uint32 len)
 		const char* msg = sm->sayer + strlen(speaker) + 13;
 		printf("OP_SpecialMesg: speaker %s says %s\n", speaker, msg);
 
-		GUI::addChat(sm->msg_type, msg);
+		gGUI.displayChat(sm->msg_type, msg);
 
 		break;
 	}

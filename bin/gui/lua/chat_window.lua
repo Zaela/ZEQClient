@@ -1,9 +1,6 @@
 
 local r = r
-local math = math
+local gGUI = gGUI
 
-function addChat(channel, str)
-	local chat = r.document:GetElementById("chattext")
-	chat.inner_rml = chat.inner_rml .. str .. "<br/>"
-	chat.scroll_top = math.huge
-end
+local chat = r.document:GetElementById("chattext")
+gGUI.registerChatWindow(chat, gGUI.chat_channels.CHANNEL_ALL)

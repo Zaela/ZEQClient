@@ -23,26 +23,16 @@ namespace Compression
 	bool decompressPacket(byte*& data, uint32& len)
 	{
 		//data is Socket.mRecvBuf; if decompressed, Compression::BUFFER; no delete in either case
-		if (len < 3)
-			return true;
-
-		if (data[2] == 0xA5) //"not compressed" flag
-		{
-			memmove(data + 2, data + 3, --len - 2);
-		}
-		else if (data[2] == 'Z')
-		{
-			uint16 opcode = *(uint16*)data;
-			//skip the opcode and compression flag
-			data += 3;
-			len -= 3;
-			//decompress, leaving the first 2 bytes of the buffer clear
-			if (!decompressBlock(data, len, 2))
-				return false;
-			//write the opcode back to the first 2 bytes
-			*(uint16*)data = opcode;
-			len += 2;
-		}
+		uint16 opcode = *(uint16*)data;
+		//skip the opcode and compression flag
+		data += 3;
+		len -= 3;
+		//decompress, leaving the first 2 bytes of the buffer clear
+		if (!decompressBlock(data, len, 2))
+			return false;
+		//write the opcode back to the first 2 bytes
+		*(uint16*)data = opcode;
+		len += 2;
 		return true;
 	}
 

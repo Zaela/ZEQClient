@@ -53,9 +53,4 @@ namespace Lua
 	Rocket::Core::ElementDocument* initGUIDocument(const char* path);
 }
 
-namespace GUI
-{
-	void addChat(int channel, const char* message);
-}
-
 #endif

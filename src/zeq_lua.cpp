@@ -1,5 +1,8 @@
 
 #include "zeq_lua.h"
+#include "gui.h"
+
+extern GUI gGUI;
 
 static lua_State* L;
 
@@ -67,6 +70,8 @@ namespace Lua
 #else
 		luaL_dostring(L, "Unix = true");
 #endif
+
+		gGUI.loadLuaFunctions(L);
 
 		//load config file
 		fileToTable(CONFIG_FILE, CONFIG_TABLE);
@@ -286,17 +291,3 @@ namespace Lua
 	}
 }
 
-namespace GUI
-{
-	void addChat(int channel, const char* message)
-	{
-		lua_getglobal(L, "addChat");
-		lua_pushinteger(L, channel);
-		lua_pushstring(L, message);
-		if (lua_pcall(L, 2, 0, 0) != 0)
-		{
-			printf("Error: %s\n", lua_tostring(L, -1));
-			lua_pop(L, 1);
-		}
-	}
-}
